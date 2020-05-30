@@ -75,8 +75,7 @@ export default {
   display: flex !important;
   .about {
     width: 100%;
-    height: 10000px;
-
+    height: 1000px;
     transition: all 0.3s ease-in-out;
     color: black;
     background: white;
