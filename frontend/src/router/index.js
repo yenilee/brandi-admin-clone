@@ -3,9 +3,12 @@ import VueRouter from 'vue-router'
 import Login from '../views/Login/Login.vue'
 import SignUp from '../views/SignUp/SignUp.vue'
 import Main from '../views/Main.vue'
-import Product from '../components/Product/Product.vue'
+import Product from '../components/Product.vue'
 import ProductList from '../components/Product/ProductList.vue'
 import ProductRegist from '../components/Product/ProductRegist.vue'
+import Seller from '../components/Seller.vue'
+import SellerList from '../components/Seller/SellerList.vue'
+import SellerRegist from '../components/Seller/SellerRegist.vue'
 
 Vue.use(VueRouter)
 
@@ -32,16 +35,29 @@ const routes = [
         children: [
           {
             path: 'productlist',
-            name: 'productlist',
-            component: ProductList
+            component: ProductList,
           },
           {
-            path: 'productregist',
-            name: 'productregist',
-            component: ProductRegist
-          }
+            path: 'productRegist',
+            component: ProductRegist,
+          },
         ]
-      }
+      },
+      {
+        path: 'seller',
+        name: 'seller',
+        component: Seller,
+        children: [
+          {
+            path: 'sellerlist',
+            component: SellerList,
+          },
+          {
+            path: 'sellerregist',
+            component: SellerRegist,
+          },
+        ]
+      },
     ],
   }
 

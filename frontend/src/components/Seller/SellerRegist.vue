@@ -1,5 +1,5 @@
 <template>
-  <div>here is prodcutlist page</div>
+  <div>here is sellerRegist page</div>
 </template>
 
 <script>

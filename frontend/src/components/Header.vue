@@ -22,6 +22,7 @@ export default {};
 
 <style lang="scss" scoped>
 .headerContainer {
+  position: fixed;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -29,6 +30,7 @@ export default {};
   height: 45px;
   background-color: #883b53;
   font-size: 13px;
+  z-index: 5;
   .logoBox {
     display: flex;
     margin-left: 30px;
@@ -50,7 +52,7 @@ export default {};
     }
     .urlBtn {
       background-color: white;
-      padding: 5px;
+      padding: 4px 10px;
       border-radius: 3px;
       margin-right: 20px;
       cursor: pointer;
