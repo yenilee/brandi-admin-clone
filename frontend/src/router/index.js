@@ -2,10 +2,10 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../views/Login/Login.vue'
 import SignUp from '../views/SignUp/SignUp.vue'
-import SellerRegist from '../views/ProductRegist/ProductRegist.vue'
-import SellerList from '../views/ProductList/ProductList.vue'
-import ProductRegist from '../views/ProductRegist/ProductRegist.vue'
-import ProductList from '../views/ProductList/ProductList.vue'
+import Main from '../views/Main.vue'
+import Product from '../components/Product/Product.vue'
+import ProductList from '../components/Product/ProductList.vue'
+import ProductRegist from '../components/Product/ProductRegist.vue'
 
 Vue.use(VueRouter)
 
@@ -16,30 +16,35 @@ const routes = [
     component: Login
   },
   {
-    path: '/SignUp',
+    path: '/signUp',
     name: 'SignUp',
     component: SignUp
   },
   {
-    path: '/SellerRegist',
-    name: 'SellerRegist',
-    component: SellerRegist
-  },
-  {
-    path: '/SellerList',
-    name: 'SellerList',
-    component: SellerList
-  },
-  {
-    path: '/ProductRegist',
-    name: 'ProductRegist',
-    component: ProductRegist
-  },
-  {
-    path: '/ProductList',
-    name: 'ProductList',
-    component: ProductList
-  },
+    path: '/main',
+    name: 'Main',
+    component: Main,
+    children: [
+      {
+        path: 'product',
+        name: 'product',
+        component: Product,
+        children: [
+          {
+            path: 'productlist',
+            name: 'productlist',
+            component: ProductList
+          },
+          {
+            path: 'productregist',
+            name: 'productregist',
+            component: ProductRegist
+          }
+        ]
+      }
+    ],
+  }
+
 ]
 
 const router = new VueRouter({
