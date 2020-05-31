@@ -10,7 +10,7 @@
       <v-list dense>
         <v-container></v-container>
 
-        <template v-for="item in items">
+        <template v-for="item in menuDatas">
           <v-list-group
             v-if="item.children"
             :key="item.text"
@@ -47,12 +47,12 @@
 </template>
 
 <script>
-import { items } from "../config/Itmes";
+import { menuDatas } from "../config/MenuData.js";
 export default {
   data() {
     return {
       drawer: true,
-      items: items,
+      menuDatas: menuDatas,
       right: false,
       miniVariant: false
     };

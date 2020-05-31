@@ -1,4 +1,4 @@
-export const items = [
+export const menuDatas = [
   {
     icon: 'mdi-chevron-up',
     'icon-alt': 'mdi-chevron-down',
