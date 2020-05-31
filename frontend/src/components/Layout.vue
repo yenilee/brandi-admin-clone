@@ -5,7 +5,7 @@
       clipped
       app
       dark
-      style="width: 256px; height: unset;border:1px solid red; position:unset; max-height: unset; top:unset"
+      style="width: 256px; height: unset; position:unset; max-height: unset; top:unset"
     >
       <v-list dense>
         <v-container></v-container>
@@ -21,7 +21,7 @@
             <!-- More 버튼 생성 -->
             <template v-slot:activator>
               <v-list-item-content>
-                <v-list-item-title style="font-weight: 300;">{{item.text}}</v-list-item-title>
+                <v-list-item-title style="font-size: 14px;font-weight: 400;">{{item.text}}</v-list-item-title>
               </v-list-item-content>
             </template>
 
@@ -32,7 +32,9 @@
               @click="detailPage(item.children[i].path)"
               link
             >
-              <v-list-item-title style="padding-left : 15px; font-weight: 300;">{{child.text}}</v-list-item-title>
+              <v-list-item-title
+                style="padding-left : 14px;font-size: 14px;font-weight: 400;"
+              >{{child.text}}</v-list-item-title>
             </v-list-item>
           </v-list-group>
         </template>
@@ -74,11 +76,16 @@ export default {
   padding-top: 45px;
   display: flex !important;
   .about {
-    width: 100%;
-    height: 1000px;
+    width: 1200px !important;
     transition: all 0.3s ease-in-out;
     color: black;
     background: white;
+    .container {
+      width: 1200px !important;
+      overflow: hidden;
+      margin: 0 0 50px 0 !important;
+      max-width: unset !important;
+    }
   }
   .non {
     height: calc(100vh - 48px);

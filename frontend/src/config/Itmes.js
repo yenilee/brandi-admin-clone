@@ -88,11 +88,11 @@ export const items = [
     children: [
       {
         text: '셀러 정보 관리',
-        path: 'seller/sellerlist'
+        path: 'seller/sellerregist'
       },
       {
         text: '셀러 계정 관리',
-        path: 'seller/sellerregist'
+        path: 'seller/sellerlist'
       },
     ],
   },
