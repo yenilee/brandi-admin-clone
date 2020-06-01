@@ -56,3 +56,25 @@ class UserDao:
         cursor.execute(check_user_sql,new_user)
         user = cursor.fetchone()
         return user
+
+    def check_user(self, get_user, db_connection):
+        cursor = db_connection.cursor()
+
+        check_user_sql = """
+        select id, user from seller_keys where user = %(user)s
+        """
+
+        cursor.execute(check_user_sql, get_user)
+        user = cursor.fetchone()
+        return user 
+
+    def check_password(self, get_user, db_connection):
+        cursor = db_connection.cursor()
+        check_pw_sql = """
+        select password, authority_id from sellers where seller_key_id = (select id from seller_keys where user = %(user)s)
+        """
+        
+        cursor.execute(check_pw_sql, get_user)
+        password = cursor.fetchone()
+        return password
+
