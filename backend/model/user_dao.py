@@ -19,6 +19,8 @@ class UserDao:
                 insert into sellers (
                     seller_key_id,
                     authority_id,
+                    seller_attribute_id,
+                    seller_status_id,
                     password,
                     phone_number,
                     name,
@@ -30,6 +32,8 @@ class UserDao:
                     end_date
                     ) values (
                         (select id from seller_keys where user = %(user)s),
+                        1,
+                        %(seller_attribute_id)s,
                         1,
                         %(password)s,
                         %(phone_number)s,
