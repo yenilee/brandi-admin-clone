@@ -1,7 +1,9 @@
 {
+  "number_of_users": "7,596",
+  "number_of_pages": "750",
   "seller_list": [
     {
-      "meta_data_id": 1,
+      "meta_data_id": "0",
       "seller_id": "testtesthi",
       "seller_eng_name": "sungjun",
       "seller_kor_name": "진성준",
@@ -15,9 +17,14 @@
       "detail_url": "http://www.naver.com",
       "created_at": "2020-05-29 19: 21: 25",
       "seller_actions": {
+        "1": "입점 승인",
+        "2": "입점 거절",
+        "3": "휴점 신청",
         "4": "휴점신청",
         "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
+        "6": "퇴점 해제 처리",
+        "7": "퇴점 철회 처리",
+        "8": "퇴점 철회 처리"
       }
     },
     {
@@ -26,9 +33,9 @@
       "seller_id": "testtesthi",
       "manager_infos_phone_number": "010-5338-7244",
       "manager_infos_email": null,
-      "manager_infos_name": "진성준",
-      "seller_eng_name": "sungjun",
-      "seller_kor_name": "진성준",
+      "manager_infos_name": "이예은",
+      "seller_eng_name": "ye",
+      "seller_kor_name": "이예은",
       "detail_number_of_products": 2,
       "seller_회원번호": 426107,
       "seller_status": "퇴점대기",

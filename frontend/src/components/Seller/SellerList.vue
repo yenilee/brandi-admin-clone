@@ -16,19 +16,124 @@
         <i class="xi-list-dot"></i>
         <div>셀러 회원 리스트</div>
       </div>
-      <div class="tableScroll">
+      <div class="tableOut">
         <template>
-          <v-data-table
-            :headers="headers"
-            :items="testData"
-            :items-per-page="10"
-            class="elevation-1"
-          ></v-data-table>
+          <v-simple-table>
+            <template v-slot:default>
+              <div class="tableIn">
+                <thead>
+                  <tr>
+                    <th class="text-left">번호</th>
+                    <th class="text-left">셀러아이디</th>
+                    <th class="text-left">영문이름</th>
+                    <th class="text-left">한글이름</th>
+                    <th class="text-left">회원번호</th>
+                    <th class="text-left">담당자이름</th>
+                    <th class="text-left">셀러상태</th>
+                    <th class="text-left">담당자연락처</th>
+                    <th class="text-left">담당자이메일</th>
+                    <th class="text-left">셀러속성</th>
+                    <th class="text-left">상품개수</th>
+                    <th class="text-left">URL</th>
+                    <th class="text-left">등록일시</th>
+                    <th class="text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.meta_data_id"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.seller_id"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.seller_eng_name"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.seller_kor_name"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.seller_number"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.manager_infos_name"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.seller_status"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="manager_infos_phone_number"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input v-on:keyup.enter="search()" v-model="manager_infos_email" type="text" />
+                    </td>
+                    <td>
+                      <input v-on:keyup.enter="search()" v-model="detail_attribute" type="text" />
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr v-for="item in infoDatas" :key="item.name">
+                    <td>{{ item.meta_data_id }}</td>
+                    <td>{{ item.seller_id }}</td>
+                    <td>{{ item.seller_eng_name }}</td>
+                    <td>{{ item.seller_kor_name }}</td>
+                    <td>{{ item.seller_회원번호 }}</td>
+                    <td>{{ item.manager_infos_name }}</td>
+                    <td>{{ item.seller_status }}</td>
+                    <td>{{ item.manager_infos_phone_number }}</td>
+                    <td>{{ item.manager_infos_email }}</td>
+                    <td>{{ item.detail_attribute }}</td>
+                    <td>{{ item.detail_number_of_products }}</td>
+                    <td>{{ item.detail_url }}</td>
+                    <td>{{ item.created_at }}</td>
+                    <td>{{ item.seller_actions }}</td>
+                  </tr>
+                </tbody>
+              </div>
+            </template>
+          </v-simple-table>
         </template>
       </div>
     </div>
   </div>
 </template>
+ 
 
 
 <script>
@@ -40,14 +145,34 @@ export default {
   data() {
     return {
       headers: sellerListHeaders,
-      testData: []
+      infoDatas: [],
+      searchDatas: {
+        meta_data_id: "",
+        seller_id: "",
+        seller_eng_name: "",
+        seller_kor_name: "",
+        seller_number: "",
+        manager_infos_name: "",
+        seller_status: "",
+        manager_infos_phone_number: "",
+        manager_infos_email: "",
+        detail_attribute: ""
+      }
     };
   },
 
+  //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
     axios
       .get("http://localhost:8080/test.json")
-      .then(response => (this.testData = response.data.seller_list));
+      .then(response => (this.infoDatas = response.data.seller_list));
+  },
+  methods: {
+    search: function() {
+      //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
+      //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
+      alert(this.searchDatas.meta_data_id);
+    }
   }
 };
 </script>
@@ -87,6 +212,12 @@ export default {
     border: 1px solid #d3d3d3;
     background-color: white;
     margin: 0 15px;
+    input {
+      width: 100%;
+      border: 1px solid lightgray;
+
+      border-radius: 3px;
+    }
     .tableTitle {
       display: flex;
       align-items: center;
@@ -98,19 +229,31 @@ export default {
     }
     .xi-list-dot {
       font-size: 18px;
-      margin: 0 8px;
+      margin: 0 15px;
     }
-    .tableScroll {
-      width: 1169px;
-      overflow: auto !important;
-
+    .tableOut {
+      min-width: 1169px;
+      overflow: auto;
       border: 1px solid lightgray;
-      .elevation-1 {
-        min-width: 1700px;
-        margin: 40px 5px;
-        border: 1px solid green;
+      .tableIn {
+        white-space: nowrap;
+        min-width: 100%;
+        padding: 0 !important;
+        height: unset !important;
       }
     }
+  }
+  th,
+  td {
+    text-align: left;
+    height: 39px !important;
+    padding: 8px;
+  }
+  th {
+    font-weight: 600;
+    color: black !important;
+    font-size: 13px !important;
+    background-color: #eee;
   }
 }
 </style>

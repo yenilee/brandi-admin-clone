@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import { items } from "../config/Itmes";
+import { items } from "../config/Items";
 export default {
   data() {
     return {
