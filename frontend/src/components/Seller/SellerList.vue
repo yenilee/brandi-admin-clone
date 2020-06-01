@@ -20,7 +20,7 @@
         <template>
           <v-data-table
             :headers="headers"
-            :items="desserts"
+            :items="testData"
             :items-per-page="10"
             class="elevation-1"
           ></v-data-table>
@@ -32,36 +32,22 @@
 
 
 <script>
+// sellerlist에 들어갈 header들을 config에서 관리하고 import 했습니다.
+import { sellerListHeaders } from "../../config/SellerListDatas";
+import axios from "axios";
+
 export default {
   data() {
     return {
-      headers: [
-        { text: "번호", value: "name" },
-        { text: "셀러이아디", value: "calories" },
-        { text: "영문이름", value: "iron" },
-        { text: "한글이름", value: "iron" },
-        { text: "회원번호", value: "iron" },
-        { text: "담당자이름", value: "iron" },
-        { text: "셀러상태", value: "iron" },
-        { text: "담당자연락처", value: "iron" },
-        { text: "담당자이메일", value: "calories" },
-        { text: "셀러속성", value: "iron" },
-        { text: "상품개수", value: "iron" },
-        { text: "URL", value: "protein" },
-        { text: "등록일시", value: "iron" },
-        { text: "Actions", value: "iron" }
-      ],
-      desserts: [
-        {
-          name: "1",
-          calories: 159,
-          fat: 9.0,
-          carbs: 24,
-          protein: <input type="text" />,
-          iron: "naver.com"
-        }
-      ]
+      headers: sellerListHeaders,
+      testData: []
     };
+  },
+
+  mounted: function() {
+    axios
+      .get("http://localhost:8080/test.json")
+      .then(response => (this.testData = response.data.seller_list));
   }
 };
 </script>
@@ -120,7 +106,7 @@ export default {
 
       border: 1px solid lightgray;
       .elevation-1 {
-        min-width: 1200px;
+        min-width: 1700px;
         margin: 40px 5px;
         border: 1px solid green;
       }
