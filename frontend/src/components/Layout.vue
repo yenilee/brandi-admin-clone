@@ -1,7 +1,6 @@
 <template>
   <div class="main-container">
     <v-navigation-drawer
-      v-model="drawer"
       clipped
       app
       dark
@@ -40,14 +39,14 @@
         </template>
       </v-list>
     </v-navigation-drawer>
-    <div :class="mainPageLayout">
+    <div class="about">
       <slot></slot>
     </div>
   </div>
 </template>
 
 <script>
-import { items } from "../config/Itmes";
+import { items } from "../config/Items";
 export default {
   data() {
     return {
@@ -56,11 +55,6 @@ export default {
       right: false,
       miniVariant: false
     };
-  },
-  computed: {
-    mainPageLayout() {
-      return this.drawer ? "about" : "non";
-    }
   },
   methods: {
     detailPage(path) {
@@ -74,27 +68,20 @@ export default {
 .main-container {
   height: 100%;
   padding-top: 45px;
-  display: flex !important;
+  display: flex;
   .about {
-    width: 1200px !important;
-    transition: all 0.3s ease-in-out;
+    width: calc(100vw - 256px);
+    height: 100vh;
     color: black;
     background: white;
     .container {
-      width: 1200px !important;
+      width: 100%;
       overflow: hidden;
       margin: 0 0 50px 0 !important;
-      max-width: unset !important;
+      max-width: unset;
     }
   }
-  .non {
-    height: calc(100vh - 48px);
-    width: 100%;
-    margin-top: 48px;
-    margin-left: 0;
-    color: black;
-    background: white;
-  }
+
   .v-icon {
     font-size: 18px;
     color: gray;
