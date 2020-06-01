@@ -1,16 +1,20 @@
 import bcrypt
 import jwt
 
-from flask import jsonify
+from flask  import jsonify
 from config import SECRET_KEY, ALGORITHM
 
 class UserService:
 
     def __init__(self, user_dao, config):
         self.user_dao = user_dao
-        self.config = config
+        self.config   = config
 
     def create_new_user(self, new_user, db_connection):
+        """
+        ef
+        """
+
         user_count = self.user_dao.check_user_exists(new_user, db_connection)
         
         if not user_count[0] == 0:

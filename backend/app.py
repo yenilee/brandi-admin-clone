@@ -1,10 +1,10 @@
-from flask      import Flask
-from flask_cors import CORS
+from flask                      import Flask
+from flask_cors                 import CORS
 
-from config     import db
-from model.user_dao import UserDao
-from service.user_service    import UserService
-from controller    import create_endpoints
+from config                     import db
+from model.user_dao             import UserDao
+from service.user_service       import UserService
+from controller.user_controller import create_user_endpoints
 
 class Services:
     pass
