@@ -1,7 +1,7 @@
 from flask      import jsonify, request
 from connection import get_connection
 
-def create_endpoints(app, services):
+def create_user_endpoints(app, services):
     user_service = services.user_service
 
     @app.route('/sign-up', methods=['POST'])
