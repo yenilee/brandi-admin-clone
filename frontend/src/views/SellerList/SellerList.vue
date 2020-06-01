@@ -13,10 +13,37 @@
     </div>
     <div class="tableBox">
       <div class="tableTitle">
-        <i class="xi-list-dot"></i>
-        <div>셀러 회원 리스트</div>
+        <div class="leftTitle">
+          <i class="xi-list-dot"></i>
+          <div>셀러 회원 리스트</div>
+        </div>
+
+        <div class="excelBtn">
+          <i class="xi-share">액셀 다운로드</i>
+        </div>
       </div>
+
       <div class="tableOut">
+        <div class="pageContainer">
+          <span>Page</span>
+          <button>
+            <i class="xi-angle-left-min"></i>
+          </button>
+          <input type="text" />
+          <button>
+            <i class="xi-angle-right-min"></i>
+          </button>
+          <span>of {{pagesData}} | View</span>
+          <select name="cars" id="cars">
+            <option value="volvo">10</option>
+            <option value="saab">20</option>
+            <option value="opel">50</option>
+            <option value="audi">150</option>
+          </select>
+          <span>records Found total {{usersData}} records</span>
+        </div>
+
+        <!-- 테이블 시작 부분입니다. -->
         <template>
           <v-simple-table>
             <template v-slot:default>
@@ -93,15 +120,23 @@
                     <td>
                       <input
                         v-on:keyup.enter="search()"
-                        v-model="manager_infos_phone_number"
+                        v-model="searchDatas.manager_infos_phone_number"
                         type="text"
                       />
                     </td>
                     <td>
-                      <input v-on:keyup.enter="search()" v-model="manager_infos_email" type="text" />
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.manager_infos_email"
+                        type="text"
+                      />
                     </td>
                     <td>
-                      <input v-on:keyup.enter="search()" v-model="detail_attribute" type="text" />
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.detail_attribute"
+                        type="text"
+                      />
                     </td>
                     <td></td>
                     <td></td>
@@ -122,13 +157,34 @@
                     <td>{{ item.detail_number_of_products }}</td>
                     <td>{{ item.detail_url }}</td>
                     <td>{{ item.created_at }}</td>
-                    <td>{{ item.seller_actions }}</td>
+                    <td>
+                      <!-- "seller_actions"의 키를 들고와서 비교에 따라 표현 -->
+                      <button v-for="action in item.seller_actions" :key="action">{{ action }}</button>
+                    </td>
                   </tr>
                 </tbody>
               </div>
             </template>
           </v-simple-table>
         </template>
+        <div class="pageContainer">
+          <span>Page</span>
+          <button>
+            <i class="xi-angle-left-min"></i>
+          </button>
+          <input type="text" />
+          <button>
+            <i class="xi-angle-right-min"></i>
+          </button>
+          <span>of {{pagesData}} | View</span>
+          <select name="cars" id="cars">
+            <option value="volvo">10</option>
+            <option value="saab">20</option>
+            <option value="opel">50</option>
+            <option value="audi">150</option>
+          </select>
+          <span>records Found total {{usersData}} records</span>
+        </div>
       </div>
     </div>
   </div>
@@ -137,15 +193,17 @@
 
 
 <script>
-// sellerlist에 들어갈 header들을 config에서 관리하고 import 했습니다.
-import { sellerListHeaders } from "../../config/SellerListDatas";
 import axios from "axios";
+import { sellerListHeaders } from "../../config/SellerListDatas";
+import { URL } from "../../config/urlConfig";
 
 export default {
   data() {
     return {
       headers: sellerListHeaders,
       infoDatas: [],
+      usersData: null,
+      pagesData: null,
       searchDatas: {
         meta_data_id: "",
         seller_id: "",
@@ -160,12 +218,13 @@ export default {
       }
     };
   },
-
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
-    axios
-      .get("http://localhost:8080/test.json")
-      .then(response => (this.infoDatas = response.data.seller_list));
+    axios.get(`${URL}/sellerList.json`).then(response => {
+      this.infoDatas = response.data.seller_list;
+      this.usersData = response.data.number_of_users;
+      this.pagesData = response.data.number_of_pages;
+    });
   },
   methods: {
     search: function() {
@@ -179,7 +238,6 @@ export default {
 <style lang="scss" scoped>
 .tableContainer {
   padding-top: 35px;
-  width: 100%;
   .slTitleBox {
     padding: 0 20px;
     display: flex;
@@ -208,38 +266,90 @@ export default {
     padding-left: 20px;
     margin-bottom: 10px;
   }
+  .pageContainer {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    margin: 5px 15px;
+    span,
+    button,
+    input,
+    select {
+      padding: 8px;
+      margin-right: 10px;
+      border-radius: 3px;
+    }
+    button,
+    select {
+      border: 1px solid lightgray;
+    }
+    select {
+      width: 80px;
+    }
+    input {
+      width: 50px !important;
+    }
+  }
   .tableBox {
     border: 1px solid #d3d3d3;
     background-color: white;
     margin: 0 15px;
+    width: calc(100% - 300px);
+    border-radius: 5px;
+
     input {
       width: 100%;
       border: 1px solid lightgray;
-
       border-radius: 3px;
     }
     .tableTitle {
       display: flex;
+      justify-content: space-between;
       align-items: center;
       height: 42px;
 
       background-color: #eee;
       font-size: 16px;
       color: #333;
+      .leftTitle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .excelBtn {
+        margin-right: 15px;
+        color: #fff;
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+        padding: 4px 10px;
+        font-size: 14px;
+        font-weight: 800;
+        line-height: 1.42857143;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 4px;
+      }
     }
     .xi-list-dot {
       font-size: 18px;
       margin: 0 15px;
     }
     .tableOut {
-      min-width: 1169px;
-      overflow: auto;
-      border: 1px solid lightgray;
+      min-width: 100%;
       .tableIn {
+        width: calc(100vw - 335px);
+        overflow: auto;
         white-space: nowrap;
-        min-width: 100%;
-        padding: 0 !important;
-        height: unset !important;
+        margin: 0 15px;
+        border: 1px solid lightgray;
+        button {
+          padding: 5px;
+          color: #fff;
+          background-color: #5cb85c;
+          border-color: #4cae4c;
+          border-radius: 3px;
+          margin-left: 5px;
+        }
       }
     }
   }
@@ -247,7 +357,10 @@ export default {
   td {
     text-align: left;
     height: 39px !important;
-    padding: 8px;
+    padding: 12px 8px 8px 8px;
+    border: 1px solid #ddd;
+    border-left-width: 0 !important;
+    border-bottom-width: 0 !important;
   }
   th {
     font-weight: 600;
