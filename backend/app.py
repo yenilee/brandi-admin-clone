@@ -4,7 +4,7 @@ from flask_cors import CORS
 from config     import db
 from model.user_dao import UserDao
 from service.user_service    import UserService
-from view       import create_endpoints
+from controller    import create_endpoints
 
 class Services:
     pass
