@@ -1,7 +1,6 @@
 from flask      import Flask
 from flask_cors import CORS
 
-
 from config     import db
 from model.user_dao import UserDao
 from service.user_service    import UserService
