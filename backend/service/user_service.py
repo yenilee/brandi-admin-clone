@@ -30,15 +30,12 @@ class UserService:
         user = self.user_dao.check_user(get_user, db_connection)
         password = self.user_dao.check_password(get_user, db_connection)
 
-        print(user)
-        print(password)
-
         if bcrypt.checkpw(get_user['password'].encode('utf-8'), password[0].encode('utf-8')):
             token = jwt.encode({'user_id': user[0], 'authority_id' : password[1] }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
             access_token = token.decode('utf-8')
             return jsonify({'token' : access_token}), 200
-        return jsonify({'message' : 'INVALID ACCESS'}), 400
 
+        return jsonify({'message' : 'INVALID ACCESS'}), 400
 
 
 

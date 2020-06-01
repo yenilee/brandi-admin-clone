@@ -11,11 +11,11 @@ def create_endpoints(app, services):
         try:
             if db_connection:
                 new_user = user_service.create_new_user(new_user, db_connection)
-                db_connection.commit() #위치모름
+                db_connection.commit()
                 return new_user
 
         finally:           
-            db_connection.close() # 커넥션 종료
+            db_connection.close()
 
     @app.route('/sign-in', methods=['POST'])
     def sign_in():
@@ -23,8 +23,7 @@ def create_endpoints(app, services):
         db_connection = get_connection()
         try:    
             if db_connection:
-                get_user = user_service.check_user(get_user, db_connection) 
-                db_connection.commit()  
+                get_user = user_service.check_user(get_user, db_connection)  
                 return get_user
 
         finally:
