@@ -45,6 +45,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
@@ -69,6 +70,28 @@ export default {
       }
       if (this.passwordValue.length === 0) {
         this.passwordState = false;
+      }
+      if (this.passwordState && this.loginState) {
+        axios
+          .post("http://192.168.7.40:5000/sign-in", {
+            method: "POST",
+            user: this.loginValue,
+            password: this.passwordValue
+          })
+          .then(response => {
+            if (response.data.token) {
+              console.log("로그인 성공");
+              console.log(response.data.token);
+              localStorage.setItem("token", response.data.token);
+              this.$router.push("/main");
+            } else {
+              alert("아이디 또는 비밀번호가 다릅니다.");
+            }
+          })
+          .catch(err => {
+            alert("로그인 실패");
+            console.error(err);
+          });
       }
     },
 

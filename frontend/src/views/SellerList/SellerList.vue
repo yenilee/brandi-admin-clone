@@ -34,11 +34,11 @@
             <i class="xi-angle-right-min"></i>
           </button>
           <span>of {{pagesData}} | View</span>
-          <select name="cars" id="cars">
-            <option value="volvo">10</option>
-            <option value="saab">20</option>
-            <option value="opel">50</option>
-            <option value="audi">150</option>
+          <select name="page">
+            <option value="pageNum">10</option>
+            <option value="pageNum">20</option>
+            <option value="pageNum">50</option>
+            <option value="pageNum">150</option>
           </select>
           <span>records Found total {{usersData}} records</span>
         </div>
@@ -111,11 +111,17 @@
                       />
                     </td>
                     <td>
-                      <input
-                        v-on:keyup.enter="search()"
+                      <select
+                        class="sellerStatus"
+                        name="sellerStatus"
                         v-model="searchDatas.seller_status"
-                        type="text"
-                      />
+                      >
+                        <option value="status">입점대기</option>
+                        <option value="status">입점</option>
+                        <option value="status">퇴점</option>
+                        <option value="status">퇴점대기</option>
+                        <option value="status">휴점</option>
+                      </select>
                     </td>
                     <td>
                       <input
@@ -132,11 +138,15 @@
                       />
                     </td>
                     <td>
-                      <input
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas.detail_attribute"
-                        type="text"
-                      />
+                      <select class="sellerStatus" v-model="searchDatas.detail_attribute">
+                        <option value="status">쇼핑몰</option>
+                        <option value="status">마켓</option>
+                        <option value="status">로드샵</option>
+                        <option value="status">디자이너브랜드</option>
+                        <option value="status">제너럴브랜드</option>
+                        <option value="status">내셔널브랜드</option>
+                        <option value="status">뷰티</option>
+                      </select>
                     </td>
                     <td></td>
                     <td></td>
@@ -214,7 +224,8 @@ export default {
         seller_status: "",
         manager_infos_phone_number: "",
         manager_infos_email: "",
-        detail_attribute: ""
+        detail_attribute: "",
+        created_at: ""
       }
     };
   },
@@ -297,7 +308,8 @@ export default {
     width: calc(100% - 300px);
     border-radius: 5px;
 
-    input {
+    input,
+    .sellerStatus {
       width: 100%;
       border: 1px solid lightgray;
       border-radius: 3px;
