@@ -12,7 +12,7 @@ class Services:
 def create_app(test_config = None):
     app = Flask(__name__)
     app.debug = True
-    CORS(app)
+    CORS(app, resources={r'*' : {'origins': '*'}})
 
     if test_config is None:
         app.config.from_pyfile('config.py')
@@ -23,5 +23,5 @@ def create_app(test_config = None):
     services = Services
     services.user_service = UserService(user_dao, app.config)
 
-    create_endpoints(app, services)
+    create_user_endpoints(app, services)
     return app
