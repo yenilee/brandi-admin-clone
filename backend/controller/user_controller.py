@@ -33,14 +33,13 @@ def create_user_endpoints(app, services):
 
         """
 
-        db_connection = None
-        new_user = request.json       
+        db_connection = None    
         try:
             db_connection = get_connection()
+            new_user = request.json
             if db_connection:
                 sign_up_response = user_service.create_new_user(new_user, db_connection)
                 db_connection.commit()
-                db_connection.close()
                 return sign_up_response          
 
         except pymysql.err.InternalError:
@@ -51,7 +50,11 @@ def create_user_endpoints(app, services):
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500 
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
+
+        finally:
+            if db_connection:
+                db_connection.close() 
 
     @app.route('/sign-in', methods=['POST'])
     def sign_in():
@@ -84,4 +87,9 @@ def create_user_endpoints(app, services):
 
         except pymysql.err.OperationalError:
             return jsonify({'message' : 'DATABASE_ACCESS_DENIED'}), 500
+
+        finally:
+
+            if db_connection:
+                db_connection.close()
                

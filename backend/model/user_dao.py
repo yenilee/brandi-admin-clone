@@ -1,9 +1,13 @@
-from flask import jsonify
+
+#AUTO_COMMIT_SQL = "SET AUTOCOMMIT = FALSE;"
+#SAVE_COMMIT = "COMMIT;"
 
 class UserDao:
 
     def insert_seller_key(self, new_user, db_connection):
         cursor = db_connection.cursor()
+        #cursor.execute(AUTO_COMMIT_SQL)
+        #cursor.execute(SAVE_COMMIT)
 
         seller_key_insert_sql = """
         insert into seller_keys(
@@ -16,6 +20,8 @@ class UserDao:
 
     def insert_seller(self, new_user, db_connection):
         cursor = db_connection.cursor()
+        #cursor.execute(AUTO_COMMIT_SQL)
+        #cursor.execute(SAVE_COMMIT)
 
         seller_insert_sql =  """
                 insert into sellers (
