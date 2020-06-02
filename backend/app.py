@@ -6,12 +6,14 @@ from model.user_dao             import UserDao
 from service.user_service       import UserService
 from controller.user_controller import create_user_endpoints
 
+
 class Services:
     pass
 
 def create_app(test_config = None):
     app = Flask(__name__)
     app.debug = True
+    app.config['JSON_SORT_KEYS'] = False
     CORS(app, resources={r'*' : {'origins': '*'}})
 
     if test_config is None:
