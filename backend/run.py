@@ -1,7 +1,9 @@
 from app import create_app
 
-IP = '192.168.7.40'
+IP        = '192.168.7.40'
+REVIEW_IP = '10.250.2.195'
+LOCALHOST = 'localhost'
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host = 'localhost', port = 5000)
+    app.run(host = LOCALHOST, port = 5000)

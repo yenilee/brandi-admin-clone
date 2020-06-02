@@ -12,15 +12,18 @@ class UserService:
         self.config   = config
 
     def create_new_user(self, new_user, db_connection):
+
         try:
+            if not re.match(r'^[A-Za-z0-9][A-Za-z0-9_-]{4,20}$', new_user['user']):
+                return {'message' : 'ID_VALIDATION_ERROR'}, 400
+
             if not re.match(r'(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{7,20}$', new_user['password']):
                 return {'message' : 'PASSWORD_VALIDATION_ERROR'}, 400
 
             if not re.match(r'\d{3}-\d{3,4}-\d{4}$', new_user['phone_number']):
                 return {'message' : 'PHONE_NUMBER_VALIDATION_ERROR'}, 400
-            
-            user_count = self.user_dao.check_user_exists(new_user, db_connection)
-            
+
+            user_count = self.user_dao.check_user_exists(new_user, db_connection)            
             if not user_count[0] == 0:
                 return {'message' : 'USER_ALREADY_EXISTS'}, 400
 
@@ -30,8 +33,8 @@ class UserService:
             return "", 200
 
         except KeyError:
+            # db_connection.rollback()        
             return {'message' : 'KEY_ERROR'}, 400
-
 
     def check_user(self, get_user, db_connection):
         user_count = self.user_dao.check_user_exists(get_user, db_connection)

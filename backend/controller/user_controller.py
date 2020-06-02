@@ -3,9 +3,9 @@ import pymysql
 from flask      import request
 from connection import get_connection
 
-def create_user_endpoints(app, services):
-    user_service = services.user_service
-
+def create_user_endpoints(app, user_service):
+    user_service = user_service
+    
     @app.route('/sign-up', methods = ['POST'])
     def sign_up():
 
@@ -42,11 +42,11 @@ def create_user_endpoints(app, services):
                 db_connection.commit()
                 return sign_up_response          
 
-        except pymysql.err.InternalError:
+        except pymysql.err.InternalError as e:
 
             if db_connection: 
                 db_connection.rollback()      
-
+            print(e)
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
