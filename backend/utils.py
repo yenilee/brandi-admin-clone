@@ -1,7 +1,7 @@
 import jwt
 
 from functools import wraps
-from flask     import request, Response, g
+from flask     import request, Response
 from config    import SECRET_KEY, ALGORITHM
 
 def authorize(f):
@@ -19,9 +19,7 @@ def authorize(f):
             return '', 400
             
         user = payload['user_id']
-        g.user = user 
         auth = payload['authority_id']
-        g.auth = auth 
             
         return f(*args, **kwargs)
     return decorated_function()
