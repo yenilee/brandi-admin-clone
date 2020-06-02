@@ -1,7 +1,8 @@
 import bcrypt
 import jwt
+import json
 
-from flask import jsonify
+from flask  import jsonify
 from config import SECRET_KEY, ALGORITHM
 
 class UserService:
@@ -23,22 +24,22 @@ class UserService:
 
     def check_user(self, get_user, db_connection):
         user_count = self.user_dao.check_user_exists(get_user, db_connection)
+        try:
+            if user_count[0] == 0:
+                return jsonify({'message' : 'USER_DOES_NOT_EXIST'}), 400
 
-        if user_count[0] == 0:
-            return jsonify({'message' : 'USER_DOES_NOT_EXIST'}), 400
+            user = self.user_dao.check_user(get_user, db_connection)
+            password = self.user_dao.check_password(get_user, db_connection)
 
-        user = self.user_dao.check_user(get_user, db_connection)
-        password = self.user_dao.check_password(get_user, db_connection)
+            if bcrypt.checkpw(get_user['password'].encode('utf-8'), password[0].encode('utf-8')):
+                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1] }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
+                access_token = token.decode('utf-8')
+                return {'access_token' : access_token}, 200 
 
-        if bcrypt.checkpw(get_user['password'].encode('utf-8'), password[0].encode('utf-8')):
-            token = jwt.encode({'user_id': user[0], 'authority_id' : password[1] }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
-            access_token = token.decode('utf-8')
-            return jsonify({'token' : access_token}), 200
+            return jsonify({'message' : 'INVALID ACCESS'}), 400
 
-        return jsonify({'message' : 'INVALID ACCESS'}), 400
-
-
-
+        except KeyError:
+            return jsonify({'message' : 'KEY ERROR'}), 400
 
 
         
