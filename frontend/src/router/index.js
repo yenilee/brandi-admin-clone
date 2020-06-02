@@ -3,12 +3,12 @@ import VueRouter from 'vue-router'
 import Login from '../views/Login/Login.vue'
 import SignUp from '../views/SignUp/SignUp.vue'
 import Main from '../views/Main.vue'
-import Product from '../components/Product.vue'
-import ProductList from '../components/Product/ProductList.vue'
-import ProductRegist from '../components/Product/ProductRegist.vue'
-import Seller from '../components/Seller.vue'
-import SellerList from '../components/Seller/SellerList.vue'
-import SellerRegist from '../components/Seller/SellerRegist.vue'
+import Product from '../components/Product'
+import ProductList from '../views/ProductList/ProductList'
+import ProductRegist from '../views/ProductRegist/ProductRegist'
+import Seller from '../components/Seller'
+import SellerList from '../views/SellerList/SellerList'
+import SellerRegist from '../views/SellerRegist/SellerRegist'
 
 Vue.use(VueRouter)
 

@@ -1,13 +1,12 @@
 import pymysql
 
-from flask      import jsonify, request
+from flask      import request
 from connection import get_connection
 
-
-def create_endpoints(app, services):
+def create_user_endpoints(app, services):
     user_service = services.user_service
 
-    @app.route('/sign-up', methods=['POST'])
+    @app.route('/sign-up', methods = ['POST'])
     def sign_up():
 
         """
@@ -25,22 +24,34 @@ def create_endpoints(app, services):
         site_url            : 사이트 URL
 
         Returns:
-        
+
         success   : 200
-        key error : {message : KEY_ERROR}, status code : 400
-            
+        key error          : {message : KEY_ERROR}, code : 400
+        셀러 ID 중복        : {message : USER_ALREADY_EXISTS}, code : 400
+        비밀번호 형식 위반   : {message : PASSWORD_VALIDATION_ERROR}, code : 400
+        핸드폰번호 형식 위반 : {message : PHONE_NUMBER_VALIDATION_ERROR}, code : 400
+
         """
 
-        new_user = request.json
-        db_connection = get_connection()
+        db_connection = None
+        new_user = request.json       
         try:
+            db_connection = get_connection()
             if db_connection:
-                new_user = user_service.create_new_user(new_user, db_connection)
+                sign_up_response = user_service.create_new_user(new_user, db_connection)
                 db_connection.commit()
-                return new_user
+                db_connection.close()
+                return sign_up_response          
 
-        finally:           
-            db_connection.close()
+        except pymysql.err.InternalError:
+
+            if db_connection: 
+                db_connection.rollback()      
+
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+        
+        except pymysql.err.OperationalError:              
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500 
 
     @app.route('/sign-in', methods=['POST'])
     def sign_in():

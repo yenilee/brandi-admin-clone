@@ -1,3 +1,5 @@
+from flask import jsonify
+
 class UserDao:
 
     def insert_seller_key(self, new_user, db_connection):
@@ -8,7 +10,7 @@ class UserDao:
             user
         ) values (
             %(user)s
-        )
+            )
         """
         cursor.execute(seller_key_insert_sql, new_user)
 
@@ -41,19 +43,20 @@ class UserDao:
                         %(eng_name)s,
                         %(service_number)s,
                         %(site_url)s,
-                        %(editor)s,
-                        %(start_date)s,
-                        %(end_date)s
+                        %(user)s,
+                        now(),
+                        '2037-12-31 23:59:59'
                         );
                         """
-        cursor.execute(seller_insert_sql,new_user)
+       
+        cursor.execute(seller_insert_sql, new_user)
 
     def check_user_exists(self, new_user, db_connection):
         cursor = db_connection.cursor()
 
         check_user_sql = """
         select count(user)
-        from seller_keys
+        from seller_keys 
         where user = %(user)s
         """
 
