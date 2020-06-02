@@ -14,28 +14,6 @@ class UserService:
 
     def create_new_user(self, new_user, db_connection):
 
-        """
-        회원가입 API [POST]
-
-        Args:
-
-        user                : 셀러 id
-        password            : 비밀번호
-        phone_number        : 핸드폰번호
-        seller_attribute_id : 셀러 정보 id (쇼핑몰 : 1, 마켓 : 2, 로드샵 : 3, 디자이너브랜드 : 4, 제너럴브랜드 : 5, 내셔널브랜드 : 6, 뷰티 : 7)
-        name                : 셀러명 (상호)
-        eng_name            : 영문 셀러명(영문상호)
-        service_number      : 고객센터 전화번호
-        site_url            : 사이트 URL     
-
-        Returns:
-        
-        success   : 200
-        key error : {message : KEY_ERROR}, status code : 400
-            
-
-        """
-        
         if not re.match(r'(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{7,20}$', new_user['password']):
             return {'message' : 'PASSWORD_VALIDATION_ERROR'}, 400
 

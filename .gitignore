@@ -332,8 +332,6 @@ config.py
 connection.py
 
 
-
-
 # 아래 내용은 frontEnd에서 추가한 GitIgnore 입니다.
 
 .DS_Store
