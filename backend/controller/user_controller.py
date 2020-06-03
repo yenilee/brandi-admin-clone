@@ -1,7 +1,8 @@
 import pymysql
 
-from flask      import request
+from flask      import request, g
 from connection import get_connection
+from utils      import authorize
 
 def create_user_endpoints(app, user_service):
     user_service = user_service
@@ -93,7 +94,8 @@ def create_user_endpoints(app, user_service):
         try:
             db_connection = get_connection()
             if db_connection:
-                sign_in_response = user_service.check_user(get_user, db_connection)                
+                sign_in_response = user_service.check_user(get_user, db_connection)
+
                 return sign_in_response
 
         except pymysql.err.InternalError:       

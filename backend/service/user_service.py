@@ -3,7 +3,8 @@ import jwt
 import json
 import re
 
-from config import SECRET_KEY, ALGORITHM
+from config   import SECRET_KEY, ALGORITHM
+from datetime import  datetime, timedelta
 
 class UserService:
 
@@ -67,7 +68,7 @@ class UserService:
             password = self.user_dao.check_password(get_user, db_connection)
 
             if bcrypt.checkpw(get_user['password'].encode('utf-8'), password[0].encode('utf-8')):
-                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1] }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
+                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1], 'exp' : datetime.utcnow() + timedelta(hours=3) }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
                 access_token = token.decode('utf-8')
                 return {'access_token' : access_token}, 200 
 
