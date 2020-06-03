@@ -25,11 +25,16 @@ def create_user_endpoints(app, user_service):
 
         Returns:
 
-        success   : 200
-        key error          : {message : KEY_ERROR}, code : 400
-        셀러 ID 중복        : {message : USER_ALREADY_EXISTS}, code : 400
-        비밀번호 형식 위반   : {message : PASSWORD_VALIDATION_ERROR}, code : 400
-        핸드폰번호 형식 위반 : {message : PHONE_NUMBER_VALIDATION_ERROR}, code : 400
+        success                : code : 200
+        key error              : {message : KEY_ERROR}, code : 400
+
+        셀러 ID 중복            : {message : USER_ALREADY_EXISTS}, code : 400
+        셀러 ID 형식 위반       : {message : ID_VALIDATION_ERROR}, code :400
+        비밀번호 형식 위반       : {message : PASSWORD_VALIDATION_ERROR}, code : 400
+        핸드폰번호 형식 위반     : {message : PHONE_NUMBER_VALIDATION_ERROR}, code : 400
+        셀러 이름 형식 위반      : {message : SELLER_NAME_VALIDATION_ERROR}, code : 400
+        셀러 영문 이름 형식 위반 : {message : SELLER_ENGLISH_NAME_VALIDATION_ERROR}, code :400
+        사이트 URL 형식 위반     : {message : SITE_URL_VALIDATION_ERROR}, code :400
 
         """
 
@@ -42,19 +47,29 @@ def create_user_endpoints(app, user_service):
                 db_connection.commit()
                 return sign_up_response          
 
-        except pymysql.err.InternalError as e:
+        except pymysql.err.InternalError:
 
             if db_connection: 
                 db_connection.rollback()      
-            print(e)
+
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:
+            db_connection.rollback() 
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500  
+
         finally:
             if db_connection:
-                db_connection.close() 
+                db_connection.close()
 
     @app.route('/sign-in', methods=['POST'])
     def sign_in():
@@ -78,18 +93,25 @@ def create_user_endpoints(app, user_service):
         try:
             db_connection = get_connection()
             if db_connection:
-                sign_in_response = user_service.check_user(get_user, db_connection)
-                db_connection.close()
+                sign_in_response = user_service.check_user(get_user, db_connection)                
                 return sign_in_response
 
-        except pymysql.err.InternalError:
-            return jsonify({'message' : 'DATABASE_SERVER_ERROR'}), 500
+        except pymysql.err.InternalError:       
 
-        except pymysql.err.OperationalError:
-            return jsonify({'message' : 'DATABASE_ACCESS_DENIED'}), 500
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+        
+        except pymysql.err.OperationalError:              
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:  
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500  
 
         finally:
-
             if db_connection:
                 db_connection.close()
-               
