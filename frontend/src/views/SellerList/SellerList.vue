@@ -168,8 +168,25 @@
                     <td>{{ item.detail_url }}</td>
                     <td>{{ item.created_at }}</td>
                     <td>
-                      <!-- "seller_actions"의 키를 들고와서 비교에 따라 표현 -->
-                      <button v-for="action in item.seller_actions" :key="action">{{ action }}</button>
+                      <!-- 클릭하면 상태를 post 하고, Post 처리가 된 뒤의 action 버튼들을 get 해야한다. -->
+                      <div class="statusBtnBox" v-for="action in item.seller_actions" :key="action">
+                        <button
+                          style="background-color: #5bc0de; border-color: #46b8da;"
+                          v-if="action === '입점 승인'"
+                        >{{action}}</button>
+                        <button
+                          style="background-color: #d9534f;border-color: #d43f3a;"
+                          v-if="action === '입점 거절' || action === '퇴점 신청 처리' || action === '퇴점 확정 처리'"
+                        >{{action}}</button>
+                        <button
+                          style="background-color: #f0ad4e; border-color: #eea236;"
+                          v-if="action === '휴점 신청'"
+                        >{{action}}</button>
+                        <button
+                          style="background-color: #5cb85c; border-color: #4cae4c;"
+                          v-if="action === '퇴점 철회 처리' || action === '휴점 해제'"
+                        >{{action}}</button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -249,6 +266,7 @@ export default {
 <style lang="scss" scoped>
 .tableContainer {
   padding-top: 35px;
+
   .slTitleBox {
     padding: 0 20px;
     display: flex;
@@ -305,7 +323,6 @@ export default {
     border: 1px solid #d3d3d3;
     background-color: white;
     margin: 0 15px;
-    width: calc(100% - 300px);
     border-radius: 5px;
 
     input,
@@ -346,6 +363,10 @@ export default {
       font-size: 18px;
       margin: 0 15px;
     }
+    .statusBtnBox {
+      display: inline;
+      font-size: 12px;
+    }
     .tableOut {
       min-width: 100%;
       .tableIn {
@@ -357,8 +378,8 @@ export default {
         button {
           padding: 5px;
           color: #fff;
-          background-color: #5cb85c;
-          border-color: #4cae4c;
+          // background-color: #5cb85c;
+          // border-color: #4cae4c;
           border-radius: 3px;
           margin-left: 5px;
         }

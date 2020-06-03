@@ -11,13 +11,13 @@
 <script>
 import LoginBox from "./LoginBox";
 import SignUpBox from "../SignUp/SignUpBox";
-import Footer from "./Footer";
+import LoginFooter from "./Footer";
 
 export default {
   components: {
     LoginBox,
     SignUpBox,
-    Footer
+    LoginFooter
   }
 };
 </script>
@@ -39,7 +39,7 @@ export default {
     background-position: center;
   }
 }
-.footer {
+.LoginFooter {
   width: 100vw;
   height: 74px;
   margin-top: 50px;

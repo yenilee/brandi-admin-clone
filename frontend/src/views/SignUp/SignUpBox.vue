@@ -10,7 +10,7 @@
       v-model="user.value"
       v-bind:class="{ defaultInput: user.state, warningInput: !user.state }"
       placeholder="아이디"
-      @keyup="idCheck()"
+      @keyup="() => regCheck(regs.idReg,this.user)"
     />
     <div
       v-bind:class="{ defaultText: user.state || user.value.length > 0, warningText: user.state || user.value.length == 0}"
@@ -25,7 +25,7 @@
       v-model="password.value"
       v-bind:class="{ defaultInput: password.state, warningInput: !password.state }"
       placeholder="비밀번호"
-      @keyup="pwCheck()"
+      @change="() => regCheck(regs.pwReg,this.password)"
       class="defaultInput"
     />
     <div
@@ -55,7 +55,7 @@
       v-model="phone_number.value"
       v-bind:class="{ defaultInput: phone_number.state, warningInput: !phone_number.state }"
       placeholder="핸드폰번호"
-      @keyup="phCheck()"
+      @keyup="() => regCheck(regs.phReg,this.phone_number)"
     />
     <div
       v-bind:class="{ defaultText: phone_number.state, warningText: !phone_number.state}"
@@ -83,13 +83,13 @@
       v-model="name.value"
       v-bind:class="{ defaultInput: name.state, warningInput: !name.state }"
       placeholder="셀러명(상호)"
-      @keyup="nameCheck()"
+      @keyup="() => regCheck(regs.nameReg,this.name)"
     />
     <div
       v-bind:class="{ defaultText: name.state || name.value.length > 0 , warningText: name.value.length == 0 || !name.state}"
     >필수 입력 항목입니다.</div>
     <div
-      v-bind:class="{ defaultText: name.value >= 0 || name.state, warningText: !name.state}"
+      v-bind:class="{ defaultText: name.state || name.value.length == 0, warningText: !name.state}"
     >한글,영문,숫자만 입력해주세요.</div>
 
     <!-- engName check input -->
@@ -97,13 +97,13 @@
       v-model="eng_name.value"
       v-bind:class="{ defaultInput: eng_name.state, warningInput: !eng_name.state }"
       placeholder="영문 셀러명 (영문상호)"
-      @keyup="engNameCheck()"
+      @keyup="() => regCheck(regs.engNameReg,this.eng_name)"
     />
     <div
       v-bind:class="{ defaultText: eng_name.state || eng_name.value.length > 0 , warningText: eng_name.value.length == 0 || !eng_name.state}"
     >필수 입력 항목입니다.</div>
     <div
-      v-bind:class="{ defaultText: eng_name.value >= 0 || eng_name.state, warningText: !eng_name.state}"
+      v-bind:class="{ defaultText: eng_name.state || eng_name.value.length == 0, warningText: !eng_name.state}"
     >셀러 영문명은 소문자만 입력가능합니다.</div>
 
     <!-- tel check input -->
@@ -111,7 +111,7 @@
       v-model="service_number.value"
       v-bind:class="{ defaultInput: service_number.state, warningInput: !service_number.state }"
       placeholder="고객센터 전화번호"
-      @keyup="telCheck()"
+      @keyup="() => regCheck(regs.telReg,this.service_number)"
       class="defaultInput"
     />
     <div
@@ -126,7 +126,7 @@
       v-model="site_url.value"
       v-bind:class="{ defaultInput: site_url.state, warningInput: !site_url.state }"
       placeholder="사이트 URL"
-      @keyup="urlCheck()"
+      @keyup="() => regCheck(regs.urlReg,this.site_url)"
     />
     <div
       v-bind:class="{ defaultText: site_url.state || site_url.value.length > 0 , warningText: site_url.value.length == 0 || !site_url.state}"
@@ -139,7 +139,7 @@
       <!-- 신청 클릭 하면 패치로 포스트 해보자 -->
       <div class="signUpApply" @click="signUpClick()">신청</div>
       <div class="signUpCancel">
-        <router-link to="/login">취소</router-link>
+        <router-link to="/">취소</router-link>
       </div>
     </div>
   </div>
@@ -147,6 +147,16 @@
 
 <script>
 import axios from "axios";
+import { SJ_URL } from "../../config/urlConfig";
+import {
+  idReg,
+  pwReg,
+  phReg,
+  nameReg,
+  engNameReg,
+  telReg,
+  urlReg
+} from "../../config/reg";
 export default {
   name: "SignUpBox",
   mounted: function() {
@@ -157,6 +167,7 @@ export default {
   },
   data() {
     return {
+      regs: { idReg, pwReg, phReg, nameReg, engNameReg, telReg, urlReg },
       user: { value: "", state: true },
       password: { value: "", state: true },
       rePw: { value: "", state: true },
@@ -169,72 +180,42 @@ export default {
     };
   },
   methods: {
-    //확인 후, 백엔드로 전송할 value값과 state값을 수정한다.
-    idCheck: function() {
-      /^[A-Za-z0-9]([-_]?[0-9a-zA-Z--_]){4,20}$/.test(this.user.value)
-        ? (this.user.state = true)
-        : (this.user.state = false);
-    },
-    //확인 후, 백엔드로 전송할 password value값과 state값을 수정한다.
-    pwCheck: function() {
-      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,20}$/.test(
-        this.password.value
-      )
-        ? ((this.password.state = true), console.log(password.state))
-        : ((this.password.state = false), console.log(password.state));
-    },
-    //확인 후, 백엔드로 전송할 phone_number value, state
-    phCheck: function() {
-      /^\d{3}-\d{3,4}-\d{4}$/.test(this.phone_number.value)
-        ? (this.phone_number.state = true)
-        : (this.phone_number.state = false);
-    },
-    //확인 후, 백엔드로 전송할 상호명 value, state
-    nameCheck: function() {
-      /^[ㄱ-ㅣ가-힣-0-9A-Za-z]([0-9ㄱ-ㅣ가-힣A-Za-z]){0,20}$/.test(
-        this.name.value
-      )
-        ? (this.name.state = true)
-        : (this.name.state = false);
+    regCheck: function(reg, inputName) {
+      reg.test(inputName.value)
+        ? (inputName.state = true)
+        : (inputName.state = false);
     },
 
-    //확인 후, 백엔드로 전송할 영문 상호명 value, state
-    engNameCheck: function() {
-      /^[a-z]*$/.test(this.eng_name.value)
-        ? (this.eng_name.state = true)
-        : (this.eng_name.state = false);
-    },
-    telCheck: function() {
-      /(^02.{0}|^01.{1}|[0-9]{4})-([0-9]+)-([0-9]{4})/.test(
-        this.service_number.value
-      )
-        ? (this.service_number.state = true)
-        : (this.service_number.state = false);
-    },
-    urlCheck: function() {
-      /(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/.test(
-        this.site_url.value
-      )
-        ? (this.site_url.state = true)
-        : (this.site_url.state = false);
-    },
     signUpClick: function() {
-      axios
-        .post("http://192.168.7.40:5000/sign-up", {
-          method: "POST",
-          user: this.user.value,
-          seller_attribute_id: this.seller_attribute_id.value,
-          password: this.password.value,
-          phone_number: this.phone_number.value,
-          name: this.name.value,
-          eng_name: this.eng_name.value,
-          service_number: this.service_number.value,
-          site_url: this.site_url.value,
-          end_date: this.end_date
-        })
-        .then(response => {
-          alert("성공");
-        });
+      if (confirm("입력하신 정보로 셀러신청을 하시겠습니까?") == true) {
+        axios
+          .post(`${SJ_URL}/sign-up`, {
+            method: "POST",
+            user: this.user.value,
+            seller_attribute_id: this.seller_attribute_id.value,
+            password: this.password.value,
+            phone_number: this.phone_number.value,
+            name: this.name.value,
+            eng_name: this.eng_name.value,
+            service_number: this.service_number.value,
+            site_url: this.site_url.value,
+            end_date: this.end_date
+          })
+          .then(res => {
+            if (res.status === 200) {
+              alert(
+                "신청이 완료되었습니다.검토 후 연락드리겠습니다.감사합니다."
+              );
+              this.$router.push("/");
+            }
+          })
+          .catch(error => console.log(error.response.data.message));
+
+        // .catch(err => {
+        //   alert("입력 내용을 확인해 주시기 바랍니다. 감사합니다.");
+        //   console.log(err);
+        // });
+      }
     },
     radios: function() {}
   }
@@ -244,7 +225,6 @@ export default {
 <style lang="scss">
 .signUpBox {
   width: 470px !important;
-  height: 937px;
   margin: 0 auto;
   padding: 20px 30px 15px 30px;
   background-color: #ffffff !important  ;
@@ -340,9 +320,12 @@ export default {
       width: 50px;
       height: 35px;
       background-color: #c9302c;
-      border: 1px solid red;
       border-top-right-radius: 4px;
       border-bottom-right-radius: 4px;
+      color: red;
+    }
+    a:visited {
+      color: white;
     }
   }
 }

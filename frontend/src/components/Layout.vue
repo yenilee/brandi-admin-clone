@@ -50,10 +50,7 @@ import { items } from "../config/Items";
 export default {
   data() {
     return {
-      drawer: true,
-      items: items,
-      right: false,
-      miniVariant: false
+      items: items
     };
   },
   methods: {
@@ -71,11 +68,11 @@ export default {
   display: flex;
   .about {
     width: calc(100vw - 256px);
-    height: 100vh;
+    // height: calc(100vh - 90px) !important;
     color: black;
     background: white;
     .container {
-      width: 100%;
+      width: unset !important;
       overflow: hidden;
       margin: 0 0 50px 0 !important;
       max-width: unset;

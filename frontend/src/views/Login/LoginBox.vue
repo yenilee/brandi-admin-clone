@@ -46,6 +46,7 @@
 
 <script>
 import axios from "axios";
+import { SJ_URL } from "../../config/urlConfig";
 export default {
   data() {
     return {
@@ -65,54 +66,45 @@ export default {
     // 로그인 클릭시 실행되는 함수 : 아이디, 비밀번호 문자열 확인 후 0 이면 state false 리턴
     // 이 곳에 아이디, 비밀번호가 맞으면 백으로 아이디, 비밀번호 API POST 할 예정
     inputHandler: function() {
-      if (this.loginValue.length === 0) {
-        this.loginState = false;
-      }
-      if (this.passwordValue.length === 0) {
-        this.passwordState = false;
-      }
+      this.loginValue.length ? "" : (this.loginState = false);
+      this.passwordValue.length ? "" : (this.passwordState = false);
+
       if (this.passwordState && this.loginState) {
         axios
-          .post("http://192.168.7.40:5000/sign-in", {
+          .post(`${SJ_URL}/sign-in`, {
             method: "POST",
             user: this.loginValue,
             password: this.passwordValue
           })
           .then(response => {
-            if (response.data.token) {
-              console.log("로그인 성공");
-              console.log(response.data.token);
-              localStorage.setItem("token", response.data.token);
-              this.$router.push("/main");
+            if (response.data.access_token) {
+              localStorage.setItem("access_token", response.data.access_token);
+              localStorage.setItem("id", this.loginValue);
+              this.$router.push("/main/seller/sellerlist");
             } else {
               alert("아이디 또는 비밀번호가 다릅니다.");
             }
           })
           .catch(err => {
-            alert("로그인 실패");
-            console.error(err);
+            console.log(err);
           });
       }
     },
 
     // 이이디 인풋창 입력시 실행되는 함수 : 문자열 길이가 0 보다 크거나 작음을 확인 후 state 변경
     idKeyHandler: function() {
-      if (this.loginState === false && this.loginValue.length > 0) {
+      if (!this.loginState && this.loginValue.length) {
         this.loginState = true;
-      } else if (this.loginState === true && this.loginValue.length === 0) {
+      } else if (this.loginState && !this.loginValue.length) {
         this.loginState = false;
       }
     },
 
     // 이이디 인풋창 입력시 실행되는 함수 : 문자열 길이가 0 보다 크거나 작음을 확인 후 state 변경
     pwKeyHandler: function() {
-      const { passwordState, passwordValue } = this;
-      if (this.passwordState === false && this.passwordValue.length > 0) {
+      if (!this.passwordState && this.passwordValue.length) {
         this.passwordState = true;
-      } else if (
-        this.passwordState === true &&
-        this.passwordValue.length === 0
-      ) {
+      } else if (this.passwordState && !this.passwordValue.length) {
         this.passwordState = false;
       }
     }
@@ -185,6 +177,9 @@ export default {
       &:hover {
         background-color: lightgrey;
         border-color: gray;
+      }
+      a:visited {
+        color: black;
       }
     }
     .loginBtn {

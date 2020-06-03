@@ -4,11 +4,11 @@
       <div class="headerLogo"></div>
     </div>
     <div class="headerUserInfo">
-      <div class="url">https://www.brandi.co.kr/shop/test20200525</div>
+      <div class="url">https://www.brandi.co.kr/shop/{{user}}</div>
       <div class="urlBtn">My Shop Url 복사하기</div>
       <div class="userBox">
-        <div class="user">
-          test20200525
+        <div @click="logoutHandle()" class="user">
+          {{user}} Logout
           <i class="xi-angle-down-min"></i>
         </div>
       </div>
@@ -17,7 +17,26 @@
 </template>
 
 <script>
-export default {};
+export default {
+  mounted() {
+    if (localStorage.id) {
+      this.user = localStorage.id;
+    }
+  },
+  data() {
+    return {
+      user: ""
+    };
+  },
+  methods: {
+    logoutHandle: function() {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("id");
+      alert(`${this.user}님 로그아웃 하겠습니다.`);
+      this.$router.push("/");
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -67,6 +86,7 @@ export default {};
         color: lightgray;
         padding: 12px 10px 0px 10px;
         height: 45px;
+        cursor: pointer;
         &:hover {
           background-color: #404347;
         }
