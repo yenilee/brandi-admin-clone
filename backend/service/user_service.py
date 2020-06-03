@@ -79,7 +79,9 @@ class UserService:
         except TypeError:
             return {'message' : 'TYPE ERROR'}, 400
 
-
+    def register_seller(self, seller_infos, db_connection):
+        self.user_dao.register_seller(seller_infos, db_connection)
+        return {"message" : "seller"}, 200
         
 
 

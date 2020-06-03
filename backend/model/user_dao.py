@@ -83,3 +83,11 @@ class UserDao:
         password = cursor.fetchone()
         return password
 
+    def register_seller(self, seller_infos, db_connection):
+        cursor = db_connection.cursor()
+        seller_register_sql = """
+        
+        """
+        cursor.execute(seller_register_sql, seller_infos)
+        
+

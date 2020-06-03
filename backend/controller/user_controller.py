@@ -115,3 +115,34 @@ def create_user_endpoints(app, user_service):
         finally:
             if db_connection:
                 db_connection.close()
+    
+    @app.route('/seller', methods = ['POST'])
+    def seller_register():
+        db_connection = None 
+        seller_infos = request.json
+        try:
+            db_connection = get_connection()
+            if db_connection:
+                register_response = user_service.register_seller(seller_infos, db_connection)                
+                return register_response
+
+        except pymysql.err.InternalError:       
+
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+        
+        except pymysql.err.OperationalError:              
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:  
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500  
+
+        finally:
+            if db_connection:
+                db_connection.close()
+        
