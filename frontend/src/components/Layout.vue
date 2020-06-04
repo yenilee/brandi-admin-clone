@@ -67,6 +67,7 @@ export default {
   padding-top: 45px;
   display: flex;
   .about {
+    min-height: 100vh !important;
     width: calc(100vw - 256px);
     color: black;
     background: white;

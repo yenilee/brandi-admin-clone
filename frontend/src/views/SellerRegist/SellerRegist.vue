@@ -1,9 +1,20 @@
 <template>
-  <div>here is sellerRegist page</div>
+  <div>
+    <SrTitle />
+    <BasicInfo />
+  </div>
 </template>
 
 <script>
-export default {};
+import SrTitle from "./component/SrTitle";
+import BasicInfo from "./component/BasicInfo";
+
+export default {
+  components: {
+    SrTitle,
+    BasicInfo
+  }
+};
 </script>
 
 <style>

@@ -20,7 +20,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .container {
   width: 100vw !important;
   margin: 75px auto 0 auto !important;
