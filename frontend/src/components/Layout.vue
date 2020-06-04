@@ -61,14 +61,13 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .main-container {
   height: 100%;
   padding-top: 45px;
   display: flex;
   .about {
     width: calc(100vw - 256px);
-    // height: calc(100vh - 90px) !important;
     color: black;
     background: white;
     .container {

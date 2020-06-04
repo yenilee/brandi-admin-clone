@@ -43,6 +43,8 @@
           <span>records Found total {{usersData}} records</span>
         </div>
 
+        <v-date-picker v-model="dates" range style="width:300px position: absolute"></v-date-picker>
+
         <!-- 테이블 시작 부분입니다. -->
         <template>
           <v-simple-table>
@@ -150,10 +152,25 @@
                     </td>
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <!-- 달력이 있어야 할 곳 -->
+                    <td class="dateBox">
+                      <v-row>
+                        <v-col
+                          cols="12"
+                          sm="16"
+                          style="width: 250px; height:39px; padding: 0 12px; font-size:10px"
+                        >
+                          <v-text-field v-model="dateRangeText" label="Date range" readonly></v-text-field>
+                        </v-col>
+                      </v-row>
+                    </td>
+                    <!-- 달력 -->
+
                     <td></td>
                   </tr>
+
                   <tr v-for="item in infoDatas" :key="item.name">
+                    <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
                     <td>{{ item.meta_data_id }}</td>
                     <td>{{ item.seller_id }}</td>
                     <td>{{ item.seller_eng_name }}</td>
@@ -243,7 +260,8 @@ export default {
         manager_infos_email: "",
         detail_attribute: "",
         created_at: ""
-      }
+      },
+      dates: ["2020-06-03", "2020-06-24"]
     };
   },
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
@@ -253,6 +271,11 @@ export default {
       this.usersData = response.data.number_of_users;
       this.pagesData = response.data.number_of_pages;
     });
+  },
+  computed: {
+    dateRangeText() {
+      return this.dates.join(" ~ ");
+    }
   },
   methods: {
     search: function() {
@@ -321,7 +344,6 @@ export default {
   }
   .tableBox {
     border: 1px solid #d3d3d3;
-    background-color: white;
     margin: 0 15px;
     border-radius: 5px;
 
@@ -378,8 +400,6 @@ export default {
         button {
           padding: 5px;
           color: #fff;
-          // background-color: #5cb85c;
-          // border-color: #4cae4c;
           border-radius: 3px;
           margin-left: 5px;
         }
@@ -400,6 +420,11 @@ export default {
     color: black !important;
     font-size: 13px !important;
     background-color: #eee;
+  }
+  .dateBox {
+    border: 1px solid red;
+    width: 50%;
+    height: 50%;
   }
 }
 </style>
