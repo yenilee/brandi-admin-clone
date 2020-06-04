@@ -66,7 +66,11 @@ def create_user_endpoints(app, user_service):
 
         except pymysql.err.IntegrityError:
             db_connection.rollback() 
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500  
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except Exception as e:
+            db_connection.rollback()
+            return {'message' : str(e)}, 500     
 
         finally:
             if db_connection:
@@ -125,12 +129,13 @@ def create_user_endpoints(app, user_service):
         try:
             db_connection = get_connection()
             if db_connection:
-                register_response = user_service.register_seller(seller_infos, db_connection)                
+                register_response = user_service.register_seller(seller_infos, db_connection)
+                db_connection.commit()                
                 return register_response
 
-        except pymysql.err.InternalError:       
+        except pymysql.err.InternalError as e:       
 
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
         
         except pymysql.err.OperationalError:              
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
@@ -142,9 +147,63 @@ def create_user_endpoints(app, user_service):
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
         except pymysql.err.IntegrityError:  
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500  
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except Exception as e:
+            db_connection.rollback()
+            return {'message' : str(e)}, 500    
 
         finally:
             if db_connection:
                 db_connection.close()
+    
+
+    @app.route('/seller_details', methods = ['GET'])
+    @authorize
+    def get_seller_info():
+
+        """
+        셀러 상세 (셀러 권한) API [GET]
         
+        Args:
+        [Header]`
+        Authorization : 로그인 토큰
+
+        Returns:
+
+        Success     : {data : user_info}, 200
+        
+        Key error   : {message : KEY_ERROR}, status code : 400
+        Type error   :{message : TYPE_ERROR}, status code : 400
+        """
+
+        db_connection = None         
+        try:
+            db_connection = get_connection()
+            if db_connection:
+                seller_infos = user_service.get_seller_info(g.user, db_connection)                                
+                return seller_infos
+
+        except pymysql.err.InternalError as e:       
+
+            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
+        
+        except pymysql.err.OperationalError:              
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError as e:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:  
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except Exception as e:
+            db_connection.rollback()
+            return {'message' : str(e)}, 500  
+
+        finally:
+            if db_connection:
+                db_connection.close()       
