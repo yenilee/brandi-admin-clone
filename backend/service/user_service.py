@@ -3,8 +3,9 @@ import jwt
 import json
 import re
 
+from flask    import jsonify
 from config   import SECRET_KEY, ALGORITHM
-from datetime import  datetime, timedelta
+from datetime import datetime, timedelta
 
 class UserService:
 
@@ -68,7 +69,7 @@ class UserService:
             password = self.user_dao.check_password(get_user, db_connection)
 
             if bcrypt.checkpw(get_user['password'].encode('utf-8'), password[0].encode('utf-8')):
-                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1], 'exp' : datetime.utcnow() + timedelta(hours=3) }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
+                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1], 'exp' : datetime.utcnow() + timedelta(days=3) }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
                 access_token = token.decode('utf-8')
                 return {'access_token' : access_token}, 200 
 
@@ -80,11 +81,25 @@ class UserService:
         except TypeError:
             return {'message' : 'TYPE ERROR'}, 400
 
+    def register_seller(self, seller_infos, db_connection):
+        self.user_dao.register_seller(seller_infos, db_connection)
+        return {"message" : "seller"}, 200
+    
+    def get_seller_info(self, user, db_connection):
+        try:
+            user_info        = self.user_dao.get_seller_infos(user, db_connection)
+            supervisor_info  = self.user_dao.get_supervisor_infos(user, db_connection)
+            buisness_hours   = self.user_dao.get_buisness_hours(user, db_connection)
+            seller_histories = self.user_dao.get_seller_histories(user, db_connection)
 
-        
+            user_info[0]['supervisors']      = supervisor_info
+            user_info[0]['buisness_hours']   = buisness_hours
+            user_info[0]['seller_histories'] = seller_histories
 
+            return {'data' : user_info}, 200 
+            
+        except KeyError:
+            return {'message' : 'KEY_ERROR'}, 400
 
-
-
-
-
+        except TypeError:
+            return {'message' : 'TYPE_ERROR'}, 400
