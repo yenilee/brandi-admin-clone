@@ -69,7 +69,9 @@ class UserDao:
         cursor = db_connection.cursor()
 
         check_user_sql = """
-        select id, user from seller_keys where user = %(user)s
+        SELECT id, user 
+        FROM seller_keys 
+        WHERE user = %(user)s
         """
 
         cursor.execute(check_user_sql, get_user)
@@ -79,12 +81,19 @@ class UserDao:
     def check_password(self, get_user, db_connection):
         cursor = db_connection.cursor()
         check_pw_sql = """
-        select password, authority_id from sellers where seller_key_id = (select id from seller_keys where user = %(user)s)
+        SELECT password, 
+            authority_id 
+        FROM sellers 
+        WHERE seller_key_id = 
+            (SELECT id 
+            FROM seller_keys 
+            WHERE user = %(user)s)
         """
         
         cursor.execute(check_pw_sql, get_user)
         password = cursor.fetchone()
         return password
+
 
     def get_seller_infos(self, user, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
@@ -174,3 +183,49 @@ class UserDao:
         WHERE seller_key_id=%(seller_key_id)s;
         """
         cursor.execute(seller_register_sql, seller_infos)
+
+
+    def get_sellerlist(self, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        sellers_list_sql = """
+        SELECT
+            sellers.id, 
+            seller_keys.user,
+            sellers.eng_name,
+            sellers.name,
+            seller_attributes.id,
+            seller_attributes.name,
+            seller_status.id,
+            seller_status.name,
+            supervisor_infos.name,
+            supervisor_infos.phone_number,
+            supervisor_infos.email,
+            (SELECT COUNT('product_keys.product_number') 
+                FROM product_keys 
+                WHERE sellers.seller_key_id = product_keys.seller_key_id) as number_of_product,
+            sellers.site_url,
+            DATE_FORMAT(start_date, '%Y-%m-%d %H:%i:%s') AS created_at
+        FROM sellers
+        INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id
+        INNER JOIN seller_status ON sellers.seller_status_id = seller_status.id
+        INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
+        LEFT JOIN `supervisor_infos` ON supervisor_infos.seller_id = sellers.id AND supervisor_infos.order=1
+        LEFT JOIN product_keys ON sellers.seller_key_id = product_keys.seller_key_id
+        WHERE end_date = '2037-12-31 23:59:59' and authority_id = 2
+        ORDER BY sellers.id DESC;
+        """
+        cursor.execute(sellers_list_sql)
+        sellers = cursor.fetchall()
+        return sellers
+
+    def get_seller_action(self, db_connection):
+        cursor = db_connection.cursor()
+        seller_actions_sql = """
+        SELECT seller_status_id, action_type
+        FROM seller_actions
+        """
+        cursor.execute(seller_actions_sql)
+        seller_actions = cursor.fetchall()
+        return seller_actions
+
+

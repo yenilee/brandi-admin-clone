@@ -3,6 +3,7 @@ import pymysql
 from flask      import request, g
 from connection import get_connection
 from utils      import authorize
+from decimal    import ROUND_HALF_UP
 
 def create_user_endpoints(app, user_service):
     user_service = user_service
@@ -91,6 +92,7 @@ def create_user_endpoints(app, user_service):
 
         Success     : {access_token : token}, 200
         Key error   : {message : KEY_ERROR}, status code : 400
+        Type eeror  : {message : Type_ERROR}, status code : 400
         """
         
         db_connection = None 
@@ -103,20 +105,64 @@ def create_user_endpoints(app, user_service):
                 return sign_in_response
 
         except pymysql.err.InternalError:       
-
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e :
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'+ str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
         except pymysql.err.IntegrityError:  
             return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500  
+
+        except  Exception as e:
+            db_connection.rollback()
+            return {'message' : str(e)}, 500
+
+        finally:
+            if db_connection:
+                db_connection.close()
+
+
+    @app.route('/sellers', methods=['GET'])
+    @authorize
+    def seller_list():
+
+        if g.auth is not 1:
+            return {'message' : 'UNAUTHORIZED'}, 401
+
+        db_connection = None
+        try:
+            db_connection = get_connection()
+            if db_connection:
+                sellers = user_service.get_sellerlist(db_connection)
+
+                return {'number_of_sellers' : len(sellers),
+                        'number_of_pages' : int(len(sellers)/10)+1,
+                        'sellers' : sellers,
+                        }, 200
+
+        except pymysql.err.InternalError as e:
+            return {'message': 'DATABASE_SERVER_ERROR' +str(e)}, 500
+
+        except pymysql.err.OperationalError:
+            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError as e:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:
+            return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except  Exception as e:
+            return {'message': str(e)}, 500
 
         finally:
             if db_connection:
