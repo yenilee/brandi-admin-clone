@@ -43,6 +43,8 @@
           <span>records Found total {{usersData}} records</span>
         </div>
 
+        <v-date-picker v-model="dates" range style="width:300px position: absolute"></v-date-picker>
+
         <!-- 테이블 시작 부분입니다. -->
         <template>
           <v-simple-table>
@@ -150,10 +152,25 @@
                     </td>
                     <td></td>
                     <td></td>
-                    <td></td>
+                    <!-- 달력이 있어야 할 곳 -->
+                    <td class="dateBox">
+                      <v-row>
+                        <v-col
+                          cols="12"
+                          sm="16"
+                          style="width: 250px; height:39px; padding: 0 12px; font-size:10px"
+                        >
+                          <v-text-field v-model="dateRangeText" label="Date range" readonly></v-text-field>
+                        </v-col>
+                      </v-row>
+                    </td>
+                    <!-- 달력 -->
+
                     <td></td>
                   </tr>
+
                   <tr v-for="item in infoDatas" :key="item.name">
+                    <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
                     <td>{{ item.meta_data_id }}</td>
                     <td>{{ item.seller_id }}</td>
                     <td>{{ item.seller_eng_name }}</td>
@@ -168,8 +185,25 @@
                     <td>{{ item.detail_url }}</td>
                     <td>{{ item.created_at }}</td>
                     <td>
-                      <!-- "seller_actions"의 키를 들고와서 비교에 따라 표현 -->
-                      <button v-for="action in item.seller_actions" :key="action">{{ action }}</button>
+                      <!-- 클릭하면 상태를 post 하고, Post 처리가 된 뒤의 action 버튼들을 get 해야한다. -->
+                      <div class="statusBtnBox" v-for="action in item.seller_actions" :key="action">
+                        <button
+                          style="background-color: #5bc0de; border-color: #46b8da;"
+                          v-if="action === '입점 승인'"
+                        >{{action}}</button>
+                        <button
+                          style="background-color: #d9534f;border-color: #d43f3a;"
+                          v-if="action === '입점 거절' || action === '퇴점 신청 처리' || action === '퇴점 확정 처리'"
+                        >{{action}}</button>
+                        <button
+                          style="background-color: #f0ad4e; border-color: #eea236;"
+                          v-if="action === '휴점 신청'"
+                        >{{action}}</button>
+                        <button
+                          style="background-color: #5cb85c; border-color: #4cae4c;"
+                          v-if="action === '퇴점 철회 처리' || action === '휴점 해제'"
+                        >{{action}}</button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -226,7 +260,8 @@ export default {
         manager_infos_email: "",
         detail_attribute: "",
         created_at: ""
-      }
+      },
+      dates: ["2020-06-03", "2020-06-24"]
     };
   },
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
@@ -236,6 +271,11 @@ export default {
       this.usersData = response.data.number_of_users;
       this.pagesData = response.data.number_of_pages;
     });
+  },
+  computed: {
+    dateRangeText() {
+      return this.dates.join(" ~ ");
+    }
   },
   methods: {
     search: function() {
@@ -249,6 +289,7 @@ export default {
 <style lang="scss" scoped>
 .tableContainer {
   padding-top: 35px;
+
   .slTitleBox {
     padding: 0 20px;
     display: flex;
@@ -303,9 +344,7 @@ export default {
   }
   .tableBox {
     border: 1px solid #d3d3d3;
-    background-color: white;
     margin: 0 15px;
-    width: calc(100% - 300px);
     border-radius: 5px;
 
     input,
@@ -346,6 +385,10 @@ export default {
       font-size: 18px;
       margin: 0 15px;
     }
+    .statusBtnBox {
+      display: inline;
+      font-size: 12px;
+    }
     .tableOut {
       min-width: 100%;
       .tableIn {
@@ -357,8 +400,6 @@ export default {
         button {
           padding: 5px;
           color: #fff;
-          background-color: #5cb85c;
-          border-color: #4cae4c;
           border-radius: 3px;
           margin-left: 5px;
         }
@@ -379,6 +420,11 @@ export default {
     color: black !important;
     font-size: 13px !important;
     background-color: #eee;
+  }
+  .dateBox {
+    border: 1px solid red;
+    width: 50%;
+    height: 50%;
   }
 }
 </style>
