@@ -296,7 +296,7 @@ export default {
       .get(`${SJ_URL}/seller_details`, {
         headers: {
           Authorization:
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyMiwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTE2MTU5NDB9.h3r1c1OUsxhwVCJ3iCWCc_QFc4oIS9BPk0DT20j4zc0"
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNCwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTE2MjA3OTN9.NpnYcqVJRF5JBkn_YQflfdfgEu-XjOBCPr9lcFyscns"
         }
       })
       .then(response => {
