@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import SrTitle from "./component/SrTitle";
-import BasicInfo from "./component/BasicInfo";
+import SrTitle from "./Components/SrTitle";
+import BasicInfo from "./Components/BasicInfo";
 
 export default {
   components: {

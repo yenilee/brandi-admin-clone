@@ -1,250 +1,66 @@
 {
-  "number_of_users": 7596,
-  "number_of_pages": 750,
-  "seller_list": [
+  "number_of_sellers": 3,
+  "number_of_pages": 1,
+  "sellers": [
     {
-      "meta_data_id": "0",
-      "seller_id": "testtesthi",
-      "seller_eng_name": "sungjun",
-      "seller_kor_name": "진성준",
-      "seller_회원번호": 426107,
-      "manager_infos_name": "진성준",
-      "seller_status": 1,
-      "manager_infos_phone_number": null,
-      "manager_infos_email": null,
-      "detail_attribute": "쇼핑몰",
-      "detail_number_of_products": 2,
-      "detail_url": "http://www.naver.com",
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_actions": {
-        "1": "입점 승인",
-        "2": "입점 거절",
-        "3": "휴점 신청",
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 해제 처리",
-        "7": "퇴점 철회 처리",
-        "8": "퇴점 철회 처리"
-      }
+      "id": 64,
+      "user": "abc123",
+      "eng_name": "abc",
+      "name": "에이비씨",
+      "seller_attributes.id": 1,
+      "seller_attributes.name": "쇼핑몰",
+      "seller_status.id": 1,
+      "seller_status.name": "입점대기",
+      "supervisor_infos.name": null,
+      "phone_number": null,
+      "email": null,
+      "number_of_product": 0,
+      "site_url": "http://www.abc123.com",
+      "created_at": "2020-06-05 00:38:42",
+      "actions_by_status": [
+        "입점 승인",
+        "입점 거절"
+      ]
     },
     {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이예은",
-      "seller_eng_name": "ye",
-      "seller_kor_name": "이예은",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
+      "id": 63,
+      "user": "yena0508",
+      "eng_name": "yenalee",
+      "name": "이예나",
+      "seller_attributes.id": 1,
+      "seller_attributes.name": "쇼핑몰",
+      "seller_status.id": 1,
+      "seller_status.name": "입점대기",
+      "supervisor_infos.name": null,
+      "phone_number": null,
+      "email": null,
+      "number_of_product": 0,
+      "site_url": "http://www.yena.com",
+      "created_at": "2020-06-05 00:38:13",
+      "actions_by_status": [
+        "입점 승인",
+        "입점 거절"
+      ]
     },
     {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이원철",
-      "seller_eng_name": "sungjun",
-      "seller_kor_name": "이원철",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "홍길동",
-      "seller_eng_name": "sungjun",
-      "seller_kor_name": "홍길동",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "하하하",
-      "seller_eng_name": "sungjun",
-      "seller_kor_name": "하하하",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "준",
-      "seller_eng_name": "sungjun",
-      "seller_kor_name": "준",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "로드샵",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "입점 승인",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이예은",
-      "seller_eng_name": "ye",
-      "seller_kor_name": "이예은",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이예은",
-      "seller_eng_name": "ye",
-      "seller_kor_name": "이예은",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이예은",
-      "seller_eng_name": "ye",
-      "seller_kor_name": "이예은",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이예은",
-      "seller_eng_name": "ye",
-      "seller_kor_name": "이예은",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이예은",
-      "seller_eng_name": "ye",
-      "seller_kor_name": "이예은",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
-    },
-    {
-      "meta_data_id": 1,
-      "created_at": "2020-05-29 19: 21: 25",
-      "seller_id": "testtesthi",
-      "manager_infos_phone_number": "010-5338-7244",
-      "manager_infos_email": null,
-      "manager_infos_name": "이예은",
-      "seller_eng_name": "ye",
-      "seller_kor_name": "이예은",
-      "detail_number_of_products": 2,
-      "seller_회원번호": 426107,
-      "seller_status": "퇴점대기",
-      "detail_attribute": "쇼핑몰",
-      "detail_url": "http://www.naver.com",
-      "seller_actions": {
-        "4": "휴점 신청",
-        "5": "퇴점 확정 처리",
-        "6": "퇴점 철회 처리"
-      }
+      "id": 62,
+      "user": "masteryeni",
+      "eng_name": "yeeunlee",
+      "name": "이예은",
+      "seller_attributes.id": 1,
+      "seller_attributes.name": "쇼핑몰",
+      "seller_status.id": 1,
+      "seller_status.name": "입점대기",
+      "supervisor_infos.name": "예은",
+      "phone_number": "010-4086-8910",
+      "email": "yeeun@nate.com",
+      "number_of_product": 1,
+      "site_url": "http://www.matisse.com",
+      "created_at": "2020-06-04 12:50:42",
+      "actions_by_status": [
+        "입점 승인",
+        "입점 거절"
+      ]
     }
   ]
 }

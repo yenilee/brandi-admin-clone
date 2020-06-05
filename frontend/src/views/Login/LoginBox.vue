@@ -112,7 +112,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .loginBox {
   width: 360px;
   height: 543px;

@@ -222,7 +222,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .signUpBox {
   width: 470px !important;
   margin: 0 auto;
