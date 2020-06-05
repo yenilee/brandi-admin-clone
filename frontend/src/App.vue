@@ -2,6 +2,6 @@
   <router-view />
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import "./assets/Styles/Reset.scss";
 </style>
