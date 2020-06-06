@@ -56,7 +56,6 @@
                     <th class="text-left">셀러아이디</th>
                     <th class="text-left">영문이름</th>
                     <th class="text-left">한글이름</th>
-                    <th class="text-left">회원번호</th>
                     <th class="text-left">담당자이름</th>
                     <th class="text-left">셀러상태</th>
                     <th class="text-left">담당자연락처</th>
@@ -71,11 +70,7 @@
                 <tbody>
                   <tr>
                     <td>
-                      <input
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas.meta_data_id"
-                        type="text"
-                      />
+                      <input v-on:keyup.enter="search()" v-model="searchDatas.id" type="text" />
                     </td>
                     <td>
                       <input
@@ -108,7 +103,7 @@
                     <td>
                       <input
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_infos_name"
+                        v-model="searchDatas.manager_name"
                         type="text"
                       />
                     </td>
@@ -116,7 +111,7 @@
                       <select
                         class="sellerStatus"
                         name="sellerStatus"
-                        v-model="searchDatas.seller_status"
+                        v-model="searchDatas.status_id"
                       >
                         <option value="status">입점대기</option>
                         <option value="status">입점</option>
@@ -128,14 +123,14 @@
                     <td>
                       <input
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_infos_phone_number"
+                        v-model="searchDatas.manager_phone_number"
                         type="text"
                       />
                     </td>
                     <td>
                       <input
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_infos_email"
+                        v-model="searchDatas.manager_email"
                         type="text"
                       />
                     </td>
@@ -171,22 +166,25 @@
 
                   <tr v-for="item in infoDatas" :key="item.name">
                     <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
-                    <td>{{ item.meta_data_id }}</td>
+                    <td>{{ item.id }}</td>
                     <td>{{ item.seller_id }}</td>
                     <td>{{ item.seller_eng_name }}</td>
                     <td>{{ item.seller_kor_name }}</td>
-                    <td>{{ item.seller_회원번호 }}</td>
-                    <td>{{ item.manager_infos_name }}</td>
-                    <td>{{ item.seller_status }}</td>
-                    <td>{{ item.manager_infos_phone_number }}</td>
-                    <td>{{ item.manager_infos_email }}</td>
-                    <td>{{ item.detail_attribute }}</td>
-                    <td>{{ item.detail_number_of_products }}</td>
-                    <td>{{ item.detail_url }}</td>
+                    <td>{{ item.manager_name }}</td>
+                    <td>{{ item.status_name}}</td>
+                    <td>{{ item.manager_phone_number }}</td>
+                    <td>{{ item.manager_email }}</td>
+                    <td>{{ item.seller_attribute_name }}</td>
+                    <td>{{ item.number_of_products }}</td>
+                    <td>{{ item.site_url }}</td>
                     <td>{{ item.created_at }}</td>
                     <td>
                       <!-- 클릭하면 상태를 post 하고, Post 처리가 된 뒤의 action 버튼들을 get 해야한다. -->
-                      <div class="statusBtnBox" v-for="action in item.seller_actions" :key="action">
+                      <div
+                        class="statusBtnBox"
+                        v-for="action in item.actions_by_status"
+                        :key="action"
+                      >
                         <button
                           style="background-color: #5bc0de; border-color: #46b8da;"
                           v-if="action === '입점 승인'"
@@ -249,15 +247,15 @@ export default {
       usersData: null,
       pagesData: null,
       searchDatas: {
-        meta_data_id: "",
+        id: "",
         seller_id: "",
         seller_eng_name: "",
         seller_kor_name: "",
         seller_number: "",
-        manager_infos_name: "",
-        seller_status: "",
-        manager_infos_phone_number: "",
-        manager_infos_email: "",
+        manager_name: "",
+        status_id: "",
+        manager_phone_number: "",
+        manager_email: "",
         detail_attribute: "",
         created_at: ""
       },
@@ -267,9 +265,10 @@ export default {
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
     axios.get(`${URL}/sellerList.json`).then(response => {
-      this.infoDatas = response.data.seller_list;
-      this.usersData = response.data.number_of_users;
+      this.infoDatas = response.data.sellers;
+      this.usersData = response.data.number_of_sellers;
       this.pagesData = response.data.number_of_pages;
+      console.log(response);
     });
   },
   computed: {
@@ -281,7 +280,7 @@ export default {
     search: function() {
       //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
-      alert(this.searchDatas.meta_data_id);
+      alert(this.searchDatas.id);
     }
   }
 };
