@@ -13,7 +13,7 @@ class UserService:
         self.user_dao = user_dao
         self.config   = config
     
-    def check_sign_in_validations(self, new_user):
+    def check_sign_up_validations(self, new_user):
 
             if not re.match(r'^[A-Za-z0-9][A-Za-z0-9_-]{4,20}$', new_user['user']):
                 return {'message' : 'ID_VALIDATION_ERROR'}, 400
@@ -36,19 +36,20 @@ class UserService:
             if not re.match(r'(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/].[^\s]*$))?', new_user['site_url']):
                 return {'message' : 'SITE_URL_VALIDATION_ERROR'}, 400
 
-    def create_new_user(self, new_user, db_connection):
+    def sign_up_seller(self, new_user, db_connection):
         try:            
-            if self.check_sign_in_validations(new_user):
-                return self.check_sign_in_validations(new_user)
 
-            user_count = self.user_dao.check_user_exists(new_user, db_connection)
+            if self.check_sign_up_validations(new_user):
+                return self.check_sign_up_validations(new_user)
 
-            if not user_count[0] == 0:
+            seller_id = self.user_dao.count_seller_id(new_user, db_connection)    
+
+            if not seller_id['count'] == 0:
                 return {'message' : 'USER_ALREADY_EXISTS'}, 400           
 
-            self.user_dao.insert_seller_key(new_user, db_connection)
+            self.user_dao.sign_up_seller_key(new_user, db_connection)
             new_user['password'] = bcrypt.hashpw(new_user['password'].encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
-            self.user_dao.insert_seller(new_user, db_connection)
+            self.user_dao.sign_up_seller(new_user, db_connection)
             return "", 200
 
         except KeyError:
@@ -59,11 +60,12 @@ class UserService:
             db_connection.rollback()             
             return {'message' : 'TYPE ERROR'}, 400
 
-    def check_user(self, get_user, db_connection):
-        user_count = self.user_dao.check_user_exists(get_user, db_connection)
+    def check_user(self, get_user, db_connection):        
         try:
-            if user_count[0] == 0:
-                return {'message' : 'USER_DOES_NOT_EXIST'}, 400
+            seller_id = self.user_dao.count_seller_id(get_user, db_connection)    
+
+            if seller_id['count'] == 0:
+                return {'message' : 'USER_DOES_NOT_EXIST'}, 400   
 
             user = self.user_dao.check_user(get_user, db_connection)
             password = self.user_dao.check_password(get_user, db_connection)
@@ -81,22 +83,39 @@ class UserService:
         except TypeError:
             return {'message' : 'TYPE ERROR'}, 400
 
-    def register_seller(self, seller_infos, db_connection):
-        self.user_dao.register_seller(seller_infos, db_connection)
-        return {"message" : "seller"}, 200
-    
-    def get_seller_info(self, user, db_connection):
-        try:
-            user_info        = self.user_dao.get_seller_infos(user, db_connection)
-            supervisor_info  = self.user_dao.get_supervisor_infos(user, db_connection)
+    def update_seller(self, user, seller_infos, db_connection):
+
+        seller_infos['user'] = user
+
+        previous_id = self.user_dao.get_previous_id(user, db_connection)  
+        self.user_dao.insert_new_seller(previous_id, db_connection)
+        self.user_dao.update_history(previous_id, db_connection) 
+
+        for supervisor in seller_infos['supervisors']:
+            supervisor['user'] = user 
+            self.user_dao.insert_supervisor(supervisor, db_connection)
+
+        for buisness_hour in seller_infos['buisness_hours']:
+            buisness_hour['user'] = user
+            self.user_dao.insert_buisness_hour(buisness_hour, db_connection)
+
+        seller_infos.pop('supervisors', None)
+        seller_infos.pop('buisness_hours', None)      
+
+        self.user_dao.update_seller(seller_infos, db_connection)              
+        return "", 200   
+      
+    def get_seller_details(self, user, db_connection):
+        try:            
+            user_info        = self.user_dao.get_seller_details(user, db_connection)
+            supervisor_info  = self.user_dao.get_supervisors(user, db_connection)
             buisness_hours   = self.user_dao.get_buisness_hours(user, db_connection)
             seller_histories = self.user_dao.get_seller_histories(user, db_connection)
-
             user_info[0]['supervisors']      = supervisor_info
             user_info[0]['buisness_hours']   = buisness_hours
             user_info[0]['seller_histories'] = seller_histories
 
-            return {'data' : user_info}, 200 
+            return {'data' : user_info[0]}, 200 
             
         except KeyError:
             return {'message' : 'KEY_ERROR'}, 400

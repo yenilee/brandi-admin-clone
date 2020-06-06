@@ -43,9 +43,11 @@ def create_user_endpoints(app, user_service):
         try:
             db_connection = get_connection()
             new_user = request.json
+
             if db_connection:
-                sign_up_response = user_service.create_new_user(new_user, db_connection)
+                sign_up_response = user_service.sign_up_seller(new_user, db_connection)
                 db_connection.commit()
+
                 return sign_up_response          
 
         except pymysql.err.InternalError:
@@ -122,32 +124,35 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 db_connection.close()
     
-    @app.route('/seller', methods = ['POST'])
-    def seller_register():
+    @app.route('/seller', methods = ['PUT'])
+    @authorize
+    def update_seller():
         db_connection = None 
         seller_infos = request.json
         try:
             db_connection = get_connection()
+
             if db_connection:
-                register_response = user_service.register_seller(seller_infos, db_connection)
-                db_connection.commit()                
+                register_response = user_service.update_seller(g.user, seller_infos, db_connection)
+                db_connection.commit()     
+
                 return register_response
 
-        except pymysql.err.InternalError as e:       
+        except pymysql.err.InternalError:       
 
-            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
-        except pymysql.err.IntegrityError:  
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+        except pymysql.err.IntegrityError as e:  
+            return {'message' : 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
 
         except Exception as e:
             db_connection.rollback()
@@ -157,10 +162,9 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 db_connection.close()
     
-
     @app.route('/seller_details', methods = ['GET'])
     @authorize
-    def get_seller_info():
+    def get_seller_details():
 
         """
         셀러 상세 (셀러 권한) API [GET]
@@ -180,18 +184,20 @@ def create_user_endpoints(app, user_service):
         db_connection = None         
         try:
             db_connection = get_connection()
+
             if db_connection:
-                seller_infos = user_service.get_seller_info(g.user, db_connection)                                
+                seller_infos = user_service.get_seller_details(g.user, db_connection) 
+
                 return seller_infos
 
-        except pymysql.err.InternalError as e:       
+        except pymysql.err.InternalError:       
 
-            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
+        except pymysql.err.ProgrammingError:
             return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:

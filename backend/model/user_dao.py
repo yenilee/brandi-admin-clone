@@ -3,7 +3,7 @@ import datetime
 
 class UserDao:
 
-    def insert_seller_key(self, new_user, db_connection):
+    def sign_up_seller_key(self, new_user, db_connection):
         cursor = db_connection.cursor()
 
         seller_key_insert_sql = """
@@ -15,7 +15,7 @@ class UserDao:
         """
         cursor.execute(seller_key_insert_sql, new_user)
 
-    def insert_seller(self, new_user, db_connection):
+    def sign_up_seller(self, new_user, db_connection):
         cursor = db_connection.cursor()
 
         seller_insert_sql =  """
@@ -52,11 +52,11 @@ class UserDao:
        
         cursor.execute(seller_insert_sql, new_user)
 
-    def check_user_exists(self, new_user, db_connection):
-        cursor = db_connection.cursor()
+    def count_seller_id(self, new_user, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
 
         check_user_sql = """
-        SELECT count(user)
+        SELECT count(user) AS count
         FROM seller_keys 
         WHERE user = %(user)s
         """
@@ -86,7 +86,7 @@ class UserDao:
         password = cursor.fetchone()
         return password
 
-    def get_seller_infos(self, user, db_connection):
+    def get_seller_details(self, user, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         seller_infos_get_sql = """
         SELECT
@@ -125,11 +125,10 @@ class UserDao:
         INNER JOIN seller_keys AS user ON sellers.seller_key_id = user.id        
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(seller_infos_get_sql, user)
+        cursor.execute(seller_infos_get_sql, user) 
         return cursor.fetchall()
         
-
-    def get_supervisor_infos(self, user, db_connection):
+    def get_supervisors(self, user, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         supervisor_infos_get_sql = """
         SELECT * 
@@ -152,25 +151,135 @@ class UserDao:
     def get_seller_histories(self, user, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         seller_histories_get_sql = """
-        SELECT 
+        SELECT
             start_date,
             status.name
         FROM sellers
         INNER JOIN seller_status AS status ON sellers.seller_status_id = status.id
-        WHERE seller_key_id = %s;         
+        WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';        
         """
         cursor.execute(seller_histories_get_sql, user)
         return cursor.fetchall()
 
-    def register_seller(self, seller_infos, db_connection):
-        cursor = db_connection.cursor()
+    def update_seller(self, seller_infos, db_connection):
+        cursor = db_connection.cursor() 
         seller_register_sql = """
-        UPDATE sellers 
-        SET 
-            profile=%(profile)s,
-            background_image=%(background_image)s,
-            simple_introduction=%(simple_introduction)s,
-            detail_introduction=%(detail_introduction)s 
-        WHERE seller_key_id=%(seller_key_id)s;
+        UPDATE sellers
+        SET  
+            profile = %(profile)s,
+            background_image = %(background_image)s,
+            simple_introduction = %(simple_introduction)s,
+            detail_introduction = %(detail_introduction)s,
+            site_url = %(site_url)s,
+            service_number = %(service_number)s,
+            zip_code = %(zip_code)s,
+            address = %(address)s,
+            detail_address = %(detail_address)s,
+            bank = %(bank)s,
+            account_owner =  %(account_owner)s,
+            bank_account = %(bank_account)s,
+            shipping_information = %(shipping_information)s,
+            refund_information = %(refund_information)s,
+            model_height = %(model_height)s,
+            model_size_top = %(model_size_top)s,
+            model_size_bottom = %(model_size_bottom)s,
+            model_size_foot = %(model_size_foot)s,
+            feed_message = %(feed_message)s
+            
+        WHERE seller_key_id = %(user)s AND end_date = '2037-12-31 23:59:59'
         """
         cursor.execute(seller_register_sql, seller_infos)
+    
+    def insert_supervisor(self, supervisor, db_connection):
+        cursor = db_connection.cursor()
+        supervisor_register_sql = """
+        INSERT INTO supervisor_infos (
+           seller_id, 
+           name,
+           phone_number,
+           email,
+           `order` 
+        ) VALUES(
+            (SELECT id FROM sellers WHERE end_date = '2037-12-31 23:59:59' AND seller_key_id = %(user)s),
+            %(supervisor_name)s,
+            %(supervisor_phone_number)s,
+            %(supervisor_email)s,
+            %(order)s
+        )       
+        """  
+        cursor.execute(supervisor_register_sql, supervisor)
+    
+    def insert_buisness_hour(self, buisness_hour, db_connection):        
+        cursor = db_connection.cursor()
+        supervisor_register_sql = """
+        INSERT INTO buisness_hours (
+           seller_id,
+           start_time,
+           end_time,
+           is_weekend 
+        ) VALUES (
+            (SELECT id FROM sellers WHERE end_date = '2037-12-31 23:59:59' AND seller_key_id = %(user)s),
+            %(start_time)s,
+            %(end_time)s,
+            %(is_weekend)s
+        )
+        """  
+        cursor.execute(supervisor_register_sql, buisness_hour)
+
+    def insert_new_seller(self, previous_id, db_connection): 
+
+        cursor = db_connection.cursor()
+        insert_seller_infos_sql = """
+        INSERT INTO sellers (
+        seller_key_id,
+        authority_id,
+        seller_attribute_id,
+        seller_status_id,
+        editor,
+        password,
+        phone_number,
+        name,
+        eng_name,
+        service_number,
+        site_url,
+        start_date,
+        end_date
+        ) 
+        SELECT
+            seller_key_id,
+            authority_id,
+            seller_attribute_id,
+            seller_status_id,
+            editor,
+            password,
+            phone_number,
+            name,
+            eng_name,
+            service_number,
+            site_url,
+            now(),
+            end_date  
+        FROM
+            sellers
+        WHERE id = %s;         
+        """    
+        cursor.execute(insert_seller_infos_sql, previous_id)  
+
+    def update_history(self, previous_id, db_connection):
+        cursor = db_connection.cursor()
+        insert_seller_infos_sql = """
+        UPDATE sellers
+        SET end_date = now()
+        WHERE id = %s;       
+        """  
+        cursor.execute(insert_seller_infos_sql, previous_id)    
+       
+    def get_previous_id(self, user, db_connection):
+        cursor = db_connection.cursor()
+        get_previous_id_sql = """
+        SELECT id
+        FROM sellers
+        WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';       
+        """  
+        cursor.execute(get_previous_id_sql, user)
+        return cursor.fetchone()   
