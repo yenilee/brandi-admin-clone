@@ -4,14 +4,14 @@
       <div class="logo"></div>
       <LoginBox />
     </div>
-    <Footer />
+    <LoginFooter />
   </div>
 </template>
 
 <script>
 import LoginBox from "./LoginBox";
 import SignUpBox from "../SignUp/SignUpBox";
-import LoginFooter from "./Footer";
+import LoginFooter from "./LoginFooter";
 
 export default {
   components: {
@@ -28,7 +28,6 @@ export default {
   margin: 75px auto 0 auto !important;
   padding: 0 !important;
   background-color: #fafafa;
-
   .logo {
     width: 360px;
     height: 82px;
@@ -37,20 +36,6 @@ export default {
     background-size: 130px 52px;
     background-repeat: no-repeat;
     background-position: center;
-  }
-}
-.LoginFooter {
-  width: 100vw;
-  height: 74px;
-  margin-top: 50px;
-  padding-top: 30px;
-  font-size: 12px;
-  color: #999ba2;
-  text-align: center;
-  background-color: #35363a;
-  div {
-    margin-bottom: 5px;
-    background-color: #35363a;
   }
 }
 </style>

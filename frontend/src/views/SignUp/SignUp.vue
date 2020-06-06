@@ -4,18 +4,18 @@
       <div class="logo"></div>
       <SignUpBox />
     </div>
-    <Footer />
+    <LoginFooter />
   </div>
 </template>
 
 <script>
 import SignUpBox from "./SignUpBox";
-import Footer from "../Login/Footer";
+import LoginFooter from "../Login/LoginFooter";
 
 export default {
   components: {
     SignUpBox,
-    Footer
+    LoginFooter
   }
 };
 </script>
@@ -35,19 +35,6 @@ export default {
     background-size: 130px 52px;
     background-repeat: no-repeat;
     background-position: center;
-  }
-}
-.footer {
-  width: 100vw;
-  height: 74px;
-  margin-top: 50px;
-  padding-top: 30px;
-  font-size: 12px;
-  color: #999ba2;
-  text-align: center;
-  background-color: #35363a;
-  div {
-    margin-bottom: 5px;
   }
 }
 </style>
