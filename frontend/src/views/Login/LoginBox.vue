@@ -112,7 +112,7 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .loginBox {
   width: 360px;
   height: 543px;
@@ -120,6 +120,7 @@ export default {
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
+
   .loginContainer {
     padding: 0px 30px 15px 30px;
   }

@@ -2,6 +2,7 @@ import bcrypt
 import jwt
 import json
 import re
+import collections
 
 from flask    import jsonify
 from config   import SECRET_KEY, ALGORITHM
@@ -71,7 +72,8 @@ class UserService:
             password = self.user_dao.check_password(get_user, db_connection)
 
             if bcrypt.checkpw(get_user['password'].encode('utf-8'), password[0].encode('utf-8')):
-                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1], 'exp' : datetime.utcnow() + timedelta(days=3) }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
+                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1], 'exp' : datetime.utcnow() + timedelta(days=15) }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
+
                 access_token = token.decode('utf-8')
                 return {'access_token' : access_token}, 200 
 
@@ -122,3 +124,26 @@ class UserService:
 
         except TypeError:
             return {'message' : 'TYPE_ERROR'}, 400
+
+
+    def get_sellerlist(self, db_connection):
+        try:
+            sellers = self.user_dao.get_sellerlist(db_connection)
+            seller_actions = self.user_dao.get_seller_action(db_connection)
+
+            merge_tuples = collections.defaultdict(list)
+            [ merge_tuples[k].extend(v.split(',')) for k, v in seller_actions ]
+
+            for seller in sellers:
+                for action in list(merge_tuples.items()):
+                    if action[0]== seller['seller_status.id']:
+                        seller.update({"actions_by_status" : action[1]})
+
+            return sellers
+
+        except KeyError:
+            return {'message' : 'KEY ERROR'}, 400
+
+        except TypeError:
+            return {'message' : 'TYPE ERROR'}, 400
+

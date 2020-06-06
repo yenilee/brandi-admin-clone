@@ -11,5 +11,19 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.LoginFooter {
+  width: 100vw;
+  height: 74px;
+  margin-top: 50px;
+  padding-top: 30px;
+  font-size: 12px;
+  color: #999ba2;
+  text-align: center;
+  background-color: #35363a;
+  div {
+    margin-bottom: 5px;
+    background-color: #35363a;
+  }
+}
 </style>
