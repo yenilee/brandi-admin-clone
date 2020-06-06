@@ -65,17 +65,15 @@
     <!-- info check input -->
     <div class="radioList">
       <p>셀러정보</p>
-      <div class="radioBox">
-        <v-radio-group v-model="seller_attribute_id.value" :mandatory="false">
-          <v-radio label="쇼핑몰" value="1"></v-radio>
-          <v-radio label="마켓" value="2"></v-radio>
-          <v-radio label="로드샵" value="3"></v-radio>
-          <v-radio label="디자이너 브랜드" value="4"></v-radio>
-          <v-radio label="제너럴 브랜드" value="5"></v-radio>
-          <v-radio label="네셔널 브랜드" value="6"></v-radio>
-          <v-radio label="기타" value="7"></v-radio>
-        </v-radio-group>
-      </div>
+      <v-radio-group class="radioBox" v-model="seller_attribute_id.value" :mandatory="false">
+        <v-radio label="쇼핑몰" value="1"></v-radio>
+        <v-radio label="마켓" value="2"></v-radio>
+        <v-radio label="로드샵" value="3"></v-radio>
+        <v-radio label="디자이너 브랜드" value="4"></v-radio>
+        <v-radio label="제너럴 브랜드" value="5"></v-radio>
+        <v-radio label="네셔널 브랜드" value="6"></v-radio>
+        <v-radio label="기타" value="7"></v-radio>
+      </v-radio-group>
     </div>
 
     <!-- name check input -->
@@ -222,7 +220,7 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .signUpBox {
   width: 470px !important;
   margin: 0 auto;

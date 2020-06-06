@@ -317,7 +317,7 @@ export default {
   }
 };
 </script>
-  <style lang="scss" >
+  <style lang="scss" scoped>
 .cmpWrap {
   border: 1px solid lightgray;
   border-radius: 3px;
