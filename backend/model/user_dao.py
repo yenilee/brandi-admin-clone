@@ -35,7 +35,7 @@ class UserDao:
                     end_date
                     ) VALUES (
                         (SELECT id FROM seller_keys WHERE user = %(user)s),
-                        2,
+                        1,
                         %(seller_attribute_id)s,
                         1,
                         %(password)s,
@@ -292,26 +292,25 @@ class UserDao:
         cursor.execute(get_previous_id_sql, user)
         return cursor.fetchone()   
 
-
     def get_sellerlist(self, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         sellers_list_sql = """
-        SELECT
-            sellers.id, 
-            seller_keys.user,
-            sellers.eng_name,
-            sellers.name,
-            seller_attributes.id,
-            seller_attributes.name,
-            seller_status.id,
-            seller_status.name,
-            supervisor_infos.name,
-            supervisor_infos.phone_number,
-            supervisor_infos.email,
+        SELECT DISTINCT
+            sellers.id AS id, 
+            seller_keys.user AS seller_id,
+            sellers.eng_name AS seller_eng_name,
+            sellers.name AS seller_kor_name,
+            seller_attributes.id AS seller_attribute_id,
+            seller_attributes.name AS seller_attribute_name,
+            sellers.seller_status_id AS status_id,
+            seller_status.name AS status_name,
+            supervisor_infos.name AS manager_name,
+            supervisor_infos.phone_number AS manager_phone_number,
+            supervisor_infos.email AS manager_email,
             (SELECT COUNT('product_keys.product_number') 
                 FROM product_keys 
-                WHERE sellers.seller_key_id = product_keys.seller_key_id) as number_of_product,
-            sellers.site_url,
+                WHERE sellers.seller_key_id = product_keys.seller_key_id) AS number_of_product,
+            sellers.site_url AS site_url,
             DATE_FORMAT(start_date, '%Y-%m-%d %H:%i:%s') AS created_at
         FROM sellers
         INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id
@@ -319,7 +318,7 @@ class UserDao:
         INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
         LEFT JOIN `supervisor_infos` ON supervisor_infos.seller_id = sellers.id AND supervisor_infos.order=1
         LEFT JOIN product_keys ON sellers.seller_key_id = product_keys.seller_key_id
-        WHERE end_date = '2037-12-31 23:59:59' and authority_id = 2
+        WHERE end_date = '2037-12-31 23:59:59' AND authority_id = 2
         ORDER BY sellers.id DESC;
         """
         cursor.execute(sellers_list_sql)

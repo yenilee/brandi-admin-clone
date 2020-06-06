@@ -3,7 +3,6 @@ import pymysql
 from flask      import request, g
 from connection import get_connection
 from utils      import authorize
-from decimal    import ROUND_HALF_UP
 
 def create_user_endpoints(app, user_service):
     user_service = user_service
@@ -112,8 +111,8 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:              
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e :
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'+ str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
@@ -129,7 +128,6 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 db_connection.close()
 
-
     @app.route('/sellers', methods=['GET'])
     @authorize
     def seller_list():
@@ -143,19 +141,22 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 sellers = user_service.get_sellerlist(db_connection)
 
-                return {'number_of_sellers' : len(sellers),
-                        'number_of_pages' : int(len(sellers)/10)+1,
-                        'sellers' : sellers,
-                        }, 200
+                if 400 in sellers:
+                    return sellers
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' +str(e)}, 500
+                return {'number_of_sellers' : len(sellers),
+                            'number_of_pages' : int(len(sellers)/10)+1,
+                            'sellers' : sellers,
+                            }, 200
+
+        except pymysql.err.InternalError:
+            return {'message': 'DATABASE_SERVER_ERROR'}, 500
 
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
@@ -181,11 +182,9 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 register_response = user_service.update_seller(g.user, seller_infos, db_connection)
                 db_connection.commit()     
-
                 return register_response
 
         except pymysql.err.InternalError:       
-
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
@@ -207,7 +206,7 @@ def create_user_endpoints(app, user_service):
         finally:
             if db_connection:
                 db_connection.close()
-    
+
     @app.route('/seller_details', methods = ['GET'])
     @authorize
     def get_seller_details():
@@ -237,14 +236,13 @@ def create_user_endpoints(app, user_service):
                 return seller_infos
 
         except pymysql.err.InternalError:       
-
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
         
         except pymysql.err.OperationalError:              
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
         except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500

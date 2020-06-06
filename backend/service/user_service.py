@@ -1,10 +1,8 @@
 import bcrypt
 import jwt
-import json
 import re
 import collections
 
-from flask    import jsonify
 from config   import SECRET_KEY, ALGORITHM
 from datetime import datetime, timedelta
 
@@ -61,7 +59,7 @@ class UserService:
             db_connection.rollback()             
             return {'message' : 'TYPE ERROR'}, 400
 
-    def check_user(self, get_user, db_connection):        
+    def check_user(self, get_user, db_connection):
         try:
             seller_id = self.user_dao.count_seller_id(get_user, db_connection)    
 
@@ -86,7 +84,6 @@ class UserService:
             return {'message' : 'TYPE ERROR'}, 400
 
     def update_seller(self, user, seller_infos, db_connection):
-
         seller_infos['user'] = user
 
         previous_id = self.user_dao.get_previous_id(user, db_connection)  
@@ -125,7 +122,6 @@ class UserService:
         except TypeError:
             return {'message' : 'TYPE_ERROR'}, 400
 
-
     def get_sellerlist(self, db_connection):
         try:
             sellers = self.user_dao.get_sellerlist(db_connection)
@@ -136,7 +132,7 @@ class UserService:
 
             for seller in sellers:
                 for action in list(merge_tuples.items()):
-                    if action[0]== seller['seller_status.id']:
+                    if action[0]== seller['status_id']:
                         seller.update({"actions_by_status" : action[1]})
 
             return sellers
