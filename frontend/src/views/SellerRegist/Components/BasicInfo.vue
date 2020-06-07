@@ -22,7 +22,7 @@
             <tbody>
               <tr>
                 <th>셀러 상태</th>
-                <td>{{infoDatas.data.name || ""}}</td>
+                <td>{{infoDatas.data.name}}</td>
               </tr>
             </tbody>
             <!-- 셀러 속성 테이블 -->
@@ -43,21 +43,23 @@
             </tbody>
             <!-- 셀러 한글명 -->
             <tbody>
-              <InputBox :value="infoDatas.data.kor_name" placeholder="셀러 한글명">
-                <template #thName>셀러 한글명</template>
-              </InputBox>
+              <tr>
+                <th>셀러 한글명</th>
+                <td>{{infoDatas.data.kor_name}}</td>
+              </tr>
             </tbody>
             <!-- 셀러 영문명 -->
             <tbody>
-              <InputBox :value="infoDatas.data.eng_name" placeholder="셀러 영문명">
-                <template #thName>셀러 영문명</template>
-              </InputBox>
+              <tr>
+                <th>셀러 영문명</th>
+                <td>{{infoDatas.data.eng_name}}</td>
+              </tr>
             </tbody>
             <!-- 셀러 계정 -->
             <tbody>
               <tr>
                 <th>셀러 계정</th>
-                <td>{{infoDatas.data.user_id || ""}}</td>
+                <td>{{infoDatas.data.user_id}}</td>
               </tr>
             </tbody>
           </template>
@@ -90,7 +92,7 @@
             </tbody>
             <!-- 셀러 한줄 소개 -->
             <tbody>
-              <InputBox :value="infoDatas.data.simple_introduction" placeholder="셀러 한줄 소개">
+              <InputBox v-model="simple_introduction" placeholder="셀러 한줄 소개">
                 <template #thName>셀러 한줄 소개</template>
               </InputBox>
             </tbody>
@@ -105,7 +107,7 @@
             </tbody>
             <!-- 셀러 사이트 URL -->
             <tbody>
-              <InputBox :value="infoDatas.data.site_url" placeholder="셀러 사이트 URL">
+              <InputBox v-model="site_url" placeholder="셀러 사이트 URL">
                 <template #thName>셀러 사이트 URL</template>
               </InputBox>
             </tbody>
@@ -278,13 +280,14 @@
         </v-simple-table>
       </div>
     </div>
+    <button @click="putInfoDatas">sdfdsf</button>
   </div>
 </template>
 
 
 <script>
 import axios from "axios";
-import { URL } from "../../../config/urlConfig";
+import { SJ_URL } from "../../../config/urlConfig";
 import ImageBox from "../Slots/ImageBox";
 import InputBox from "../Slots/InputBox";
 import TextAreaBox from "../Slots/TextAreaBox";
@@ -292,34 +295,136 @@ import ThreeInputBox from "../Slots/ThreeInputBox";
 export default {
   mounted: function() {
     axios
-      .get(`${URL}/sellerregist.json`, {
+      .get(`${SJ_URL}/seller_details`, {
         headers: {
           Authorization:
-            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNCwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTE2MjA3OTN9.NpnYcqVJRF5JBkn_YQflfdfgEu-XjOBCPr9lcFyscns"
+            "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozMiwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTI3Mjk3OTN9.EpZxH6fxkVd3HhGA2fTKFThntU_PgpF99n95Z6DmqLY"
         }
       })
       .then(response => {
         this.infoDatas = response.data;
-        console.log(this.infoDatas.data.supervisors[0].name);
+        this.profile = this.infoDatas.data.profile;
+        this.background_image = this.infoDatas.data.background_image;
+        this.simple_introduction = this.infoDatas.data.simple_introduction;
+        this.background_image = this.infoDatas.data.background_image;
+        this.site_url = this.infoDatas.data.site_url;
+        this.supervisors = this.infoDatas.data.supervisors;
+        this.service_number = this.infoDatas.data.service_number;
+        this.zip_code = this.infoDatas.data.zip_code;
+        this.address = this.infoDatas.data.address;
+        this.detail_address = this.infoDatas.data.detail_address;
+        this.buisness_hours = this.infoDatas.data.buisness_hours;
+        this.bank = this.infoDatas.data.bank;
+        this.account_owner = this.infoDatas.data.account_owner;
+        this.bank_account = this.infoDatas.data.bank_account;
+        this.shipping_information = this.infoDatas.data.shipping_information;
+        this.refund_information = this.infoDatas.data.refund_information;
+        this.model_height = this.infoDatas.data.model_height;
+        this.model_size_top = this.infoDatas.data.model_size_top;
+        this.model_size_bottom = this.infoDatas.data.model_size_bottom;
+        this.model_size_foot = this.infoDatas.data.model_size_foot;
+        this.feed_message = this.infoDatas.data.feed_message;
       });
-    // mounted: function() {
-    //   axios
-    //     .get(`${SJ_URL}/seller_details`, {
-    //       headers: {
-    //         Authorization:
-    //           "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNCwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTE2MjA3OTN9.NpnYcqVJRF5JBkn_YQflfdfgEu-XjOBCPr9lcFyscns"
-    //       }
-    //     })
-    //     .then(response => {
-    //       this.infoDatas = response.data;
-    //       console.log(this.infoDatas.data.name);
-    //     });
+  },
+  methods: {
+    putInfoDatas: function() {
+      axios
+        .put(
+          `${SJ_URL}/seller`,
+          {
+            profile: this.profile,
+            background_image: this.background_image,
+            simple_introduction: this.simple_introduction,
+            detail_introduction: this.detail_introduction,
+            site_url: this.site_url,
+            supervisors: [
+              {
+                supervisor_name: "담당자1",
+                supervisor_phone_number: "010-1234-1564",
+                supervisor_email: "담당자1 이메일",
+                order: "1"
+              },
+              {
+                supervisor_name: "담당자",
+                supervisor_phone_number: "010-1234-1564",
+                supervisor_email: "담당자2 이메일",
+                order: "2"
+              },
+              {
+                supervisor_name: "담당자3",
+                supervisor_phone_number: "010-5338-7244",
+                supervisor_email: "담당자3 이메일",
+                order: "3"
+              }
+            ],
+            service_number: this.service_number,
+            zip_code: this.zip_code,
+            address: this.address,
+            detail_address: this.detail_address,
+            buisness_hours: [
+              {
+                start_time: "9:00:00",
+                end_time: "6:00:00",
+                is_weekend: "0"
+              },
+              {
+                start_time: "9:00:00",
+                end_time: "6:00:00",
+                is_weekend: "1"
+              }
+            ],
+            bank: this.bank,
+            account_owner: this.account_owner,
+            bank_account: this.bank_account,
+            shipping_information: this.shipping_information,
+            refund_information: this.refund_information,
+            model_height: this.model_height,
+            model_size_top: this.model_size_top,
+            model_size_bottom: this.model_size_bottom,
+            model_size_foot: this.model_size_foot,
+            feed_message: this.feed_message
+          },
+          {
+            headers: {
+              Authorization:
+                "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozMiwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTI3Mjk3OTN9.EpZxH6fxkVd3HhGA2fTKFThntU_PgpF99n95Z6DmqLY"
+            }
+          }
+        )
+        .then(res => {
+          if (res.status === 200) {
+          }
+        })
+        .catch(error => console.log(error.response.data.message));
+    }
   },
   data() {
     return {
-      infoDatas: []
+      infoDatas: [],
+      profile: "",
+      background_image: "",
+      simple_introduction: "",
+      background_image: "",
+      site_url: "",
+      supervisors: "",
+      service_number: "",
+      zip_code: "",
+      address: "",
+      detail_address: "",
+      buisness_hours: "",
+      bank: "",
+      account_owner: "",
+      bank_account: "",
+      shipping_information: "",
+      refund_information: "",
+      model_height: "",
+      model_size_top: "",
+      model_size_bottom: "",
+      model_size_foot: "",
+      feed_message: ""
     };
   },
+
   components: {
     ImageBox,
     InputBox,

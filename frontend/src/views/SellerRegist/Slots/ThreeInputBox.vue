@@ -44,8 +44,7 @@ export default {
   data() {
     return {
       clickCount: 0,
-      name01: this.supervisors[0].name,
-      phon
+      name01: this.supervisors[0].name
     };
   }
 };

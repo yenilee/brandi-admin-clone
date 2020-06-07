@@ -4,7 +4,12 @@
       <slot name="thName"></slot>
     </th>
     <td>
-      <input type="text" :value="value" :placeholder="placeholder" />
+      <input
+        type="text"
+        :value="value"
+        @input="$emit('input',$event.target.value)"
+        :placeholder="placeholder"
+      />
     </td>
     <td class="infoTd">
       <slot name="infoText01"></slot>
@@ -14,7 +19,16 @@
 
 <script>
 export default {
-  props: ["placeholder", "value"]
+  props: {
+    placeholder: {
+      type: String
+    },
+    value: {
+      type: String
+    }
+  },
+
+  methods: {}
 };
 </script>
 
