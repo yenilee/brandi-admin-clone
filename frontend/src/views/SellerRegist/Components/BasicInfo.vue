@@ -285,7 +285,7 @@
 
 <script>
 import axios from "axios";
-import { SJ_URL } from "../../../config/urlConfig";
+import { URL } from "../../../config/urlConfig";
 import ImageBox from "../Slots/ImageBox";
 import InputBox from "../Slots/InputBox";
 import TextAreaBox from "../Slots/TextAreaBox";
@@ -293,7 +293,7 @@ import ThreeInputBox from "../Slots/ThreeInputBox";
 export default {
   mounted: function() {
     axios
-      .get(`${SJ_URL}/seller_details`, {
+      .get(`${URL}/sellerregist.json`, {
         headers: {
           Authorization:
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNCwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTE2MjA3OTN9.NpnYcqVJRF5JBkn_YQflfdfgEu-XjOBCPr9lcFyscns"
@@ -303,6 +303,18 @@ export default {
         this.infoDatas = response.data;
         console.log(this.infoDatas.data.name);
       });
+    // mounted: function() {
+    //   axios
+    //     .get(`${SJ_URL}/seller_details`, {
+    //       headers: {
+    //         Authorization:
+    //           "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNCwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTE2MjA3OTN9.NpnYcqVJRF5JBkn_YQflfdfgEu-XjOBCPr9lcFyscns"
+    //       }
+    //     })
+    //     .then(response => {
+    //       this.infoDatas = response.data;
+    //       console.log(this.infoDatas.data.name);
+    //     });
   },
   data() {
     return {
@@ -317,7 +329,7 @@ export default {
   }
 };
 </script>
-  <style lang="scss" scoped>
+  <style lang="scss" >
 .cmpWrap {
   border: 1px solid lightgray;
   border-radius: 3px;
