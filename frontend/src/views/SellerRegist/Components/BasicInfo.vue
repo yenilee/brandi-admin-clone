@@ -280,22 +280,29 @@
         </v-simple-table>
       </div>
     </div>
-    <button @click="putInfoDatas">sdfdsf</button>
+    <!-- 신청 클릭 하면 패치로 포스트 해보자 -->
+    <div class="signUpBtnBox">
+      <!-- 신청 클릭 하면 패치로 포스트 해보자 -->
+      <div class="signUpApply" @click="putInfoDatas">수정</div>
+      <div class="signUpCancel">취소</div>
+    </div>
   </div>
 </template>
 
 
 <script>
 import axios from "axios";
-import { SJ_URL } from "../../../config/urlConfig";
+import { URL } from "../../../config/urlConfig";
 import ImageBox from "../Slots/ImageBox";
 import InputBox from "../Slots/InputBox";
 import TextAreaBox from "../Slots/TextAreaBox";
 import ThreeInputBox from "../Slots/ThreeInputBox";
+// .get(`${SJ_URL}/seller_details`, {
 export default {
+  //첫 마운트가 되면 셀러의 기존 입력된 정보들을 불러오게 합니다.
   mounted: function() {
     axios
-      .get(`${SJ_URL}/seller_details`, {
+      .get(`${URL}/sellerRegist.json`, {
         headers: {
           Authorization:
             "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozMiwiYXV0aG9yaXR5X2lkIjoyLCJleHAiOjE1OTI3Mjk3OTN9.EpZxH6fxkVd3HhGA2fTKFThntU_PgpF99n95Z6DmqLY"
@@ -327,6 +334,7 @@ export default {
       });
   },
   methods: {
+    // 수정버튼을 누르면 백엔드로 인풋에 입력된 모든 내용을 보냅니다.
     putInfoDatas: function() {
       axios
         .put(
@@ -517,6 +525,37 @@ export default {
         margin-bottom: 20px;
       }
     }
+  }
+}
+.signUpBtnBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: #ffffff;
+  div {
+    padding: 10px 10px;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+  }
+  .signUpApply {
+    width: 50px;
+    height: 35px;
+    background-color: rgb(92, 184, 92);
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  .signUpCancel {
+    width: 50px;
+    height: 35px;
+    background-color: #eee;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    color: black;
+  }
+  a:visited {
+    color: black;
   }
 }
 </style>;
