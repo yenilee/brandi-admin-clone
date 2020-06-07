@@ -112,7 +112,7 @@
             <!-- 담당자 정보 -->
             <tbody>
               <ThreeInputBox
-                :value="infoDatas.data.eng_name"
+                :supervisors="infoDatas.data.supervisors"
                 placeholder01="담당자명"
                 placeholder02="담당자 핸드폰번호"
                 placeholder03="담당자 이메일"
@@ -136,17 +136,16 @@
             </tbody>
             <!-- 정산정보 입력 -->
             <tbody>
-              <ThreeInputBox
-                :value01="infoDatas.data.bank"
-                :value02="infoDatas.data.account_owner"
-                :value03="infoDatas.data.bank_account"
-                placeholder01="정산은행"
-                placeholder02="계좌주"
-                placeholder03="계좌번호"
-              >
-                <template #thName>정산정보 입력</template>
-              </ThreeInputBox>
+              <tr>
+                <th>정산정보 입력</th>
+                <td class="threeInput">
+                  <input type="text" :value="infoDatas.data.bank" placeholder="정산은행" />
+                  <input type="text" :value="infoDatas.data.account_owner" placeholder="계좌주" />
+                  <input type="text" :value="infoDatas.data.bank_account" placeholder="계좌번호" />
+                </td>
+              </tr>
             </tbody>
+
             <!-- 셀러상태 변경기록 -->
             <tbody>
               <th>셀러상태 변경기록</th>
@@ -301,7 +300,7 @@ export default {
       })
       .then(response => {
         this.infoDatas = response.data;
-        console.log(this.infoDatas.data.name);
+        console.log(this.infoDatas.data.supervisors[0].name);
       });
     // mounted: function() {
     //   axios
@@ -404,6 +403,13 @@ export default {
       }
       label {
         margin-right: 10px;
+      }
+    }
+    .threeInput {
+      display: flex;
+      flex-direction: column;
+      input {
+        margin-bottom: 20px;
       }
     }
   }
