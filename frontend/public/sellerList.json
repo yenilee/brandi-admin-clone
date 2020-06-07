@@ -1,65 +1,24 @@
 {
-  "number_of_sellers": 3,
+  "number_of_sellers": 1,
   "number_of_pages": 1,
   "sellers": [
     {
-      "id": 64,
-      "user": "abc123",
-      "eng_name": "abc",
-      "name": "에이비씨",
-      "seller_attributes.id": 1,
-      "seller_attributes.name": "쇼핑몰",
-      "seller_status.id": 1,
-      "seller_status.name": "입점대기",
-      "supervisor_infos.name": null,
-      "phone_number": null,
-      "email": null,
-      "number_of_product": 0,
-      "site_url": "http://www.abc123.com",
-      "created_at": "2020-06-05 00:38:42",
+      "id": 1,
+      "seller_id": "chun0917 ok",
+      "seller_eng_name": "chunminpark ok",
+      "seller_kor_name": "춘민 ok",
+      "seller_attribute_id": 2,
+      "seller_attribute_name": "마켓 ok",
+      "status_id": 1,
+      "status_name": "입점대기 ",
+      "manager_name": "yeni ok",
+      "manager_phone_number": "010-1111-2222 ok",
+      "manager_email": "yeni@gg.com ok",
+      "number_of_product": 3,
+      "site_url": "http://www.chunchun.com",
+      "created_at": "2020-06-05 20: 34: 12",
       "actions_by_status": [
-        "입점 승인",
-        "입점 거절"
-      ]
-    },
-    {
-      "id": 63,
-      "user": "yena0508",
-      "eng_name": "yenalee",
-      "name": "이예나",
-      "seller_attributes.id": 1,
-      "seller_attributes.name": "쇼핑몰",
-      "seller_status.id": 1,
-      "seller_status.name": "입점대기",
-      "supervisor_infos.name": null,
-      "phone_number": null,
-      "email": null,
-      "number_of_product": 0,
-      "site_url": "http://www.yena.com",
-      "created_at": "2020-06-05 00:38:13",
-      "actions_by_status": [
-        "입점 승인",
-        "입점 거절"
-      ]
-    },
-    {
-      "id": 62,
-      "user": "masteryeni",
-      "eng_name": "yeeunlee",
-      "name": "이예은",
-      "seller_attributes.id": 1,
-      "seller_attributes.name": "쇼핑몰",
-      "seller_status.id": 1,
-      "seller_status.name": "입점대기",
-      "supervisor_infos.name": "예은",
-      "phone_number": "010-4086-8910",
-      "email": "yeeun@nate.com",
-      "number_of_product": 1,
-      "site_url": "http://www.matisse.com",
-      "created_at": "2020-06-04 12:50:42",
-      "actions_by_status": [
-        "입점 승인",
-        "입점 거절"
+        "입점 승인"
       ]
     }
   ]
