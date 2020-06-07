@@ -73,18 +73,10 @@
                       <input v-on:keyup.enter="search()" v-model="searchDatas.id" type="text" />
                     </td>
                     <td>
-                      <input
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas.seller_id"
-                        type="text"
-                      />
+                      <input v-on:keyup.enter="search()" v-model="searchDatas.user" type="text" />
                     </td>
                     <td>
-                      <input
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas.seller_eng_name"
-                        type="text"
-                      />
+                      <input v-on:keyup.enter="search()" v-model="searchDatas.eng_name" type="text" />
                     </td>
                     <td>
                       <input
@@ -167,8 +159,8 @@
                   <tr v-for="item in infoDatas" :key="item.name">
                     <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
                     <td>{{ item.id }}</td>
-                    <td>{{ item.seller_id }}</td>
-                    <td>{{ item.seller_eng_name }}</td>
+                    <td>{{ item.user}}</td>
+                    <td>{{ item.eng_name }}</td>
                     <td>{{ item.seller_kor_name }}</td>
                     <td>{{ item.manager_name }}</td>
                     <td>{{ item.status_name}}</td>
@@ -248,8 +240,8 @@ export default {
       pagesData: null,
       searchDatas: {
         id: "",
-        seller_id: "",
-        seller_eng_name: "",
+        user: "",
+        eng_name: "",
         seller_kor_name: "",
         seller_number: "",
         manager_name: "",

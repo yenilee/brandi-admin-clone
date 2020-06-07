@@ -120,6 +120,7 @@ export default {
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
+
   .loginContainer {
     padding: 0px 30px 15px 30px;
   }
