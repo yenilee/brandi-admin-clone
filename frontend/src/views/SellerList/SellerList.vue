@@ -43,8 +43,6 @@
           <span>records Found total {{usersData}} records</span>
         </div>
 
-        <v-date-picker v-model="dates" range style="width:300px position: absolute"></v-date-picker>
-
         <!-- 테이블 시작 부분입니다. -->
         <template>
           <v-simple-table>
@@ -140,19 +138,7 @@
                     <td></td>
                     <td></td>
                     <!-- 달력이 있어야 할 곳 -->
-                    <td class="dateBox">
-                      <v-row>
-                        <v-col
-                          cols="12"
-                          sm="16"
-                          style="width: 250px; height:39px; padding: 0 12px; font-size:10px"
-                        >
-                          <v-text-field v-model="dateRangeText" label="Date range" readonly></v-text-field>
-                        </v-col>
-                      </v-row>
-                    </td>
                     <!-- 달력 -->
-
                     <td></td>
                   </tr>
 
