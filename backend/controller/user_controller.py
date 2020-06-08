@@ -1,11 +1,11 @@
 import pymysql
 
-from jsonschema import validate, ValidationError
+from jsonschema      import validate, ValidationError
 
-from flask      import request, g
-from connection import get_connection
-from utils      import authorize
-from config     import seller_register_schema
+from flask           import request, g
+from connection      import get_connection
+from utils           import authorize
+from json_schema     import seller_register_schema
 
 
 def create_user_endpoints(app, user_service):
@@ -64,15 +64,15 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
-        except pymysql.err.IntegrityError:
+        except pymysql.err.IntegrityError as e:
             db_connection.rollback()
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+            return {'message' : 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
 
         except Exception as e:
             db_connection.rollback()
@@ -175,11 +175,11 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 db_connection.close()
 
-    @app.route('/seller', methods = ['PUT'])
+    @app.route('/seller', methods=['PUT'])
     @authorize
     def update_seller():
         """
-        셀러 등록 / 수정 (셀러 권한) API [PUT]
+        셀러 수정 (셀러 권한) API [PUT]
 
         Args:
 
@@ -236,14 +236,15 @@ def create_user_endpoints(app, user_service):
         """
         db_connection = None
         seller_infos = request.json
-        try:
+        
+        try: 
             validate(seller_infos, seller_register_schema)
             db_connection = get_connection()
 
             if db_connection:
-                register_response = user_service.update_seller(g.user, seller_infos, db_connection)
+                update_response = user_service.update_seller(g.user, seller_infos, db_connection)
                 db_connection.commit()
-                return register_response
+                return update_response
 
         except  ValidationError:
             return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
@@ -264,10 +265,14 @@ def create_user_endpoints(app, user_service):
             return {'message' : 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
 
         except Exception as e:
-            db_connection.rollback()
+
+            if db_connection:
+                db_connection.rollback()
+
             return {'message' : str(e)}, 500
 
         finally:
+            
             if db_connection:
                 db_connection.close()
 
@@ -321,3 +326,4 @@ def create_user_endpoints(app, user_service):
         finally:
             if db_connection:
                 db_connection.close()
+    

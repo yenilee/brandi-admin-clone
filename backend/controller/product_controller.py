@@ -113,3 +113,14 @@ def create_product_endpoints(app, product_service):
         finally:
             if db_connection:
                 db_connection.close()
+
+    @app.route('/resize', methods=['POST'])
+    def resize_image():
+        db_connection = None
+      
+        db_connection = get_connection()
+        if db_connection:
+            image_url = '/home/sungjunjin/바탕화면/brandi.jpg'
+            register_response = product_service.resize_image(image_url, db_connection)
+            return image_url
+

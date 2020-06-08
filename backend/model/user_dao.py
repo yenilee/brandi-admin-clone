@@ -4,6 +4,7 @@ import datetime
 class UserDao:
 
     def sign_up_seller_key(self, new_user, db_connection):
+        # 셀러 고유 ID 저장 
         cursor = db_connection.cursor()
 
         seller_key_insert_sql = """
@@ -16,8 +17,8 @@ class UserDao:
         cursor.execute(seller_key_insert_sql, new_user)
 
     def sign_up_seller(self, new_user, db_connection):
+        # 회원가입 시 필요한 셀러 정보 저장 
         cursor = db_connection.cursor()
-
         seller_insert_sql =  """
                 INSERT INTO sellers (
                     seller_key_id,
@@ -51,12 +52,15 @@ class UserDao:
                         """
 
         cursor.execute(seller_insert_sql, new_user)
+        return cursor.lastrowid
 
     def count_seller_id(self, new_user, db_connection):
+        # 셀러 ID로 가입된 셀러 존재 여부 확인
+        # COUNT가 0일 아닐 경우 : 셀러 중복   
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
 
         check_user_sql = """
-        SELECT count(user) AS count
+        SELECT COUNT(user) AS count
         FROM seller_keys
         WHERE user = %(user)s
         """
@@ -95,6 +99,7 @@ class UserDao:
         return password
 
     def get_seller_details(self, user, db_connection):
+        #셀러 상세 정보 조회
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         seller_infos_get_sql = """
         SELECT
@@ -137,6 +142,7 @@ class UserDao:
         return cursor.fetchall()
 
     def get_supervisors(self, user, db_connection):
+        #셀러 담당자 정보 조회
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         supervisor_infos_get_sql = """
         SELECT *
@@ -147,6 +153,7 @@ class UserDao:
         return cursor.fetchall()
 
     def get_buisness_hours(self, user, db_connection):
+        #셀러 영업시간 조회
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         buisness_hours_get_sql = """
         SELECT *
@@ -157,11 +164,13 @@ class UserDao:
         return cursor.fetchall()
 
     def get_seller_histories(self, user, db_connection):
+        #셀러상태 변경기록 조회
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         seller_histories_get_sql = """
         SELECT
-            start_date,
-            status.name
+            DATE_FORMAT(start_date, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
+            status.name,
+            editor
         FROM sellers
         INNER JOIN seller_status AS status ON sellers.seller_status_id = status.id
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
@@ -170,6 +179,7 @@ class UserDao:
         return cursor.fetchall()
 
     def update_seller(self, seller_infos, db_connection):
+        #  셀러 나머지 정보 (한줄 소개, 간략 소개, 배경 이미지, 계좌 정보, 배송, 환불 정보 등) 업데이트
         cursor = db_connection.cursor()
         seller_register_sql = """
         UPDATE sellers
@@ -199,6 +209,7 @@ class UserDao:
         cursor.execute(seller_register_sql, seller_infos)
 
     def insert_supervisor(self, supervisor, db_connection):
+        # 담당자 정보 삽입
         cursor = db_connection.cursor()
         supervisor_register_sql = """
         INSERT INTO supervisor_infos (
@@ -217,7 +228,40 @@ class UserDao:
         """
         cursor.execute(supervisor_register_sql, supervisor)
 
+    def insert_initial_supervisor(self, new_user, db_connection):
+        # 초기 회원가입 시 담당자 정보에 셀러 핸드폰번호 초기화
+        cursor = db_connection.cursor()
+        supervisor_register_sql = """
+        INSERT INTO supervisor_infos (
+           seller_id,
+           phone_number,
+           `order`
+        ) VALUES (
+            %(last_row_id)s,
+            %(service_number)s,
+            1
+        )
+        """
+        cursor.execute(supervisor_register_sql, new_user)
+
+    def insert_initial_buisness_hours(self, new_user, db_connection):
+        # 초기 회원가입 시 담당자 정보에 셀러 영업시간 초기화
+        cursor = db_connection.cursor()
+        supervisor_register_sql = """
+        INSERT INTO buisness_hours (
+           seller_id,
+           start_time,
+           end_time
+        ) VALUES (
+            %(last_row_id)s,
+            '09:00:00',
+            '18:00:00'
+        )
+        """
+        cursor.execute(supervisor_register_sql, new_user)
+
     def insert_buisness_hour(self, buisness_hour, db_connection):
+        # 영업시간 정보 삽입
         cursor = db_connection.cursor()
         supervisor_register_sql = """
         INSERT INTO buisness_hours (
@@ -234,8 +278,8 @@ class UserDao:
         """
         cursor.execute(supervisor_register_sql, buisness_hour)
 
-    def insert_new_seller(self, previous_id, db_connection):
-
+    def insert_new_seller(self, recent_id, db_connection):
+        #셀러 정보 수정 시 가장 최근 셀러 기록에서 기본정보 (셀러 키 ID, 권한, 속성, 셀러 정보, 비밀번호, 이름, 영문 이름를 가져와 새로운 셀러 레코드 생성
         cursor = db_connection.cursor()
         insert_seller_infos_sql = """
         INSERT INTO sellers (
@@ -271,9 +315,10 @@ class UserDao:
             sellers
         WHERE id = %s;
         """
-        cursor.execute(insert_seller_infos_sql, previous_id)
+        cursor.execute(insert_seller_infos_sql, recent_id)
 
     def update_history(self, previous_id, db_connection):
+        # 이전의 셀러 레코드의 유효종료일을 현재 시점으로 업데이트
         cursor = db_connection.cursor()
         insert_seller_infos_sql = """
         UPDATE sellers
@@ -282,14 +327,15 @@ class UserDao:
         """
         cursor.execute(insert_seller_infos_sql, previous_id)
 
-    def get_previous_id(self, user, db_connection):
+    def get_recent_seller_id(self, user, db_connection):
+        # 가장 최근에 수정된 셀러 레코드의 id를 가져온다 
         cursor = db_connection.cursor()
-        get_previous_id_sql = """
+        get_recent_seller_id_sql = """
         SELECT id
         FROM sellers
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(get_previous_id_sql, user)
+        cursor.execute(get_recent_seller_id_sql, user)
         return cursor.fetchone()
 
     def get_sellerlist(self, db_connection):
@@ -334,5 +380,3 @@ class UserDao:
         cursor.execute(seller_actions_sql)
         seller_actions = cursor.fetchall()
         return seller_actions
-
-
