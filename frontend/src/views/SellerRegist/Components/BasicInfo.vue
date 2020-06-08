@@ -584,6 +584,10 @@ export default {
       font-size: 14px;
       font-weight: 500;
       color: #333333;
+      background-color: white;
+    }
+    input:focus {
+      outline: 1px solid #eee;
     }
 
     textarea {
@@ -592,6 +596,7 @@ export default {
       padding: 6px 12px;
       border: 1px solid lightgray;
       border-radius: 3px;
+      background-color: white;
     }
 
     .infoTd {
