@@ -37,6 +37,24 @@
         "name": "이원철",
         "phone_number": "010-4086-8910",
         "email": "lwc@lwc.co.kr"
+      },
+      {
+        "id": 2,
+        "seller_id": 2,
+        "is_deleted": 0,
+        "order": 1,
+        "name": "이원철",
+        "phone_number": "010-4086-8910",
+        "email": "lwc@lwc.co.kr"
+      },
+      {
+        "id": 2,
+        "seller_id": 2,
+        "is_deleted": 0,
+        "order": 1,
+        "name": "이원철",
+        "phone_number": "010-4086-8910",
+        "email": "lwc@lwc.co.kr"
       }
     ],
     "buisness_hours": [
