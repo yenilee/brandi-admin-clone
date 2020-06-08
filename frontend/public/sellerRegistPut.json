@@ -1,0 +1,53 @@
+{
+  "profile": "url",
+  "background_image": "url",
+  "simple_introduction": "안녕 난 진아야 안녕",
+  "detail_introduction": "셀러 상세 소개",
+  "site_url": "http://www.naver.com",
+  "supervisors": [
+    {
+      "supervisor_name": "담당자1",
+      "supervisor_phone_number": "담당자1 핸드폰번호",
+      "supervisor_email": "담당자1 이메일",
+      "order": "1"
+    },
+    {
+      "supervisor_name": "담당자",
+      "supervisor_phone_number": "담당자2 핸드폰번호",
+      "supervisor_email": "담당자2 이메일",
+      "order": "2"
+    },
+    {
+      "supervisor_name": "담당자3",
+      "supervisor_phone_number": "담당자3 핸드폰번호",
+      "supervisor_email": "담당자3 이메일",
+      "order": "3"
+    }
+  ],
+  "service_number": "010-5338-7244",
+  "zip_code": "우편번호",
+  "address": "주소 (택배 수령지)",
+  "detail_address": "상세주소 (택배 수령지)",
+  "buisness_hours": [
+    {
+      "start_time": "9:00:00",
+      "end_time": "6:00:00",
+      "is_weekend": "0"
+    },
+    {
+      "start_time": "9:00:00",
+      "end_time": "6:00:00",
+      "is_weekend": "1"
+    }
+  ],
+  "bank": "정산은행",
+  "account_owner": "계좌주",
+  "bank_account": "계좌번호",
+  "shipping_information": "배송정보",
+  "refund_information": "교환 / 환불 정보",
+  "model_height": 177,
+  "model_size_top": 50,
+  "model_size_bottom": 30,
+  "model_size_foot": 255,
+  "feed_message": "안녕하세요 OOO에요! 봄에 어울리는 신상이 입고 되었습니다."
+}
