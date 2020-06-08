@@ -45,6 +45,15 @@
         "name": "이예은",
         "phone_number": "010-1234-1567",
         "email": "leeye@brandi.co.kr"
+      },
+      {
+        "id": 3,
+        "seller_id": null,
+        "is_deleted": null,
+        "order": null,
+        "name": null,
+        "phone_number": null,
+        "email": null
       }
     ],
     "buisness_hours": [
@@ -68,7 +77,8 @@
     "seller_histories": [
       {
         "start_date": "Thu, 04 Jun 2020 09:29:39 GMT",
-        "name": "입점대기"
+        "name": "입점대기",
+        "editor": "master"
       }
     ]
   }
