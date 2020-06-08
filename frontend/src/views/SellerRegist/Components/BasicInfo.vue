@@ -609,6 +609,7 @@ export default {
         width: 10px;
         height: 10px;
         margin-right: 10px;
+        background-color: white;
       }
       label {
         margin-right: 10px;
