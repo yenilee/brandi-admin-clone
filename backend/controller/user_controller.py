@@ -1,7 +1,5 @@
 import pymysql
 
-from jsonschema      import validate, ValidationError
-
 from flask           import request, g
 from connection      import get_connection
 from utils           import authorize
