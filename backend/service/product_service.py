@@ -1,16 +1,19 @@
 import json
 import boto3
 
+from PIL         import Image
+from config      import S3
+
 class ProductService:
 
     def __init__(self, product_dao, config):
         self.product_dao = product_dao
         self.config   = config
-        # self.s3 = boto3.client(
-        #     "s3",
-        #     aws_access_key_id     = S3['S3_ACCESS_KEY'],
-        #     aws_secret_access_key = S3['S3_SECRET_KEY']
-        # )
+        self.s3 = boto3.client(
+            "s3",
+            aws_access_key_id     = S3['S3_ACCESS_KEY'],
+            aws_secret_access_key = S3['S3_SECRET_KEY']
+        )
 
     def create_new_product(self, product, db_connection):
         try:
