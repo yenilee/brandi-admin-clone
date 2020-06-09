@@ -1,3 +1,4 @@
+import pymysql
 import json
 import boto3
 
@@ -86,5 +87,15 @@ class ProductService:
             "image_large"
         )
 
-        
-    
+    def get_product_list(self, db_connection):
+        try:
+            product = self.product_dao.get_product_list(db_connection)
+            return {'first_categories' : product}, 200
+
+        except KeyError as e:
+            db_connection.rollback()
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            db_connection.rollback()
+            return {'message': 'TYPE ERROR' + str(e)}, 400

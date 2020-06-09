@@ -97,7 +97,7 @@ class ProductDao:
         cursor.execute(get_sellers_sql)
         return cursor.fetchall()
 
-    def get_product_first_category(self, user, db_connection):
+    def get_product_first_category(self, user, db_connection):  
         cursor = db_connection.cursor()
 
         get_attribute_group_sql = """
@@ -127,3 +127,20 @@ class ProductDao:
         get_categories = cursor.fetchall()
 
         return get_categories
+
+    def get_product_list(self, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+
+        product_list_sql = """
+
+        SELECT 
+        DATE_FORMAT(start_date, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
+        name 
+        FROM products
+        """
+
+        cursor.execute(product_list_sql)
+        return cursor.fetchall()
+
+        
+    
