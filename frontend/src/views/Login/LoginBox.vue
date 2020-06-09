@@ -9,6 +9,7 @@
           placeholder="셀러 아이디"
           v-bind:class="{ defaultInput: loginState, warningInput: !loginState }"
           @keyup="idKeyHandler()"
+          @keyup.enter="inputHandler()"
         />
         <span v-bind:class="{ defaultText: loginState, warningText: !loginState }">아이디를 입력해 주세요.</span>
       </div>
@@ -21,6 +22,7 @@
           placeholder="셀러 비밀번호"
           v-bind:class="{ defaultInput: passwordState, warningInput: !passwordState }"
           @keyup="pwKeyHandler()"
+          @keyup.enter="inputHandler()"
         />
         <span
           v-bind:class="{ defaultText: passwordState, warningText: !passwordState }"
