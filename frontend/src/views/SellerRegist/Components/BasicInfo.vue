@@ -76,7 +76,10 @@
             <!-- 셀러 한줄 소개 -->
             <tbody>
               <InputBox v-model="simple_introduction" placeholder="셀러 한줄 소개">
-                <template #thName>셀러 한줄 소개</template>
+                <template #thName>
+                  셀러 한줄 소개
+                  <i class="xi-pen" />
+                </template>
               </InputBox>
             </tbody>
             <!-- 셀러 상세 소개 -->
@@ -91,13 +94,19 @@
             <!-- 셀러 사이트 URL -->
             <tbody>
               <InputBox v-model="site_url" placeholder="셀러 사이트 URL">
-                <template #thName>셀러 사이트 URL</template>
+                <template #thName>
+                  셀러 사이트 URL
+                  <i class="xi-pen" />
+                </template>
               </InputBox>
             </tbody>
             <!-- 담당자 정보 -->
             <tbody>
               <tr>
-                <th>담당자정보</th>
+                <th>
+                  담당자정보
+                  <i class="xi-pen" />
+                </th>
                 <td></td>
                 <td class="threeInput">
                   <input
@@ -199,12 +208,18 @@
             <!-- 고객센터 -->
             <tbody>
               <InputBox v-model="service_number" placeholder="고객센터 전화번호">
-                <template #thName>고객센터</template>
+                <template #thName>
+                  고객센터
+                  <i class="xi-pen" />
+                </template>
               </InputBox>
             </tbody>
             <!-- 택배 -->
             <tbody>
-              <th>택배주소</th>
+              <th>
+                택배주소
+                <i class="xi-pen" />
+              </th>
               <td class="addressBox">
                 <div class="addressBtn">
                   <input
@@ -228,7 +243,10 @@
             </tbody>
             <!-- 고객센터 운영시간(주중)-->
             <tbody>
-              <th>고객센터 운영시간(주중)</th>
+              <th>
+                고객센터 운영시간(주중)
+                <i class="xi-pen" />
+              </th>
               <td>
                 <v-app id="inspire">
                   <v-row>
@@ -285,7 +303,10 @@
             <!-- 정산정보 입력 -->
             <tbody>
               <tr>
-                <th>정산정보 입력</th>
+                <th>
+                  정산정보 입력
+                  <i class="xi-pen" />
+                </th>
                 <td class="threeInput">
                   <input type="text" v-model="bank" placeholder="정산은행" />
                   <input type="text" v-model="account_owner" placeholder="계좌주" />
@@ -345,7 +366,10 @@
               v-model="shipping_information"
               placeholder="ex) 도서산간 지역은 배송비가 추가비용이 발생할 수 있습니다. 결제 완료 후 1~3일 후 출고됩니다."
             >
-              <template #thName>배송 정보</template>
+              <template #thName>
+                배송 정보
+                <i class="xi-pen" />
+              </template>
               <template #infoText01>
                 <i class="xi-info">문장이 끝나면 엔터로 줄바꿈을 해주세요.</i>
               </template>
@@ -356,7 +380,10 @@
               v-model="refund_information"
               placeholder="ex) 브랜디는 소비자보호법 및 전자상거래법을 기반한 환불보장제를 운영 중에 있습니다. 정당하지 않은 사유로 인한 환불 거부 등은 제재 사유가 될 수 있는 점 참고 부탁드립니다."
             >
-              <template #thName>교환/환불 정보</template>
+              <template #thName>
+                교환/환불 정보
+                <i class="xi-pen" />
+              </template>
               <template #infoText01>
                 <i class="xi-info">문장이 끝나면 엔터로 줄바꿈을 해주세요.</i>
               </template>
@@ -456,7 +483,7 @@
         </v-simple-table>
       </div>
     </div>
-    <div class="test" v-if="addressModal">
+    <div class="daumAddress" v-if="addressModal">
       <div id="app">
         <DaumPostcode :on-complete="handleAddress" />
       </div>
@@ -649,7 +676,7 @@ export default {
           })
           .catch(error => {
             console.log(error.response.data.message);
-            alert("올바른 정보를 기입해 주시기 바랍니다.");
+            alert("입력하지 않은 필수항목이 있습니다. 다시 확인해주세요.");
           });
       }
     },
@@ -877,7 +904,7 @@ export default {
     min-height: unset;
   }
 }
-.test {
+.daumAddress {
   background-color: white;
   position: fixed;
   display: flex;
@@ -919,5 +946,8 @@ export default {
 .minusBtn {
   background-color: #d9534f;
   border-color: #d43f3a;
+}
+.xi-pen {
+  color: red;
 }
 </style>;
