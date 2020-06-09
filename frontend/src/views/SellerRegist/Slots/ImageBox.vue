@@ -31,6 +31,7 @@ label {
   padding: 8px 13px;
   border-radius: 3px;
   cursor: pointer;
+  background-color: white;
 }
 input {
   display: none;
