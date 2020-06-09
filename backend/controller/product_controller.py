@@ -201,56 +201,47 @@ def create_product_endpoints(app, product_service):
             register_response = product_service.resize_image(image_url, db_connection)
             return image_url
 
-    @app.route('/product/category', methods = ['GET'])
+    @app.route('/products', methods=['GET'])
     @authorize
-    def get_second_category():
+    def get_product_list():
 
-        """
-        2차 카테고리 API [GET]
-
-        Args:
-
-        [Header]
-        Authorization : 로그인 토큰
-
-        [body]
-        first_category_id : 1차 카테고리 id
-
-        Returns:
-
-        success    : {"second_categories" : second_category}, code : 200
-        key error  : {"message" : "KEY_ERROR"}, code : 400
-        """
+        if g.auth is not 1:
+            return {'message' : 'UNAUTHORIZED'}, 401
 
         db_connection = None
-        product = request.json
         try:
             db_connection = get_connection()
             if db_connection:
+                products = product_service.get_product_list(db_connection)
 
-                product['seller_id'] = g.user
-                second_category = product_service.get_second_category(product, db_connection)
-                return {"second_categories" : second_category}, 200
+                # if 400 in products:
+                #     return products
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
+                # return {'number_of_sellers' : len(products),
+                #             'number_of_pages' : int(len(products)/10)+1,
+                #             'sellers' : products,
+                #             }, 200
+
+                return products
+
+        except pymysql.err.InternalError:
+            return {'message': 'DATABASE_SERVER_ERROR'}, 500
 
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
+        except pymysql.err.IntegrityError:
+            return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
 
-        except Exception as e:
+        except  Exception as e:
             return {'message': str(e)}, 500
 
         finally:
             if db_connection:
                 db_connection.close()
-

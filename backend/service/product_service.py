@@ -1,3 +1,4 @@
+import pymysql
 import json
 import boto3
 
@@ -24,6 +25,7 @@ class ProductService:
             self.product_dao.update_product_number(db_connection)
 
             # 상품 옵션(색상, 사이즈 조합) insert
+
             # self.product_dao.insert_options(product, db_connection)
 
             # 상품 고시 정보를 상세 상품 정보에 표시할 경우 notices id를 null 값으로 표시
