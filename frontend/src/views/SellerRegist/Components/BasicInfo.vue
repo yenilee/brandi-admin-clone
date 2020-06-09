@@ -25,23 +25,6 @@
                 <td>{{infoDatas.data.name}}</td>
               </tr>
             </tbody>
-            <!-- 셀러 속성 테이블 -->
-            <!-- <tbody>
-              <tr>
-                <th>셀러속성</th>
-                <td>
-                  <div class="option">
-                    <input type="radio" id="option1" name="option" value="option1" />
-                    <label for="option1">쇼핑몰</label>
-                    <input type="radio" id="option2" name="option" value="option2" />
-                    <label for="option2">마켓</label>
-                    <input type="radio" id="option3" name="option" value="option3" />
-                    <label for="option3">로드샵</label>
-                  </div>
-                </td>
-              </tr>
-            </tbody>-->
-            <!-- 셀러 한글명 -->
             <tbody>
               <tr>
                 <th>셀러 한글명</th>
@@ -116,66 +99,101 @@
               <tr>
                 <th>담당자정보</th>
                 <td></td>
-                <!-- <td class="threeInput">
-                  <input
-                    type="text"
-                    v-model="supervisors[0].name"
-                    @input="supervisors[0].name = $event.target.value"
-                    placeholder="담당자명"
-                  />
-                  <input
-                    type="text"
-                    v-model="supervisors[0].phone_number"
-                    @input="supervisors[0].phone_number = $event.target.value"
-                    placeholder="담당자 번호"
-                  />
-                  <input
-                    type="text"
-                    v-model="supervisors[0].email"
-                    @input="supervisors[0].email = $event.target.value"
-                    placeholder="담당자 이메일"
-                  />
-                </td>
                 <td class="threeInput">
                   <input
                     type="text"
-                    v-model="supervisors[1].name"
-                    @input="supervisors[1].name = $event.target.value"
+                    v-model="supervisors[0].supervisor_name"
+                    @input="supervisors[0].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="supervisors[1].phone_number"
-                    @input="supervisors[1].phone_number = $event.target.value"
+                    v-model="supervisors[0].supervisor_phone_number"
+                    @input="supervisors[0].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
                   />
-                  <input
-                    type="text"
-                    v-model="supervisors[1].email"
-                    @input="supervisors[1].email = $event.target.value"
-                    placeholder="담당자 이메일"
-                  />
+                  <div style="display: flex">
+                    <input
+                      type="text"
+                      v-model="supervisors[0].supervisor_email"
+                      @input="supervisors[0].supervisor_email = $event.target.value"
+                      placeholder="담당자 이메일"
+                    />
+                    <div
+                      v-if="tableCount == 1"
+                      @click="tableCount = 2"
+                      class="supervisorsBtn plusBtn"
+                    >
+                      <i class="xi-plus"></i>
+                    </div>
+                  </div>
                 </td>
-                <td class="threeInput">
+                <td class="threeInput" v-if="tableCount > 1">
                   <input
                     type="text"
-                    v-model="supervisors[2].name"
-                    @input="supervisors[2].name = $event.target.value"
+                    v-model="supervisors[1].supervisor_name"
+                    @input="supervisors[1].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="supervisors[2].phone_number"
-                    @input="supervisors[2].phone_number = $event.target.value"
+                    v-model="supervisors[1].supervisor_phone_number"
+                    @input="supervisors[1].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
+                  />
+                  <div style="display: flex">
+                    <input
+                      type="text"
+                      v-model="supervisors[1].supervisor_email"
+                      @input="supervisors[1].supervisor_email = $event.target.value"
+                      placeholder="담당자 이메일"
+                    />
+                    <div
+                      v-if="tableCount == 2"
+                      @click="tableCount = 3"
+                      class="supervisorsBtn plusBtn"
+                    >
+                      <i class="xi-plus"></i>
+                    </div>
+                    <div
+                      v-if="tableCount == 2"
+                      @click="() => supervisorsMinus(1)"
+                      class="supervisorsBtn minusBtn"
+                    >
+                      <i class="xi-minus"></i>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="threeInput" v-if="tableCount > 2">
+                  <input
+                    type="text"
+                    v-model="supervisors[2].supervisor_name"
+                    @input="supervisors[2].supervisor_name = $event.target.value"
+                    placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="supervisors[2].email"
-                    @input="supervisors[2].email = $event.target.value"
-                    placeholder="담당자 이메일"
+                    v-model="supervisors[2].supervisor_phone_number"
+                    @input="supervisors[2].supervisor_phone_number = $event.target.value"
+                    placeholder="담당자 번호"
                   />
-                </td>-->
+                  <div style="display: flex">
+                    <input
+                      type="text"
+                      v-model="supervisors[2].supervisor_email"
+                      @input="supervisors[2].supervisor_email = $event.target.value"
+                      placeholder="담당자 이메일"
+                    />
+                    <div
+                      v-if="tableCount == 3"
+                      @click="() => supervisorsMinus(2)"
+                      class="supervisorsBtn minusBtn"
+                    >
+                      <i class="xi-minus"></i>
+                    </div>
+                  </div>
+                </td>
               </tr>
             </tbody>
             <!-- 고객센터 -->
@@ -187,12 +205,82 @@
             <!-- 택배 -->
             <tbody>
               <th>택배주소</th>
-              <td></td>
+              <td class="addressBox">
+                <div class="addressBtn">
+                  <input
+                    class="disabledInput"
+                    type="text"
+                    v-model="zip_code"
+                    placeholder="우편번호"
+                    disabled
+                  />
+                  <div class="searchZip" @click="addressModalOpen()">우편번호 찾기</div>
+                </div>
+                <input
+                  class="disabledInput"
+                  type="text"
+                  v-model="address"
+                  placeholder="주소(택배 수령지)"
+                  disabled
+                />
+                <input type="text" v-model="detail_address" placeholder="상세주소(택배 수령지)" />
+              </td>
             </tbody>
-            <!-- 고객센터 운영시간(주중) -->
+            <!-- 고객센터 운영시간(주중)-->
             <tbody>
               <th>고객센터 운영시간(주중)</th>
-              <td></td>
+              <td>
+                <v-app id="inspire">
+                  <v-row>
+                    <v-col cols="1">
+                      <v-text-field
+                        :value="buisness_hours[0].start_time"
+                        @input="buisness_hours[0].start_time = $event"
+                        type="time"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-app>
+                <v-app id="inspire">
+                  <v-row>
+                    <v-col cols="1">
+                      <v-text-field
+                        :value="buisness_hours[0].end_time"
+                        @input="buisness_hours[0].end_time = $event"
+                        type="time"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-app>
+              </td>
+            </tbody>
+            <!-- 고객센터 운영시간(주중)-->
+            <tbody>
+              <th>고객센터 운영시간(주말)</th>
+              <td>
+                <v-app id="inspire">
+                  <v-row>
+                    <v-col cols="1">
+                      <v-text-field
+                        :value="buisness_hours[1].start_time"
+                        @input="buisness_hours[1].start_time = $event"
+                        type="time"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-app>
+                <v-app id="inspire">
+                  <v-row>
+                    <v-col cols="1">
+                      <v-text-field
+                        :value="buisness_hours[1].end_time"
+                        @input="buisness_hours[1].end_time = $event"
+                        type="time"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-app>
+              </td>
             </tbody>
             <!-- 정산정보 입력 -->
             <tbody>
@@ -219,7 +307,7 @@
                     <th>셀러상태 변경 적용일시</th>
                   </tr>
                   <tr>
-                    <td>{{history.start_date}}</td>
+                    <td>{{history.created_at}}</td>
                   </tr>
                 </tbody>
                 <tbody>
@@ -252,7 +340,7 @@
       <div class="cmpTable">
         <v-simple-table>
           <!-- 테이블 시작 영역 -->
-          <tbody class="test">
+          <tbody>
             <TextAreaBox
               v-model="shipping_information"
               placeholder="ex) 도서산간 지역은 배송비가 추가비용이 발생할 수 있습니다. 결제 완료 후 1~3일 후 출고됩니다."
@@ -368,6 +456,14 @@
         </v-simple-table>
       </div>
     </div>
+    <div class="test" v-if="addressModal">
+      <div id="app">
+        <DaumPostcode :on-complete="handleAddress" />
+      </div>
+      <div @click="addressModalOpen()" class="appCancel">
+        <i class="xi-close"></i>
+      </div>
+    </div>
     <!-- 신청 클릭 하면 패치로 포스트 해보자 -->
     <div class="btnBox">
       <!-- 신청 클릭 하면 패치로 포스트 해보자 -->
@@ -384,7 +480,9 @@ import { SJ_URL } from "../../../config/urlConfig";
 import ImageBox from "../Slots/ImageBox";
 import InputBox from "../Slots/InputBox";
 import TextAreaBox from "../Slots/TextAreaBox";
-// .get(`${SJ_URL}/seller_details`, {
+import DaumPostcode from "vuejs-daum-postcode";
+
+// .get(`${URL}/seller_details`, {
 export default {
   //첫 마운트가 되면 셀러의 기존 입력된 정보들을 불러오게 합니다.
   mounted: function() {
@@ -395,6 +493,7 @@ export default {
         }
       })
       .then(response => {
+        console.log(response);
         this.infoDatas = response.data;
         this.profile = this.infoDatas.data.profile;
         this.background_image = this.infoDatas.data.background_image;
@@ -402,13 +501,67 @@ export default {
         this.detail_introduction = this.infoDatas.data.detail_introduction;
         this.background_image = this.infoDatas.data.background_image;
         this.site_url = this.infoDatas.data.site_url;
-        this.supervisors = this.infoDatas.data.supervisors;
+        this.supervisors = [
+          {
+            supervisor_name: this.infoDatas.data.supervisors[0]
+              ? this.infoDatas.data.supervisors[0].name
+              : null,
+            supervisor_phone_number: this.infoDatas.data.supervisors[0]
+              ? this.infoDatas.data.supervisors[0].phone_number
+              : null,
+            supervisor_email: this.infoDatas.data.supervisors[0]
+              ? this.infoDatas.data.supervisors[0].email
+              : null,
+            order: 1
+          },
+          {
+            supervisor_name: this.infoDatas.data.supervisors[1]
+              ? this.infoDatas.data.supervisors[1].name
+              : null,
+            supervisor_phone_number: this.infoDatas.data.supervisors[1]
+              ? this.infoDatas.data.supervisors[1].phone_number
+              : null,
+            supervisor_email: this.infoDatas.data.supervisors[1]
+              ? this.infoDatas.data.supervisors[1].email
+              : null,
+            order: 2
+          },
+          {
+            supervisor_name: this.infoDatas.data.supervisors[2]
+              ? this.infoDatas.data.supervisors[2].name
+              : null,
+            supervisor_phone_number: this.infoDatas.data.supervisors[2]
+              ? this.infoDatas.data.supervisors[2].phone_number
+              : null,
+            supervisor_email: this.infoDatas.data.supervisors[2]
+              ? this.infoDatas.data.supervisors[2].email
+              : null,
+            order: 3
+          }
+        ];
         this.service_number = this.infoDatas.data.service_number;
         this.zip_code = this.infoDatas.data.zip_code;
         this.address = this.infoDatas.data.address;
         this.detail_address = this.infoDatas.data.detail_address;
-        this.buisness_hours = this.infoDatas.data.buisness_hours;
-        this.bank = this.infoDatas.data.bank;
+        (this.buisness_hours = [
+          {
+            start_time: this.infoDatas.data.buisness_hours[0].start_time,
+            end_time: this.infoDatas.data.buisness_hours[0].end_time,
+            is_weekend: "0"
+          },
+          {
+            start_time:
+              this.infoDatas.data.buisness_hours.length == 1
+                ? null
+                : this.infoDatas.data.buisness_hours[1].start_time,
+            end_time:
+              this.infoDatas.data.buisness_hours.length == 1
+                ? null
+                : this.infoDatas.data.buisness_hours[1].end_time,
+            is_weekend: "1"
+          }
+        ]),
+          (this.bank = this.infoDatas.data.bank);
         this.account_owner = this.infoDatas.data.account_owner;
         this.bank_account = this.infoDatas.data.bank_account;
         this.shipping_information = this.infoDatas.data.shipping_information;
@@ -418,9 +571,41 @@ export default {
         this.model_size_bottom = this.infoDatas.data.model_size_bottom;
         this.model_size_foot = this.infoDatas.data.model_size_foot;
         this.feed_message = this.infoDatas.data.feed_message;
+        this.tableCount = this.infoDatas.data.supervisors.length;
+        this.btnCount = this.infoDatas.data.supervisors.length;
       });
   },
+
   methods: {
+    addressModalOpen: function() {
+      this.addressModal = !this.addressModal;
+    },
+    timeInput: function(e) {
+      this.time = e;
+    },
+    supervisorsMinus: function(index) {
+      this.tableCount = this.tableCount - 1;
+      this.supervisors[index].supervisor_name = null;
+      this.supervisors[index].supervisor_phone_number = null;
+      this.supervisors[index].supervisor_email = null;
+    },
+    handleAddress: function(data) {
+      let fullAddress = data.address;
+      let extraAddress = "";
+      if (data.addressType === "R") {
+        if (data.bname !== "") {
+          extraAddress += data.bname;
+        }
+        if (data.buildingName !== "") {
+          extraAddress +=
+            extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+        }
+        fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+      }
+      this.address = fullAddress;
+      this.zip_code = data.zonecode;
+      console.log(data); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
+    },
     // 수정버튼을 누르면 백엔드로 인풋에 입력된 모든 내용을 보냅니다.
     putInfoDatas: function() {
       if (confirm("셀러정보를 수정 하시겠습니까?") == true) {
@@ -433,42 +618,12 @@ export default {
               simple_introduction: this.simple_introduction,
               detail_introduction: this.detail_introduction,
               site_url: this.site_url,
-              supervisors: [
-                {
-                  supervisor_name: "이원철",
-                  supervisor_phone_number: "010-1234-1234",
-                  supervisor_email: "lwc@lwc.com",
-                  order: 1
-                },
-                {
-                  supervisor_name: "이원철",
-                  supervisor_phone_number: "010-1234-1234",
-                  supervisor_email: "lwc@lwc.com",
-                  order: 2
-                },
-                {
-                  supervisor_name: "이원철",
-                  supervisor_phone_number: "010-1234-1234",
-                  supervisor_email: "lwc@lwc.com",
-                  order: 3
-                }
-              ],
+              supervisors: this.supervisors,
               service_number: this.service_number,
-              zip_code: "우편번호",
-              address: "주소 (택배 수령지)",
-              detail_address: "상세주소 (택배 수령지)",
-              buisness_hours: [
-                {
-                  start_time: "9:00:00",
-                  end_time: "6:00:00",
-                  is_weekend: "0"
-                },
-                {
-                  start_time: "9:00:00",
-                  end_time: "6:00:00",
-                  is_weekend: "1"
-                }
-              ],
+              zip_code: this.zip_code,
+              address: this.address,
+              detail_address: this.detail_address,
+              buisness_hours: this.buisness_hours,
               bank: this.bank,
               account_owner: this.account_owner,
               bank_account: this.bank_account,
@@ -489,9 +644,13 @@ export default {
           .then(res => {
             if (res.status === 200) {
               alert("셀러정보가 정상적으로 수정되었습니다.");
+              window.location.reload();
             }
           })
-          .catch(error => console.log(error.response.data.message));
+          .catch(error => {
+            console.log(error.response.data.message);
+            alert("올바른 정보를 기입해 주시기 바랍니다.");
+          });
       }
     },
     cancelEdit: function() {
@@ -511,7 +670,7 @@ export default {
       detail_introduction: "",
       background_image: "",
       site_url: "",
-      supervisors: null,
+      supervisors: [],
       service_number: "",
       zip_code: "",
       address: "",
@@ -526,14 +685,17 @@ export default {
       model_size_top: "",
       model_size_bottom: "",
       model_size_foot: "",
-      feed_message: ""
+      feed_message: "",
+      addressModal: false,
+      tableCount: null
     };
   },
 
   components: {
     ImageBox,
     InputBox,
-    TextAreaBox
+    TextAreaBox,
+    DaumPostcode
   }
 };
 </script>
@@ -584,6 +746,10 @@ export default {
       font-size: 14px;
       font-weight: 500;
       color: #333333;
+      background-color: white;
+    }
+    input:focus {
+      outline: 1px solid #eee;
     }
 
     textarea {
@@ -592,6 +758,7 @@ export default {
       padding: 6px 12px;
       border: 1px solid lightgray;
       border-radius: 3px;
+      background-color: white;
     }
 
     .infoTd {
@@ -633,22 +800,41 @@ export default {
       background-color: #eee;
     }
   }
-  .timeTable {
+}
+
+.addressBox {
+  display: flex;
+  flex-direction: column;
+  .disabledInput {
+    cursor: not-allowed !important;
+  }
+  .addressBtn {
     display: flex;
-    .mid {
-      border: 1px solid red;
-      width: 100px;
+    width: 40%;
+    input {
+      margin-right: 10px;
+    }
+
+    .searchZip {
+      border-radius: 3px;
+      width: 50%;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      text-align: center;
       vertical-align: middle;
+      color: #fff;
+      background-color: #5cb85c;
+      border-color: #4cae4c;
+      padding: 6px 12px;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.42857143;
+      white-space: nowrap;
+      cursor: pointer;
     }
-    #inspire {
-      width: 500px;
-      height: 100px;
-      #dropdown-example {
-      }
-      input {
-        all: unset;
-      }
-    }
+  }
+  input {
+    margin-bottom: 10px;
   }
 }
 
@@ -682,5 +868,56 @@ export default {
   a:visited {
     color: black;
   }
+}
+
+#inspire {
+  margin-left: 50px;
+
+  .v-application--wrap {
+    min-height: unset;
+  }
+}
+.test {
+  background-color: white;
+  position: fixed;
+  display: flex;
+  top: 30%;
+  left: 55%;
+  z-index: 10;
+  border: 3px solid black;
+  .appCancel {
+    width: 30px;
+    height: 25px;
+    background-color: #eee;
+    text-align: center;
+    vertical-align: middle;
+  }
+}
+.supervisorsBtn {
+  margin-left: 20px;
+  width: 40px;
+  height: 33px;
+  color: #fff;
+
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.plusBtn {
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+.minusBtn {
+  background-color: #d9534f;
+  border-color: #d43f3a;
 }
 </style>;
