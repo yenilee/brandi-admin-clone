@@ -139,6 +139,9 @@ export default {
     display: flex;
     flex-direction: column;
   }
+  input:focus {
+    outline: 1px solid #eee;
+  }
 
   .loginOption {
     margin-bottom: 30px;

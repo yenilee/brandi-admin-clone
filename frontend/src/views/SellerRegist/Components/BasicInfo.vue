@@ -108,6 +108,7 @@
                   <i class="xi-pen" />
                 </th>
                 <td></td>
+                <!-- 담당자 1번 테이블은 항상 보여집니다. -->
                 <td class="threeInput">
                   <input
                     type="text"
@@ -137,6 +138,7 @@
                     </div>
                   </div>
                 </td>
+                <!-- 담당자 2번 테이블 v-if를 이용하여 tableCount가 1보다 크면 보여지게 하였습니다. -->
                 <td class="threeInput" v-if="tableCount > 1">
                   <input
                     type="text"
@@ -157,6 +159,7 @@
                       @input="supervisors[1].supervisor_email = $event.target.value"
                       placeholder="담당자 이메일"
                     />
+                    <!-- 담당자 2번의 플러스 버튼 -->
                     <div
                       v-if="tableCount == 2"
                       @click="tableCount = 3"
@@ -164,6 +167,7 @@
                     >
                       <i class="xi-plus"></i>
                     </div>
+                    <!-- 담당자 2번의 마이너스 버튼 -->
                     <div
                       v-if="tableCount == 2"
                       @click="() => supervisorsMinus(1)"
@@ -173,7 +177,7 @@
                     </div>
                   </div>
                 </td>
-
+                <!-- 담당자 3번 테이블 v-if를 이용하여 tableCount가 2보다 크면 보여지게 하였습니다. -->
                 <td class="threeInput" v-if="tableCount > 2">
                   <input
                     type="text"
@@ -216,89 +220,95 @@
             </tbody>
             <!-- 택배 -->
             <tbody>
-              <th>
-                택배주소
-                <i class="xi-pen" />
-              </th>
-              <td class="addressBox">
-                <div class="addressBtn">
+              <tr>
+                <th>
+                  택배주소
+                  <i class="xi-pen" />
+                </th>
+                <td class="addressBox">
+                  <div class="addressBtn">
+                    <input
+                      class="disabledInput"
+                      type="text"
+                      v-model="zip_code"
+                      placeholder="우편번호"
+                      disabled
+                    />
+                    <div class="searchZip" @click="addressModalOpen()">우편번호 찾기</div>
+                  </div>
                   <input
                     class="disabledInput"
                     type="text"
-                    v-model="zip_code"
-                    placeholder="우편번호"
+                    v-model="address"
+                    placeholder="주소(택배 수령지)"
                     disabled
                   />
-                  <div class="searchZip" @click="addressModalOpen()">우편번호 찾기</div>
-                </div>
-                <input
-                  class="disabledInput"
-                  type="text"
-                  v-model="address"
-                  placeholder="주소(택배 수령지)"
-                  disabled
-                />
-                <input type="text" v-model="detail_address" placeholder="상세주소(택배 수령지)" />
-              </td>
+                  <input type="text" v-model="detail_address" placeholder="상세주소(택배 수령지)" />
+                </td>
+              </tr>
             </tbody>
             <!-- 고객센터 운영시간(주중)-->
             <tbody>
-              <th>
-                고객센터 운영시간(주중)
-                <i class="xi-pen" />
-              </th>
-              <td>
-                <v-app id="inspire">
-                  <v-row>
-                    <v-col cols="1">
-                      <v-text-field
-                        :value="buisness_hours[0].start_time"
-                        @input="buisness_hours[0].start_time = $event"
-                        type="time"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-app>
-                <v-app id="inspire">
-                  <v-row>
-                    <v-col cols="1">
-                      <v-text-field
-                        :value="buisness_hours[0].end_time"
-                        @input="buisness_hours[0].end_time = $event"
-                        type="time"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-app>
-              </td>
+              <tr>
+                <th>
+                  고객센터 운영시간(주중)
+                  <i class="xi-pen" />
+                </th>
+                <td>
+                  <v-app id="inspire">
+                    <v-row>
+                      <v-col cols="1">
+                        <v-text-field
+                          :value="buisness_hours[0].start_time"
+                          @input="buisness_hours[0].start_time = $event"
+                          type="time"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </v-app>
+                  <v-app id="inspire">
+                    <v-row>
+                      <v-col cols="1">
+                        <v-text-field
+                          :value="buisness_hours[0].end_time"
+                          @input="buisness_hours[0].end_time = $event"
+                          type="time"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </v-app>
+                </td>
+              </tr>
             </tbody>
             <!-- 고객센터 운영시간(주중)-->
             <tbody>
-              <th>고객센터 운영시간(주말)</th>
-              <td>
-                <v-app id="inspire">
-                  <v-row>
-                    <v-col cols="1">
-                      <v-text-field
-                        :value="buisness_hours[1].start_time"
-                        @input="buisness_hours[1].start_time = $event"
-                        type="time"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-app>
-                <v-app id="inspire">
-                  <v-row>
-                    <v-col cols="1">
-                      <v-text-field
-                        :value="buisness_hours[1].end_time"
-                        @input="buisness_hours[1].end_time = $event"
-                        type="time"
-                      ></v-text-field>
-                    </v-col>
-                  </v-row>
-                </v-app>
-              </td>
+              <tr>
+                <th>고객센터 운영시간(주말)</th>
+                <td>
+                  <v-app id="inspire">
+                    <v-row>
+                      <v-col cols="1">
+                        <v-text-field
+                          :value="buisness_hours[1].start_time"
+                          @input="buisness_hours[1].start_time = $event"
+                          type="time"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </v-app>
+                  <v-app id="inspire">
+                    <v-row>
+                      <v-col cols="1">
+                        <v-text-field
+                          :value="buisness_hours[1].end_time"
+                          @input="buisness_hours[1].end_time = $event"
+                          type="time"
+                        ></v-text-field>
+                      </v-col>
+                    </v-row>
+                  </v-app>
+                </td>
+              </tr>
             </tbody>
             <!-- 정산정보 입력 -->
             <tbody>
@@ -317,37 +327,39 @@
 
             <!-- 셀러상태 변경기록 -->
             <tbody>
-              <th>셀러상태 변경기록</th>
-              <td
-                class="historyBox"
-                v-for="history in infoDatas.data.seller_histories"
-                :key="history.id"
-              >
-                <tbody>
-                  <tr>
-                    <th>셀러상태 변경 적용일시</th>
-                  </tr>
-                  <tr>
-                    <td>{{history.created_at}}</td>
-                  </tr>
-                </tbody>
-                <tbody>
-                  <tr>
-                    <th>셀러상태</th>
-                  </tr>
-                  <tr>
-                    <td>{{history.name}}</td>
-                  </tr>
-                </tbody>
-                <tbody>
-                  <tr>
-                    <th>변경 실행자</th>
-                  </tr>
-                  <tr>
-                    <td>{{history.editor}}</td>
-                  </tr>
-                </tbody>
-              </td>
+              <tr>
+                <th>셀러상태 변경기록</th>
+                <td
+                  class="historyBox"
+                  v-for="history in infoDatas.data.seller_histories"
+                  :key="history.id"
+                >
+                  <tbody>
+                    <tr>
+                      <th>셀러상태 변경 적용일시</th>
+                    </tr>
+                    <tr>
+                      <td>{{history.created_at}}</td>
+                    </tr>
+                  </tbody>
+                  <tbody>
+                    <tr>
+                      <th>셀러상태</th>
+                    </tr>
+                    <tr>
+                      <td>{{history.name}}</td>
+                    </tr>
+                  </tbody>
+                  <tbody>
+                    <tr>
+                      <th>변경 실행자</th>
+                    </tr>
+                    <tr>
+                      <td>{{history.editor}}</td>
+                    </tr>
+                  </tbody>
+                </td>
+              </tr>
             </tbody>
           </template>
         </v-simple-table>
@@ -786,6 +798,9 @@ export default {
       border: 1px solid lightgray;
       border-radius: 3px;
       background-color: white;
+    }
+    textarea:focus {
+      outline: 1px solid #eee;
     }
 
     .infoTd {
