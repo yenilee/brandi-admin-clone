@@ -1,9 +1,7 @@
 import json
 import boto3
 
-from collections import defaultdict
 from PIL         import Image
-
 from config      import S3
 
 class ProductService:
@@ -26,7 +24,7 @@ class ProductService:
             self.product_dao.update_product_number(db_connection)
 
             # 상품 옵션(색상, 사이즈 조합) insert
-            self.product_dao.insert_options(product, db_connection)
+            # self.product_dao.insert_options(product, db_connection)
 
             # 상품 고시 정보를 상세 상품 정보에 표시할 경우 notices id를 null 값으로 표시
             product['notices_id'] = None
@@ -57,7 +55,7 @@ class ProductService:
 
     def get_sellers_for_master(self, user, db_connection):
         try:
-            # 셀러 권한 ID들의 한국 이름, 프로필을 불러와 return
+            # 셀러 권한 ID들의 한국 이름, 프로필 불러오기
             sellers_kor_names = self.product_dao.get_sellers_for_master(db_connection)
             return sellers_kor_names
 
@@ -73,15 +71,11 @@ class ProductService:
             # 셀러 속성 정보를 기반으로 상품 속성 그룹을 불러오기
             user['attribute_group_id'] = self.product_dao.get_attribute_group_id(user, db_connection)
 
-            # 셀러 속성 그룹 ID를 선택했을 때 보여지는 1차 카테고리를 불러와 변수에 저장
+            # 셀러 속성 그룹 ID를 선택했을 때 보여지는 1차 카테고리 불러오기
             categories = self.product_dao.get_first_category(user, db_connection)
 
             first_categories = [
                 {category['first_category_id'] : category['first_category_name']} for category in categories ]
-
-            # 1차 카테고리 ID, 이름 조합이 중복 생성되어, 리스트 안에서 동일한 딕셔너리를 제거하는 map 함수 실행
-            first_categories = list(
-                map(dict, collections.OrderedDict.fromkeys(tuple(sorted(d.items())) for d in first_categories)))
 
             # 색상 필터 id, 이름, 이미지 url 불러오기
             color_filters = self.product_dao.get_color_filters(db_connection)
@@ -130,10 +124,6 @@ class ProductService:
 
             second_categories = [
                 {category['second_category_id']: category['second_category_name']} for category in categories]
-
-            # # 2차 카테고리 ID, 이름 조합이 중복 생성되어, 리스트 안에서 동일한 딕셔너리를 제거하는 map 함수 실행
-            second_categories = list(
-                map(dict, collections.OrderedDict.fromkeys(tuple(sorted(d.items())) for d in second_categories)))
 
             return second_categories
 

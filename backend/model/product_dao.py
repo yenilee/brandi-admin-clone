@@ -73,9 +73,9 @@ class ProductDao:
         cursor = db_connection.cursor()
         insert_option_sql = """
         INSERT INTO products_options(
-            product_id, 
-            size_id, 
-            color_id, 
+            product_id,
+            size_id,
+            color_id,
             quantity
             ) VALUES (
             %(product_key_id)s,
@@ -169,7 +169,7 @@ class ProductDao:
     def get_first_category(self, user, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         get_categories_sql = """
-        SELECT
+        SELECT DISTINCT
             attributes_categories.attribute_group_id,
             first.id AS first_category_id,
             first.name AS first_category_name
@@ -185,7 +185,7 @@ class ProductDao:
     def get_second_category(self, product, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         get_categories_sql = """
-        SELECT
+        SELECT DISTINCT
             second.id AS second_category_id,
             second.name AS second_category_name
         FROM attributes_categories
