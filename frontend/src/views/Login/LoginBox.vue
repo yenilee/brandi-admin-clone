@@ -81,12 +81,16 @@ export default {
               localStorage.setItem("access_token", response.data.access_token);
               localStorage.setItem("id", this.loginValue);
               this.$router.push("/main/seller/sellerlist");
-            } else {
-              alert("아이디 또는 비밀번호가 다릅니다.");
             }
           })
-          .catch(err => {
-            console.log(err);
+          .catch(error => {
+            if (error.response.data.message === "UNAUTHORIZED USER") {
+              alert("승인 전이니 담당자가 승인 후 로그인 가능 합니다.");
+            }
+            if (error.response.data.message === "INVALID ACCESS") {
+              alert("아이디와 비밀번호를 다시 확인해주세요.");
+            }
+            console.log(error.response.data.message);
           });
       }
     },

@@ -145,15 +145,15 @@
                   <tr v-for="item in infoDatas" :key="item.name">
                     <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
                     <td>{{ item.id }}</td>
-                    <td>{{ item.user}}</td>
-                    <td>{{ item.eng_name }}</td>
+                    <td>{{ item.seller_id}}</td>
+                    <td>{{ item.seller_eng_name }}</td>
                     <td>{{ item.seller_kor_name }}</td>
                     <td>{{ item.manager_name }}</td>
                     <td>{{ item.status_name}}</td>
                     <td>{{ item.manager_phone_number }}</td>
                     <td>{{ item.manager_email }}</td>
                     <td>{{ item.seller_attribute_name }}</td>
-                    <td>{{ item.number_of_products }}</td>
+                    <td>{{ item.number_of_product }}</td>
                     <td>{{ item.site_url }}</td>
                     <td>{{ item.created_at }}</td>
                     <td>
@@ -242,12 +242,18 @@ export default {
   },
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
-    axios.get(`${SJ_URL}/sellers`).then(response => {
-      this.infoDatas = response.data.sellers;
-      this.usersData = response.data.number_of_sellers;
-      this.pagesData = response.data.number_of_pages;
-      console.log(response);
-    });
+    axios
+      .get(`${SJ_URL}/sellers`, {
+        headers: {
+          Authorization: localStorage.access_token
+        }
+      })
+      .then(response => {
+        this.infoDatas = response.data.sellers;
+        this.usersData = response.data.number_of_sellers;
+        this.pagesData = response.data.number_of_pages;
+        console.log(response);
+      });
   },
   methods: {
     search: function() {

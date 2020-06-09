@@ -219,6 +219,7 @@
               </InputBox>
             </tbody>
             <!-- 택배 -->
+            <!-- npm install --save vuejs-daum-postcode -->
             <tbody>
               <tr>
                 <th>
