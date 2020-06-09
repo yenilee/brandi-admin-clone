@@ -96,8 +96,10 @@ def create_user_endpoints(app, user_service):
         Returns:
 
         Success     : {access_token : token}, 200
-        Key error   : {message : KEY_ERROR}, status code : 400
-        Type eeror  : {message : Type_ERROR}, status code : 400
+        key error   : {message : KEY_ERROR}, code : 400
+
+        로그인 ID 오류   : {'message' : 'USER_DOES_NOT_EXIST'}, code : 400
+        비밀번호 불일치   : {'message' : 'INVALID ACCESS'}
         """
 
         db_connection = None
@@ -135,6 +137,23 @@ def create_user_endpoints(app, user_service):
     @app.route('/sellers', methods=['GET'])
     @authorize
     def seller_list():
+
+        """
+        셀러 계정 관리 리스트 API [GET]
+
+        Args:
+
+        [Header] Authorization : 로그인 토큰
+
+        Returns:
+
+        Success     : {'number_of_sellers' : number_of_sellers,
+                       'number_of_pages'   : number_of_pages,
+                       'sellers'           : sellers }, 200
+        key error   : {message : KEY_ERROR}, code : 400
+
+        마스터 권한 아닐 시 : {'message' : 'UNAUTHORIZED'}, code : 400
+        """
 
         if g.auth is not 1:
             return {'message' : 'UNAUTHORIZED'}, 401

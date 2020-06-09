@@ -87,7 +87,12 @@ class UserService:
             password = self.user_dao.check_password(get_user, db_connection)
 
             if bcrypt.checkpw(get_user['password'].encode('utf-8'), password[0].encode('utf-8')):
-                token = jwt.encode({'user_id': user[0], 'authority_id' : password[1], 'exp' : datetime.utcnow() + timedelta(days=15) }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
+                token = jwt.encode(
+                    {'user_id'      : user[0],
+                     'authority_id' : password[1],
+                     'exp'          : datetime.utcnow() + timedelta(days=15),
+
+                     }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
 
                 access_token = token.decode('utf-8')
                 return {'access_token' : access_token}, 200

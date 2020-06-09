@@ -1,84 +1,59 @@
 {
   "data": {
-    "id": 61,
-    "seller_key_id": 235,
+    "id": 2,
+    "seller_key_id": 2,
     "authorization": "master",
+    "is_deleted": 0,
     "attribute": "쇼핑몰",
-    "profile": "url",
-    "name": "입점대기 ok",
-    "kor_name": "진성준 ok",
-    "eng_name": "sungjun ok",
-    "user_id": "test1 ok",
-    "background_image": "url",
-    "simple_introduction": "안녕 난 진아야 안녕 ok",
-    "detail_introduction": "나는 팔이랑 갈비뼈가 아야 했어 ok",
-    "site_url": "http://www.naver.com ok",
-    "service_number": "010-4086-8910 ok",
-    "zip_code": "06223",
-    "address": "서울 강남구 테헤란로 32길 26 역삼동",
-    "detail_address": "자이하버뷰 106동 902호",
-    "bank": "신한 ok",
-    "account_owner": "진성준 ok",
-    "bank_account": "110412104131 ok",
-    "shipping_information": "배송 정보 ok",
-    "refund_information": "교환 / 환불 정보 ok",
-    "model_height": 180,
-    "model_size_top": 55,
-    "model_size_bottom": 27,
-    "model_size_foot": 240,
-    "feed_message": "안녕하세요! 000에요!! 봄에 어울리는 신상이 입고 되었습니다.",
+    "profile": null,
+    "name": "입점대기",
+    "kor_name": "진성준",
+    "eng_name": "sungjun",
+    "user_id": "test1",
+    "background_image": null,
+    "simple_introduction": null,
+    "detail_introduction": null,
+    "site_url": "http://www.naver.com",
+    "service_number": "010-4086-8910",
+    "zip_code": null,
+    "address": null,
+    "detail_address": null,
+    "bank": null,
+    "account_owner": null,
+    "bank_account": null,
+    "shipping_information": null,
+    "refund_information": null,
+    "model_height": null,
+    "model_size_top": null,
+    "model_size_bottom": null,
+    "model_size_foot": null,
+    "feed_message": null,
     "supervisors": [
       {
-        "id": 1,
-        "seller_id": 61,
+        "id": 2,
+        "seller_id": 2,
         "is_deleted": 0,
         "order": 1,
-        "name": "진성준",
-        "phone_number": "010-5338-7244",
-        "email": "jinsj@brandi.co.kr"
-      },
-      {
-        "id": 2,
-        "seller_id": 61,
-        "is_deleted": 0,
-        "order": 2,
-        "name": "이예은",
-        "phone_number": "010-1234-1567",
-        "email": "leeye@brandi.co.kr"
-      },
-      {
-        "id": 3,
-        "seller_id": null,
-        "is_deleted": null,
-        "order": null,
-        "name": null,
-        "phone_number": null,
-        "email": null
+        "name": "이원철",
+        "phone_number": "010-4086-8910",
+        "email": "lwc@lwc.co.kr"
       }
     ],
     "buisness_hours": [
       {
         "id": 1,
-        "seller_id": 61,
+        "seller_id": 2,
         "start_time": "9:00:00",
         "end_time": "18:00:00",
-        "is_weekend": 0,
-        "is_deleted": 0
-      },
-      {
-        "id": 2,
-        "seller_id": 61,
-        "start_time": "3:00:00",
-        "end_time": "18:00:00",
-        "is_weekend": 1,
+        "is_weekend": null,
         "is_deleted": 0
       }
     ],
     "seller_histories": [
       {
-        "start_date": "Thu, 04 Jun 2020 09:29:39 GMT",
+        "start_date": "Mon, 08 Jun 2020 20:04:59 GMT",
         "name": "입점대기",
-        "editor": "master"
+        "editor": "test1"
       }
     ]
   }
