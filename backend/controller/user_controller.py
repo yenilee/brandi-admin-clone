@@ -264,8 +264,8 @@ def create_user_endpoints(app, user_service):
                 db_connection.commit()
                 return update_response
 
-        except  ValidationError:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
+        except  ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
 
         except pymysql.err.InternalError:
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
@@ -316,10 +316,8 @@ def create_user_endpoints(app, user_service):
         db_connection = None
         try:
             db_connection = get_connection()
-
             if db_connection:
                 seller_infos = user_service.get_seller_details(g.user, db_connection)
-
                 return seller_infos
 
         except pymysql.err.InternalError:

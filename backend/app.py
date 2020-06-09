@@ -1,4 +1,5 @@
 import datetime
+import decimal
 
 from flask                         import Flask
 from flask_cors                    import CORS
@@ -16,6 +17,9 @@ from controller.product_controller import create_product_endpoints
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.timedelta):
+            return str(obj)
+        
+        if isinstance(obj, decimal.Decimal):
             return str(obj)
         
         return JSONEncoder.default(self, obj)
