@@ -36,7 +36,7 @@ class UserDao:
                     end_date
                     ) VALUES (
                         (SELECT id FROM seller_keys WHERE user = %(user)s),
-                        1,
+                        2,
                         %(seller_attribute_id)s,
                         1,
                         %(password)s,
