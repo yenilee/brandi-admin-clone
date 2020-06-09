@@ -90,14 +90,17 @@ class UserService:
                 token = jwt.encode(
                     {'user_id'      : user[0],
                      'authority_id' : password[1],
-                     'exp'          : datetime.utcnow() + timedelta(days=15),
+                     'exp'          : datetime.utcnow() + timedelta(days = 15),
 
                      }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
-
                 access_token = token.decode('utf-8')
+
+                if self.user_dao.check_user_auth(get_user, db_connection) is 3:
+                    return {'message' : 'UNAUTHORIZED USER'}, 401
+
                 return {'access_token' : access_token}, 200
 
-            return {'message' : 'INVALID ACCESS'}, 401
+            return {'message' : 'INVALID ACCESS'}, 400            
 
         except KeyError:
             return {'message' : 'KEY ERROR'}, 400

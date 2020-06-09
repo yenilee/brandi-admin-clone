@@ -212,3 +212,40 @@ class ProductDao:
         cursor.execute(get_color_filter_sql)
         color_filters = cursor.fetchall()
         return color_filters
+
+    def get_productlist(self, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        # 판매 미판매 여부는 boolean field라서 IF 구문을 활용해 1이면 판매, 0이면 미판매 문자열을 출력
+        # 할인가는 판매가 - 할인율 계산하는 로직을 짜서 구현
+        # 할인여부는 IF 구문을 사용해 할인율이 0이 아니면 '할인', 0이면 '미할인'
+
+        products_list_sql = """
+        SELECT
+        products.id,
+        product_keys.id AS product_keys_id,
+        DATE_FORMAT(product_keys.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,    
+        products.name AS name,
+        product_keys.product_number,
+        seller_attributes.name AS seller_attributes_name,
+        seller_keys.user,        
+        CAST(products.price AS unsigned) AS price, 
+        CAST((products.price - (products.discount_rate / 100 * products.price)) AS unsigned) AS discount_price,
+        is_onsale,
+        is_displayed,
+        IF(products.discount_rate != 0, 1, 0) AS is_discount        
+        FROM
+        products
+        INNER JOIN product_keys ON products.product_key_id = product_keys.id
+        INNER JOIN seller_keys ON product_keys.seller_key_id = seller_keys.id      
+        INNER JOIN sellers ON seller_keys.id = sellers.seller_key_id AND sellers.end_date = '2037-12-31 23:59:59'
+        INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
+        WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2       
+        ORDER BY products.id DESC;
+        """
+
+        # cursor.execute 결과를 확인해 SELECT에 걸린 상품이 하나도 없으면 0을 리턴
+        if cursor.execute(products_list_sql) == 0:
+            return 0  
+
+        return cursor.fetchall()       
+        

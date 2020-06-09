@@ -380,3 +380,16 @@ class UserDao:
         cursor.execute(seller_actions_sql)
         seller_actions = cursor.fetchall()
         return seller_actions
+
+    def check_user_auth(self, get_user, db_connection):
+        cursor = db_connection.cursor()
+        check_user_auth_sql = """
+        SELECT authority_id
+        FROM sellers
+        INNER JOIN seller_keys ON seller_keys.id = sellers.seller_key_id
+        WHERE seller_keys.user = %(user)s
+        """
+        cursor.execute(check_user_auth_sql, get_user)
+        user = cursor.fetchone()[0]
+        print(user)
+        return user
