@@ -215,7 +215,7 @@
 <script>
 import axios from "axios";
 import { sellerListHeaders } from "../../config/SellerListDatas";
-import { URL } from "../../config/urlConfig";
+import { SJ_URL } from "../../config/urlConfig";
 
 export default {
   data() {
@@ -242,17 +242,12 @@ export default {
   },
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
-    axios.get(`${URL}/sellerList.json`).then(response => {
+    axios.get(`${SJ_URL}/sellers`).then(response => {
       this.infoDatas = response.data.sellers;
       this.usersData = response.data.number_of_sellers;
       this.pagesData = response.data.number_of_pages;
       console.log(response);
     });
-  },
-  computed: {
-    dateRangeText() {
-      return this.dates.join(" ~ ");
-    }
   },
   methods: {
     search: function() {

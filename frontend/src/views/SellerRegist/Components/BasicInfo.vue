@@ -102,21 +102,21 @@
                 <td class="threeInput">
                   <input
                     type="text"
-                    v-model="supervisors[0].name"
-                    @input="supervisors[0].name = $event.target.value"
+                    v-model="supervisors[0].supervisor_name"
+                    @input="supervisors[0].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="supervisors[0].phone_number"
-                    @input="supervisors[0].phone_number = $event.target.value"
+                    v-model="supervisors[0].supervisor_phone_number"
+                    @input="supervisors[0].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
                   />
                   <div style="display: flex">
                     <input
                       type="text"
-                      v-model="supervisors[0].email"
-                      @input="supervisors[0].email = $event.target.value"
+                      v-model="supervisors[0].supervisor_email"
+                      @input="supervisors[0].supervisor_email = $event.target.value"
                       placeholder="담당자 이메일"
                     />
                     <div
@@ -131,21 +131,21 @@
                 <td class="threeInput" v-if="tableCount > 1">
                   <input
                     type="text"
-                    v-model="supervisors[1].name"
-                    @input="supervisors[1].name = $event.target.value"
+                    v-model="supervisors[1].supervisor_name"
+                    @input="supervisors[1].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="supervisors[1].phone_number"
-                    @input="supervisors[1].phone_number = $event.target.value"
+                    v-model="supervisors[1].supervisor_phone_number"
+                    @input="supervisors[1].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
                   />
                   <div style="display: flex">
                     <input
                       type="text"
-                      v-model="supervisors[1].email"
-                      @input="supervisors[1].email = $event.target.value"
+                      v-model="supervisors[1].supervisor_email"
+                      @input="supervisors[1].supervisor_email = $event.target.value"
                       placeholder="담당자 이메일"
                     />
                     <div
@@ -168,21 +168,21 @@
                 <td class="threeInput" v-if="tableCount > 2">
                   <input
                     type="text"
-                    v-model="supervisors[2].name"
-                    @input="supervisors[2].name = $event.target.value"
+                    v-model="supervisors[2].supervisor_name"
+                    @input="supervisors[2].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="supervisors[2].phone_number"
-                    @input="supervisors[2].phone_number = $event.target.value"
+                    v-model="supervisors[2].supervisor_phone_number"
+                    @input="supervisors[2].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
                   />
                   <div style="display: flex">
                     <input
                       type="text"
-                      v-model="supervisors[2].email"
-                      @input="supervisors[2].email = $event.target.value"
+                      v-model="supervisors[2].supervisor_email"
+                      @input="supervisors[2].supervisor_email = $event.target.value"
                       placeholder="담당자 이메일"
                     />
                     <div
@@ -234,7 +234,7 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        value="09:00:00"
+                        :value="buisness_hours[0].start_time"
                         @input="buisness_hours[0].start_time = $event"
                         type="time"
                       ></v-text-field>
@@ -245,7 +245,7 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        value="18:00:00"
+                        :value="buisness_hours[0].end_time"
                         @input="buisness_hours[0].end_time = $event"
                         type="time"
                       ></v-text-field>
@@ -262,7 +262,7 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        value="09:00:00"
+                        :value="buisness_hours[1].start_time"
                         @input="buisness_hours[1].start_time = $event"
                         type="time"
                       ></v-text-field>
@@ -273,7 +273,7 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        value="18:00:00"
+                        :value="buisness_hours[1].end_time"
                         @input="buisness_hours[1].end_time = $event"
                         type="time"
                       ></v-text-field>
@@ -307,7 +307,7 @@
                     <th>셀러상태 변경 적용일시</th>
                   </tr>
                   <tr>
-                    <td>{{history.start_date}}</td>
+                    <td>{{history.created_at}}</td>
                   </tr>
                 </tbody>
                 <tbody>
@@ -476,7 +476,7 @@
 
 <script>
 import axios from "axios";
-import { URL } from "../../../config/urlConfig";
+import { SJ_URL } from "../../../config/urlConfig";
 import ImageBox from "../Slots/ImageBox";
 import InputBox from "../Slots/InputBox";
 import TextAreaBox from "../Slots/TextAreaBox";
@@ -487,12 +487,13 @@ export default {
   //첫 마운트가 되면 셀러의 기존 입력된 정보들을 불러오게 합니다.
   mounted: function() {
     axios
-      .get(`${URL}/sellerregist.json`, {
+      .get(`${SJ_URL}/seller_details`, {
         headers: {
           Authorization: localStorage.access_token
         }
       })
       .then(response => {
+        console.log(response);
         this.infoDatas = response.data;
         this.profile = this.infoDatas.data.profile;
         this.background_image = this.infoDatas.data.background_image;
@@ -500,45 +501,45 @@ export default {
         this.detail_introduction = this.infoDatas.data.detail_introduction;
         this.background_image = this.infoDatas.data.background_image;
         this.site_url = this.infoDatas.data.site_url;
-        (this.supervisors = [
+        this.supervisors = [
           {
-            name: this.infoDatas.data.supervisors[0]
+            supervisor_name: this.infoDatas.data.supervisors[0]
               ? this.infoDatas.data.supervisors[0].name
               : null,
-            phone_number: this.infoDatas.data.supervisors[0]
+            supervisor_phone_number: this.infoDatas.data.supervisors[0]
               ? this.infoDatas.data.supervisors[0].phone_number
               : null,
-            email: this.infoDatas.data.supervisors[0]
+            supervisor_email: this.infoDatas.data.supervisors[0]
               ? this.infoDatas.data.supervisors[0].email
               : null,
             order: 1
           },
           {
-            name: this.infoDatas.data.supervisors[1]
+            supervisor_name: this.infoDatas.data.supervisors[1]
               ? this.infoDatas.data.supervisors[1].name
               : null,
-            phone_number: this.infoDatas.data.supervisors[1]
+            supervisor_phone_number: this.infoDatas.data.supervisors[1]
               ? this.infoDatas.data.supervisors[1].phone_number
               : null,
-            email: this.infoDatas.data.supervisors[1]
+            supervisor_email: this.infoDatas.data.supervisors[1]
               ? this.infoDatas.data.supervisors[1].email
               : null,
             order: 2
           },
           {
-            name: this.infoDatas.data.supervisors[2]
+            supervisor_name: this.infoDatas.data.supervisors[2]
               ? this.infoDatas.data.supervisors[2].name
               : null,
-            phone_number: this.infoDatas.data.supervisors[2]
+            supervisor_phone_number: this.infoDatas.data.supervisors[2]
               ? this.infoDatas.data.supervisors[2].phone_number
               : null,
-            email: this.infoDatas.data.supervisors[2]
+            supervisor_email: this.infoDatas.data.supervisors[2]
               ? this.infoDatas.data.supervisors[2].email
               : null,
             order: 3
           }
-        ]),
-          (this.service_number = this.infoDatas.data.service_number);
+        ];
+        this.service_number = this.infoDatas.data.service_number;
         this.zip_code = this.infoDatas.data.zip_code;
         this.address = this.infoDatas.data.address;
         this.detail_address = this.infoDatas.data.detail_address;
@@ -584,9 +585,9 @@ export default {
     },
     supervisorsMinus: function(index) {
       this.tableCount = this.tableCount - 1;
-      this.supervisors[index].name = "";
-      this.supervisors[index].phone_number = "";
-      this.supervisors[index].email = "";
+      this.supervisors[index].supervisor_name = null;
+      this.supervisors[index].supervisor_phone_number = null;
+      this.supervisors[index].supervisor_email = null;
     },
     handleAddress: function(data) {
       let fullAddress = data.address;
@@ -617,23 +618,12 @@ export default {
               simple_introduction: this.simple_introduction,
               detail_introduction: this.detail_introduction,
               site_url: this.site_url,
-              supervisors,
+              supervisors: this.supervisors,
               service_number: this.service_number,
               zip_code: this.zip_code,
               address: this.address,
               detail_address: this.detail_address,
-              buisness_hours: [
-                {
-                  start_time: "9:00:00",
-                  end_time: "6:00:00",
-                  is_weekend: "0"
-                },
-                {
-                  start_time: "9:00:00",
-                  end_time: "6:00:00",
-                  is_weekend: "1"
-                }
-              ],
+              buisness_hours: this.buisness_hours,
               bank: this.bank,
               account_owner: this.account_owner,
               bank_account: this.bank_account,
@@ -654,9 +644,13 @@ export default {
           .then(res => {
             if (res.status === 200) {
               alert("셀러정보가 정상적으로 수정되었습니다.");
+              window.location.reload();
             }
           })
-          .catch(error => console.log(error.response.data.message));
+          .catch(error => {
+            console.log(error.response.data.message);
+            alert("올바른 정보를 기입해 주시기 바랍니다.");
+          });
       }
     },
     cancelEdit: function() {
@@ -693,8 +687,7 @@ export default {
       model_size_foot: "",
       feed_message: "",
       addressModal: false,
-      tableCount: null,
-      btnCount: null
+      tableCount: null
     };
   },
 
