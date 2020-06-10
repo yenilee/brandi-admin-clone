@@ -36,7 +36,7 @@ class UserDao:
                     end_date
                     ) VALUES (
                         (SELECT id FROM seller_keys WHERE user = %(user)s),
-                        2,
+                        3,
                         %(seller_attribute_id)s,
                         1,
                         %(password)s,
@@ -80,6 +80,20 @@ class UserDao:
 
         cursor.execute(check_user_sql, get_user)
         user = cursor.fetchone()
+        return user
+
+    def check_user_auth(self, get_user, db_connection):
+        cursor = db_connection.cursor()
+
+        check_user_auth_sql = """
+        SELECT authority_id
+        FROM sellers
+        INNER JOIN seller_keys ON seller_keys.id = sellers.seller_key_id
+        WHERE seller_keys.user = %(user)s
+        """
+        cursor.execute(check_user_auth_sql, get_user)
+        user = cursor.fetchone()[0]
+
         return user
 
     def check_password(self, get_user, db_connection):
@@ -341,8 +355,18 @@ class UserDao:
         cursor.execute(get_recent_seller_id_sql, user)
         return cursor.fetchone()
 
-    def get_sellerlist(self, db_connection):
+    def get_seller_list(self, filters, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+
+        # 밑에서 추가할 SQL statement를 정의
+        statement = ""
+
+        # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
+        if filters is not None:
+            for key in filters.keys():
+                statement += f" AND {key}=" + str(filters[f'{key}'])
+                print(statement)
+
         sellers_list_sql = """
         SELECT DISTINCT
             sellers.id AS id,
@@ -368,18 +392,110 @@ class UserDao:
         INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
         LEFT JOIN `supervisor_infos` ON supervisor_infos.seller_id = sellers.id AND supervisor_infos.order=1
         LEFT JOIN product_keys ON sellers.seller_key_id = product_keys.seller_key_id
-        WHERE end_date = '2037-12-31 23:59:59' AND authority_id = 2
-        ORDER BY sellers.id DESC;
-        """
-        cursor.execute(sellers_list_sql)
+        WHERE end_date = '2037-12-31 23:59:59' 
+        AND (authority_id = 2 OR authority_id = 3) """ + statement + " ORDER BY sellers.id DESC"
+
+        if cursor.execute(sellers_list_sql) == 0:
+            return 0
         sellers = cursor.fetchall()
         return sellers
+
+    def get_next_status(self, action_type, db_connection):
+        cursor = db_connection.cursor()
+        change_status_sql = """
+        SELECT next_status_id 
+        FROM seller_actions
+        WHERE action_type = %(action_type)s
+        """
+        cursor.execute(change_status_sql, action_type)
+        next_status_id = cursor.fetchone()[0]
+        return next_status_id
+
+    def update_seller_all(self, user, db_connection):
+        cursor = db_connection.cursor()
+        update_seller_all_sql = """
+        INSERT INTO sellers(
+            seller_key_id,
+            authority_id,
+            seller_attribute_id,
+            seller_status_id,
+            editor,
+            password,
+            phone_number,
+            name,
+            eng_name,
+            service_number,
+            site_url,
+            start_date,
+            end_date,
+            profile,
+            background_image, 
+            simple_introduction, 
+            detail_introduction, 
+            zip_code,
+            address,
+            detail_address, 
+            bank, 
+            account_owner,  
+            bank_account, 
+            shipping_information, 
+            refund_information, 
+            model_height, 
+            model_size_top, 
+            model_size_bottom, 
+            model_size_foot,
+            feed_message
+            ) SELECT 
+                seller_key_id,
+                authority_id,
+                seller_attribute_id,
+                seller_status_id,
+                editor,
+                password,
+                phone_number,
+                name,
+                eng_name,
+                service_number,
+                site_url,
+                now(),
+                '2037-12-31 23:59:59',
+                profile,
+                background_image, 
+                simple_introduction, 
+                detail_introduction, 
+                zip_code,
+                address,
+                detail_address, 
+                bank, 
+                account_owner,  
+                bank_account, 
+                shipping_information, 
+                refund_information, 
+                model_height, 
+                model_size_top, 
+                model_size_bottom, 
+                model_size_foot,
+                feed_message    
+            FROM sellers
+            WHERE id = %s;
+        """
+        cursor.execute(update_seller_all_sql, user)
+        return cursor.lastrowid
+
+    def update_status(self, next_status_id, user, db_connection):
+        cursor = db_connection.cursor()
+        update_status_sql = """
+        UPDATE sellers SET seller_status_id = %s
+        WHERE id = %s
+        """
+        cursor.execute(update_status_sql, (next_status_id, user))
 
     def get_seller_action(self, db_connection):
         cursor = db_connection.cursor()
         seller_actions_sql = """
-        SELECT seller_status_id, action_type
+        SELECT seller_status.id, action_type
         FROM seller_actions
+        INNER JOIN seller_status ON seller_actions.seller_status_id = seller_status.id
         """
         cursor.execute(seller_actions_sql)
         seller_actions = cursor.fetchall()
@@ -397,3 +513,11 @@ class UserDao:
         user = cursor.fetchone()[0]
    
         return user
+
+    def update_authority(self, user, db_connection):
+        cursor = db_connection.cursor()
+        update_status_sql = """
+        UPDATE sellers SET authority_id = %s
+        WHERE id = %s
+        """
+        cursor.execute(update_status_sql, (2, user))

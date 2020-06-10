@@ -5,6 +5,7 @@ from flask           import request, g
 from connection      import get_connection
 from utils           import authorize
 from json_schema     import seller_register_schema
+from flask           import request
 
 
 def create_user_endpoints(app, user_service):
@@ -63,8 +64,8 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
@@ -135,7 +136,7 @@ def create_user_endpoints(app, user_service):
 
     @app.route('/sellers', methods=['GET'])
     @authorize
-    def seller_list():
+    def show_sellers():
 
         """
         셀러 계정 관리 리스트 API [GET]
@@ -161,15 +162,13 @@ def create_user_endpoints(app, user_service):
         try:
             db_connection = get_connection()
             if db_connection:
-                sellers = user_service.get_sellerlist(db_connection)
 
-                if 400 in sellers:
-                    return sellers
+                filters = None
+                if request.args:
+                    filters = request.args
 
-                return {'number_of_sellers' : len(sellers),
-                            'number_of_pages' : int(len(sellers)/10)+1,
-                            'sellers' : sellers,
-                            }, 200
+                sellers_response = user_service.get_seller_list(filters, db_connection)
+                return sellers_response
 
         except pymysql.err.InternalError:
             return {'message': 'DATABASE_SERVER_ERROR'}, 500
@@ -346,59 +345,51 @@ def create_user_endpoints(app, user_service):
         finally:
             if db_connection:
                 db_connection.close()
-    
-    @app.route('/seller_details/master', methods = ['GET'])
-    @authorize   
-    def get_seller_details_master():
-        """
-        셀러 상세 (마스터 권한) API [GET]
 
-        Args:
-            [Header]`
-                Authorization : 로그인 토큰
-
-        Returns:
-
-            Success             : {data : user_info}, status code : 200
-
-            Authorization error : {message : UNAUTHORIZED}, status code : 401
-            Key error           : {message : KEY_ERROR}, status code : 400
-            Type error          : {message : TYPE_ERROR}, status code : 400
-        """
+    @app.route('/action', methods = ['PUT'])
+    @authorize
+    def change_seller_status():
 
         db_connection = None
         try:
-            # 권한 ID가 마스터가 아닐 경우 권한 없음 에러 메시지 표시
-            if g.auth is not 1:
-                return {'message' : 'UNAUTHORIZED'}, 401       
-
-
-            # Query String으로 셀러 고유 ID를 가지고 온다         
-            seller_key_id = request.args.get('seller_key_id')
             db_connection = get_connection()
+            action_type = request.json
 
-            if db_connection: 
-                seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
-                return seller_infos
+            if db_connection:
+                if g.auth is not 1:
+                    return {'message' : 'UNAUTHORIZED'}, 400
 
-        except pymysql.err.InternalError:
+                user = action_type['user']
+                action_response = user_service.update_status(user, action_type, db_connection)
+                db_connection.commit()
+
+                return action_response
+
+        except pymysql.err.InternalError as e:
+
+            if db_connection:
+                db_connection.rollback()
+
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
 
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
         except pymysql.err.IntegrityError:
+            db_connection.rollback()
             return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except Exception as e:
+            db_connection.rollback()
             return {'message' : str(e)}, 500
 
         finally:
             if db_connection:
                 db_connection.close()
+
