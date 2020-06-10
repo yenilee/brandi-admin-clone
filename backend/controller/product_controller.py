@@ -205,24 +205,17 @@ def create_product_endpoints(app, product_service):
     @authorize
     def get_product_list():
 
+        #데코레이터를 통해 마스터 권한 확인 
         if g.auth is not 1:
             return {'message' : 'UNAUTHORIZED'}, 401
 
         db_connection = None
+
         try:
             db_connection = get_connection()
-            if db_connection:
-                products = product_service.get_product_list(db_connection)
-
-                # if 400 in products:
-                #     return products
-
-                # return {'number_of_sellers' : len(products),
-                #             'number_of_pages' : int(len(products)/10)+1,
-                #             'sellers' : products,
-                #             }, 200
-
-                return products
+            if db_connection:                
+                products_list_response = product_service.get_product_list(db_connection)
+                return products_list_response
 
         except pymysql.err.InternalError:
             return {'message': 'DATABASE_SERVER_ERROR'}, 500
@@ -230,8 +223,8 @@ def create_product_endpoints(app, product_service):
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500

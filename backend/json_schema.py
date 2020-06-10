@@ -109,7 +109,7 @@ seller_register_schema = {
         },
         "detail_introduction": {
             "$id": "#/properties/detail_introduction",
-            "type": "string",
+            "type": ["string", "null"],
             "title": "The detail_introduction schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
@@ -435,7 +435,7 @@ seller_register_schema = {
         },
         "feed_message": {
             "$id": "#/properties/feed_message",
-            "type": "string",
+            "type": ["string", "null"],
             "title": "The feed_message schema",
             "description": "An explanation about the purpose of this instance.",
             "default": "",
