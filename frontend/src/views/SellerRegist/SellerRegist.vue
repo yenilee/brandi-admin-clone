@@ -517,7 +517,10 @@ import DaumPostcode from "vuejs-daum-postcode";
 export default {
   //첫 마운트가 되면 셀러의 기존 입력된 정보들을 불러오게 합니다.
   mounted: function() {
-    // console.log("제발나와라", id);
+    eventBus.$on("please", id => {
+      console.log("제발나와라", id);
+    });
+
     axios //       .get(`${SJ_URL}/seller_details`, {
       .get(`${URL}/sellerregist.json`, {
         headers: {
@@ -606,6 +609,7 @@ export default {
         this.tableCount = this.infoDatas.data.supervisors.length;
         this.btnCount = this.infoDatas.data.supervisors.length;
       });
+    // console.log("제발나와라", id);
   },
 
   methods: {

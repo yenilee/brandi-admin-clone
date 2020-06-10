@@ -262,7 +262,7 @@ export default {
   },
   methods: {
     idClick: function(id) {
-      eventBus.$emit("mounted", id);
+      eventBus.$emit("please", id);
       this.$router.push("/main/seller/sellerregist");
 
       //이때, 아이디 값을 버스에 실어서 보냅시다.
