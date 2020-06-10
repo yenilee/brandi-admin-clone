@@ -137,19 +137,22 @@ class ProductService:
             db_connection.rollback()
             return {'message': 'TYPE ERROR' + str(e)}, 400
 
-    def get_product_list(self, db_connection):
+    def get_product_list(self, filters, db_connection):
         try:
-            products = self.product_dao.get_productlist(db_connection)
+
+            #filter args validation
+            products = self.product_dao.get_productlist(filters, db_connection)
+            product_count = self.product_dao.get_product_count(db_connection)
+
             if products == 0:
                 return {'message' : 'NO_PRODUCTS_SELECTED'}, 500
 
-            return {
-            'number_of_products' : len(products),
-            'products'           : products,
-            }, 200
+            return { 
+            'product_count' : product_count, 
+            'products' : products,}, 200
 
-        except KeyError:           
-            return {'message': 'KEY_ERROR'}, 400
+        except KeyError as e:           
+            return {'message': 'KEY_ERROR' + str(e)}, 400
 
-        except TypeError:            
-            return {'message': 'TYPE ERROR'}, 400
+        except TypeError as e:            
+            return {'message': 'TYPE ERROR' + str(e)}, 400

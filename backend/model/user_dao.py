@@ -138,7 +138,10 @@ class UserDao:
         INNER JOIN seller_keys AS user ON sellers.seller_key_id = user.id
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(seller_infos_get_sql, user)
+        # cursor.execute 결과를 확인해 SELECT에 걸린 상품이 하나도 없으면 0을 리턴
+        if cursor.execute(seller_infos_get_sql, user) == 0:
+            return 0
+
         return cursor.fetchall()
 
     def get_supervisors(self, user, db_connection):
@@ -344,6 +347,7 @@ class UserDao:
         SELECT DISTINCT
             sellers.id AS id,
             seller_keys.user AS seller_id,
+            seller_keys.id AS seller_key_id,
             sellers.eng_name AS seller_eng_name,
             sellers.name AS seller_kor_name,
             seller_attributes.id AS seller_attribute_id,
@@ -391,5 +395,5 @@ class UserDao:
         """
         cursor.execute(check_user_auth_sql, get_user)
         user = cursor.fetchone()[0]
-        print(user)
+   
         return user

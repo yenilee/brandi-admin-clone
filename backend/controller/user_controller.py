@@ -264,8 +264,8 @@ def create_user_endpoints(app, user_service):
                 db_connection.commit()
                 return update_response
 
-        except  ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
+        except  ValidationError:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
 
         except pymysql.err.InternalError:
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
@@ -273,14 +273,14 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
-        except pymysql.err.IntegrityError as e:
-            return {'message' : 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
+        except pymysql.err.IntegrityError:
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except Exception as e:
 
@@ -294,29 +294,34 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 db_connection.close()
 
-    @app.route('/seller_details', methods = ['GET'])
+    @app.route('/seller_details/', methods = ['GET'])
     @authorize
     def get_seller_details():
-
         """
-        셀러 상세 (셀러 권한) API [GET]
+        셀러 상세 정보 [GET]
 
         Args:
-            [Header]`
+            [Header]
                 Authorization : 로그인 토큰
 
         Returns:
 
-            Success     : {data : user_info}, status code : 200
+            Success    : {data : user_info}, status code : 200
 
-            Key error   : {message : KEY_ERROR}, status code : 400
-            Type error   :{message : TYPE_ERROR}, status code : 400
+            Key error  : {message : KEY_ERROR}, status code : 400
+            Type error : {message : TYPE_ERROR}, status code : 400
         """
 
         db_connection = None
         try:
             db_connection = get_connection()
-            if db_connection:
+            if db_connection: 
+                # 마스터일 경우 query string의 인자로 셀러의 상세 정보를 가져온다
+                if g.auth is 1:
+                    seller_key_id = request.args.get('seller_key_id')
+                    seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
+                    return seller_infos 
+                # 일반 셀러의 경우 토큰의 고유 id 값으로 상세 정보를 가져온다. 
                 seller_infos = user_service.get_seller_details(g.user, db_connection)
                 return seller_infos
 
@@ -336,10 +341,64 @@ def create_user_endpoints(app, user_service):
             return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except Exception as e:
-            db_connection.rollback()
             return {'message' : str(e)}, 500
 
         finally:
             if db_connection:
                 db_connection.close()
     
+    @app.route('/seller_details/master', methods = ['GET'])
+    @authorize   
+    def get_seller_details_master():
+        """
+        셀러 상세 (마스터 권한) API [GET]
+
+        Args:
+            [Header]`
+                Authorization : 로그인 토큰
+
+        Returns:
+
+            Success             : {data : user_info}, status code : 200
+
+            Authorization error : {message : UNAUTHORIZED}, status code : 401
+            Key error           : {message : KEY_ERROR}, status code : 400
+            Type error          : {message : TYPE_ERROR}, status code : 400
+        """
+
+        db_connection = None
+        try:
+            # 권한 ID가 마스터가 아닐 경우 권한 없음 에러 메시지 표시
+            if g.auth is not 1:
+                return {'message' : 'UNAUTHORIZED'}, 401       
+
+
+            # Query String으로 셀러 고유 ID를 가지고 온다         
+            seller_key_id = request.args.get('seller_key_id')
+            db_connection = get_connection()
+
+            if db_connection: 
+                seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
+                return seller_infos
+
+        except pymysql.err.InternalError:
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+
+        except pymysql.err.OperationalError:
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError as e:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except Exception as e:
+            return {'message' : str(e)}, 500
+
+        finally:
+            if db_connection:
+                db_connection.close()

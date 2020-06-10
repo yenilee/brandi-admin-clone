@@ -201,7 +201,7 @@ def create_product_endpoints(app, product_service):
             register_response = product_service.resize_image(image_url, db_connection)
             return image_url
 
-    @app.route('/products', methods=['GET'])
+    @app.route('/products/', methods=['GET'])
     @authorize
     def get_product_list():
 
@@ -210,15 +210,16 @@ def create_product_endpoints(app, product_service):
             return {'message' : 'UNAUTHORIZED'}, 401
 
         db_connection = None
-
         try:
+            #필터 Query String
+            filters = request.args
             db_connection = get_connection()
             if db_connection:                
-                products_list_response = product_service.get_product_list(db_connection)
+                products_list_response = product_service.get_product_list(filters, db_connection)
                 return products_list_response
 
-        except pymysql.err.InternalError:
-            return {'message': 'DATABASE_SERVER_ERROR'}, 500
+        except pymysql.err.InternalError as e:
+            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
 
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500

@@ -148,6 +148,10 @@ class UserService:
         try:
             # 사용자 정보
             user_info        = self.user_dao.get_seller_details(user, db_connection)
+            
+            if user_info == 0:
+                return {'message' : 'NO_SELLER_SELECTED'}, 500
+
             # 담당자 정보
             supervisor_info  = self.user_dao.get_supervisors(user, db_connection)
             # 영업시간
@@ -166,7 +170,7 @@ class UserService:
             return {'message' : 'KEY_ERROR'}, 400
 
         except TypeError:
-            return {'message' : 'TYPE_ERROR' + str(e)}, 400
+            return {'message' : 'TYPE_ERROR'}, 400
 
     def get_sellerlist(self, db_connection):
         try:
