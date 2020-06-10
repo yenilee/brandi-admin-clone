@@ -19,7 +19,8 @@ class ProductService:
     def create_new_product(self, product, db_connection):
         try:
             # 상품 KEY ID insert
-            product['product_key_id'] = self.product_dao.insert_product_key(product, db_connection)
+            product_key_id = self.product_dao.insert_product_key(product, db_connection)
+            product['product_key_id'] = product_key_id
 
             # 위에서 등록한 KEY ID row에 상품 코드(문자+숫자 조합) 업데이트
             self.product_dao.update_product_number(db_connection)
@@ -43,7 +44,9 @@ class ProductService:
             self.product_dao.insert_product(product, db_connection)
 
             # 여러개의 상품 태그를 리스트에 담아 받고, 반복분으로 각각 insert
-            [self.product_dao.insert_tags(tag, db_connection) for tag in product['tag_name']]
+            tags = [self.product_dao.insert_tags(tag, db_connection) for tag in product['tag_name']]
+
+            [ self.product_dao.insert_product_tags(product_key_id, tag, db_connection) for tag in tags]
 
             return "", 200
 
