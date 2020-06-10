@@ -145,7 +145,7 @@
                   <tr v-for="item in infoDatas" :key="item.name">
                     <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
                     <td>{{ item.id }}</td>
-                    <td>{{ item.seller_id}}</td>
+                    <td @click="() => idClick(item.seller_key_id)">{{ item.seller_id}}</td>
                     <td>{{ item.seller_eng_name }}</td>
                     <td>{{ item.seller_kor_name }}</td>
                     <td>{{ item.manager_name }}</td>
@@ -166,18 +166,22 @@
                         <button
                           style="background-color: #5bc0de; border-color: #46b8da;"
                           v-if="action === '입점 승인'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                         <button
                           style="background-color: #d9534f;border-color: #d43f3a;"
                           v-if="action === '입점 거절' || action === '퇴점 신청 처리' || action === '퇴점 확정 처리'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                         <button
                           style="background-color: #f0ad4e; border-color: #eea236;"
                           v-if="action === '휴점 신청'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                         <button
                           style="background-color: #5cb85c; border-color: #4cae4c;"
                           v-if="action === '퇴점 철회 처리' || action === '휴점 해제'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                       </div>
                     </td>
@@ -214,8 +218,9 @@
 
 <script>
 import axios from "axios";
+import { eventBus } from "../../main";
 import { sellerListHeaders } from "../../config/SellerListDatas";
-import { SJ_URL } from "../../config/urlConfig";
+import { URL } from "../../config/urlConfig";
 
 export default {
   data() {
@@ -242,8 +247,8 @@ export default {
   },
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
-    axios
-      .get(`${SJ_URL}/sellers`, {
+    axios //  .get(`${SJ_URL}/sellers`, {
+      .get(`${URL}/sellerList.json`, {
         headers: {
           Authorization: localStorage.access_token
         }
@@ -256,6 +261,48 @@ export default {
       });
   },
   methods: {
+    idClick: function(id) {
+      eventBus.$emit("mounted", id);
+      this.$router.push("/main/seller/sellerregist");
+
+      //이때, 아이디 값을 버스에 실어서 보냅시다.
+      // axios
+      //   .get(`${SJ_URL}/seller_details/?seller_key_id=${id}`, {
+      //     headers: {
+      //       Authorization: localStorage.access_token
+      //     }
+      //   })
+      //   .then(response => {
+      //     console.log("여기야", response);
+      //     this.$router.push(`/main/seller/sellerregist`);
+      //   })
+      //   .catch(error => console.log(error));
+    },
+    actionClick: function(action, id) {
+      axios
+        .put(
+          `${SJ_URL}/action`,
+          {
+            user: id,
+            action_type: action
+          },
+
+          {
+            headers: {
+              Authorization: localStorage.access_token
+            }
+          }
+        )
+        .then(response => {
+          console.log(response);
+          if (response.status === 200) {
+            alert("성공");
+          }
+        })
+        .catch(error => {
+          console.log(error.response.data.message);
+        });
+    },
     search: function() {
       //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
