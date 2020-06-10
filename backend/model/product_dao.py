@@ -15,7 +15,10 @@ class ProductDao:
             %(seller_id)s
         )
         """
-        cursor.execute(insert_product_key_sql, product)
+        affected_row = cursor.execute(insert_product_key_sql, product)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
+
         product_key_id = cursor.lastrowid
         return product_key_id
 
@@ -25,7 +28,9 @@ class ProductDao:
         UPDATE product_keys SET product_number = (SELECT CONCAT ('BRANDI', (SELECT max(id))))
         WHERE product_number = "default";
         """
-        cursor.execute(insert_product_number_sql)
+        affected_row = cursor.execute(insert_product_number_sql)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def insert_manufacturer(self, product, db_connection):
         cursor = db_connection.cursor()
@@ -40,8 +45,12 @@ class ProductDao:
                 %(origin)s
             );
         """
-        cursor.execute(insert_notice_sql, product)
+        affected_row = cursor.execute(insert_notice_sql, product)
+
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
         notice_id = cursor.lastrowid
+
         return notice_id
 
     def insert_tags(self, tag, db_connection):
@@ -49,8 +58,26 @@ class ProductDao:
         insert_tags_sql = """
         INSERT INTO tags (name) VALUES (%s);
         """
-        cursor.execute(insert_tags_sql, tag)
+        affected_row = cursor.execute(insert_tags_sql, tag)
+
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
+
         tag_id = cursor.lastrowid
+        return tag_id
+
+    def insert_product_tags(self, product_id, tag, db_connection):
+        cursor = db_connection.cursor()
+        insert_product_tags_sql = """
+        INSERT INTO products_tags(
+            product_id,
+            tag_id
+            ) VALUES (
+            %s,
+            %s
+            )
+        """
+        cursor.execute(insert_product_tags_sql, (product_id, tag))
 
     def insert_discount(self, product, db_connection):
         cursor = db_connection.cursor()
@@ -67,7 +94,10 @@ class ProductDao:
                 %(discount_end)s
                 );
         """
-        cursor.execute(insert_product_sql, product)
+        affected_row = cursor.execute(insert_product_sql, product)
+
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def insert_options(self, product, db_connection):
         cursor = db_connection.cursor()
@@ -83,7 +113,10 @@ class ProductDao:
             (SELECT id FROM colors WHERE name = %(color)s),
             %(quantity)s
         """
-        cursor.execute(insert_option_sql, product)
+        affected_row = cursor.execute(insert_option_sql, product)
+
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def insert_product(self, product, db_connection):
         cursor = db_connection.cursor()
@@ -147,10 +180,14 @@ class ProductDao:
             sellers.profile AS seller_profile_image
         FROM sellers
         INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id
-        WHERE sellers.authority_id = 2
+        WHERE sellers.authority_id = 2 
+        AND sellers.end_date = '2037-12-31 23:59:59'
         """
 
-        cursor.execute(get_sellers_sql)
+        affected_row = cursor.execute(get_sellers_sql)
+        if affected_row == 0:
+            raise Exception("DATA DOES NOT EXIST")
+
         return cursor.fetchall()
 
     def get_attribute_group_id(self, user, db_connection):
@@ -247,5 +284,4 @@ class ProductDao:
         if cursor.execute(products_list_sql) == 0:
             return 0  
 
-        return cursor.fetchall()       
-        
+        return cursor.fetchall()

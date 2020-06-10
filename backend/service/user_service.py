@@ -91,15 +91,13 @@ class UserService:
                     {'user_id'      : user[0],
                      'authority_id' : password[1],
                      'exp'          : datetime.utcnow() + timedelta(days = 15),
-
-                     }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
+                    }, SECRET_KEY['secret'], ALGORITHM['algorithm'])
                 access_token = token.decode('utf-8')
 
                 if self.user_dao.check_user_auth(get_user, db_connection) is 3:
                     return {'message' : 'UNAUTHORIZED USER'}, 401
 
                 return {'access_token' : access_token}, 200
-
             return {'message' : 'INVALID ACCESS'}, 400            
 
         except KeyError:
@@ -168,24 +166,66 @@ class UserService:
         except TypeError:
             return {'message' : 'TYPE_ERROR' + str(e)}, 400
 
-    def get_sellerlist(self, db_connection):
+    def get_seller_list(self, filters, db_connection):
         try:
-            sellers = self.user_dao.get_sellerlist(db_connection)
+            # seller list를 불러오는 dao 함수 실행
+            sellers = self.user_dao.get_seller_list(filters, db_connection)
+
+            # dao 함수에서 가져온 seller가 없을 경우, 메시지를 보내줌
+            if sellers == 0:
+                return {'message' : 'NO SELLER SELECTED'}
+
+            # 셀러의 상태 값에 따른 액션 상태를 딕셔너리로 불러옴
             seller_actions = self.user_dao.get_seller_action(db_connection)
 
+            # 같은 상태 값을 가진 액션을 셀러 상태 : [액션1, 액션2, 액션3] 상태로 만들어줌
             merge_tuples = collections.defaultdict(list)
             [ merge_tuples[k].extend(v.split(',')) for k, v in seller_actions ]
 
+            # 위에서 만든 값을 셀러의 상태 ID와 매칭해줌
             for seller in sellers:
                 for action in list(merge_tuples.items()):
                     if action[0]== seller['status_id']:
                         seller.update({"actions_by_status" : action[1]})
 
-            return sellers
+            return {'number_of_sellers' : len(sellers),
+                    'number_of_pages' : int(len(sellers)/10)+1,
+                    'sellers' : sellers}, 200
+
+        except KeyError as e:
+            return {'message' : 'KEY ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message' : 'TYPE ERROR' +str(e)}, 400
+
+    def update_status(self, user, action_type, db_connection):
+        try:
+            # 예전 기록 중 최신 수정 데이터를 갖고 있는 셀러의 ID를 불러오기
+            previous_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)[0]
+
+            # 위에서 가져온 ID의 데이터 종료일을 현재로 바꿔줌
+            self.user_dao.update_history(previous_seller_id, db_connection)
+
+            # 최신 셀러의 데이터를 insert하고 현재의 ID 값을 가져옴
+            recent_seller_id = self.user_dao.update_seller_all(previous_seller_id, db_connection)
+
+            # request에 담긴 action을 기반으로 다음 status 불러오기
+            next_status_id = self.user_dao.get_next_status(action_type, db_connection)
+
+            # 입점 승인 요청일 경우 권한 ID를 2에서 3으로 바꿈
+            if action_type['action_type'] == '입점 승인':
+                self.user_dao.update_authority(recent_seller_id, db_connection)
+
+            # 다음 status id와 seller의 최신 ID를 가져와 반영해준다.
+            self.user_dao.update_status(next_status_id, recent_seller_id, db_connection)
+
+            return "", 200
 
         except KeyError:
-            return {'message' : 'KEY ERROR'}, 400
+            db_connection.rollback()
+            return {'message' : 'KEY_ERROR'}, 400
 
-        except TypeError:
-            return {'message' : 'TYPE ERROR'}, 400
+        except TypeError as e:
+            db_connection.rollback()
+            return {'message' : 'TYPE_ERROR' + str(e)}, 400
 
