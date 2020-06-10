@@ -76,7 +76,7 @@
             </tbody>
             <!-- 셀러 한줄 소개 -->
             <tbody>
-              <InputBox v-model="infoDatas.data.simple_introduction" placeholder="셀러 한줄 소개">
+              <InputBox v-model="infoDatas.simple_introduction" placeholder="셀러 한줄 소개">
                 <template #thName>
                   셀러 한줄 소개
                   <i class="xi-pen" />
@@ -85,7 +85,7 @@
             </tbody>
             <!-- 셀러 상세 소개 -->
             <tbody>
-              <TextAreaBox v-model="infoDatas.data.detail_introduction" placeholder="셀러 상세 소개">
+              <TextAreaBox v-model="detail_introduction" placeholder="셀러 상세 소개">
                 <template #thName>셀러 상세 소개</template>
                 <template #infoText01>
                   <i class="xi-info">셀러 상세 소개 글은 최소10자 이상 입니다.</i>
@@ -94,7 +94,7 @@
             </tbody>
             <!-- 셀러 사이트 URL -->
             <tbody>
-              <InputBox v-model="infoDatas.data.site_url" placeholder="셀러 사이트 URL">
+              <InputBox v-model="site_url" placeholder="셀러 사이트 URL">
                 <template #thName>
                   셀러 사이트 URL
                   <i class="xi-pen" />
@@ -112,21 +112,21 @@
                 <td class="threeInput">
                   <input
                     type="text"
-                    v-model="infoDatas.data.supervisors[0].supervisor_name"
-                    @input="infoDatas.data.supervisors[0].supervisor_name = $event.target.value"
+                    v-model="supervisors[0].supervisor_name"
+                    @input="supervisors[0].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="infoDatas.data.supervisors[0].supervisor_phone_number"
-                    @input="infoDatas.data.supervisors[0].supervisor_phone_number = $event.target.value"
+                    v-model="supervisors[0].supervisor_phone_number"
+                    @input="supervisors[0].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
                   />
                   <div style="display: flex">
                     <input
                       type="text"
-                      v-model="infoDatas.data.supervisors[0].supervisor_email"
-                      @input="infoDatas.data.supervisors[0].supervisor_email = $event.target.value"
+                      v-model="supervisors[0].supervisor_email"
+                      @input="supervisors[0].supervisor_email = $event.target.value"
                       placeholder="담당자 이메일"
                     />
                     <div
@@ -141,21 +141,21 @@
                 <td class="threeInput" v-if="tableCount > 1">
                   <input
                     type="text"
-                    v-model="infoDatas.data.supervisors[1].supervisor_name"
-                    @input="infoDatas.data.supervisors[1].supervisor_name = $event.target.value"
+                    v-model="supervisors[1].supervisor_name"
+                    @input="supervisors[1].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="infoDatas.data.supervisors[1].supervisor_phone_number"
-                    @input="infoDatas.data.supervisors[1].supervisor_phone_number = $event.target.value"
+                    v-model="supervisors[1].supervisor_phone_number"
+                    @input="supervisors[1].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
                   />
                   <div style="display: flex">
                     <input
                       type="text"
-                      v-model="infoDatas.data.supervisors[1].supervisor_email"
-                      @input="infoDatas.data.supervisors[1].supervisor_email = $event.target.value"
+                      v-model="supervisors[1].supervisor_email"
+                      @input="supervisors[1].supervisor_email = $event.target.value"
                       placeholder="담당자 이메일"
                     />
                     <div
@@ -178,21 +178,21 @@
                 <td class="threeInput" v-if="tableCount > 2">
                   <input
                     type="text"
-                    v-model="infoDatas.data.supervisors[2].supervisor_name"
-                    @input="infoDatas.data.supervisors[2].supervisor_name = $event.target.value"
+                    v-model="supervisors[2].supervisor_name"
+                    @input="supervisors[2].supervisor_name = $event.target.value"
                     placeholder="담당자명"
                   />
                   <input
                     type="text"
-                    v-model="infoDatas.data.supervisors[2].supervisor_phone_number"
-                    @input="infoDatas.data.supervisors[2].supervisor_phone_number = $event.target.value"
+                    v-model="supervisors[2].supervisor_phone_number"
+                    @input="supervisors[2].supervisor_phone_number = $event.target.value"
                     placeholder="담당자 번호"
                   />
                   <div style="display: flex">
                     <input
                       type="text"
-                      v-model="infoDatas.data.supervisors[2].supervisor_email"
-                      @input="infoDatas.data.supervisors[2].supervisor_email = $event.target.value"
+                      v-model="supervisors[2].supervisor_email"
+                      @input="supervisors[2].supervisor_email = $event.target.value"
                       placeholder="담당자 이메일"
                     />
                     <div
@@ -208,7 +208,7 @@
             </tbody>
             <!-- 고객센터 -->
             <tbody>
-              <InputBox v-model="infoDatas.data.service_number" placeholder="고객센터 전화번호">
+              <InputBox v-model="service_number" placeholder="고객센터 전화번호">
                 <template #thName>
                   고객센터
                   <i class="xi-pen" />
@@ -227,7 +227,7 @@
                   <input
                     class="disabledInput"
                     type="text"
-                    v-model="infoDatas.data.zip_code"
+                    v-model="zip_code"
                     placeholder="우편번호"
                     disabled
                   />
@@ -236,15 +236,11 @@
                 <input
                   class="disabledInput"
                   type="text"
-                  v-model="infoDatas.data.address"
+                  v-model="address"
                   placeholder="주소(택배 수령지)"
                   disabled
                 />
-                <input
-                  type="text"
-                  v-model="infoDatas.data.detail_address"
-                  placeholder="상세주소(택배 수령지)"
-                />
+                <input type="text" v-model="detail_address" placeholder="상세주소(택배 수령지)" />
               </td>
             </tbody>
             <!-- 고객센터 운영시간(주중)-->
@@ -258,8 +254,8 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        :value="infoDatas.data.buisness_hours[0].start_time"
-                        @input="infoDatas.data.buisness_hours[0].start_time = $event"
+                        :value="buisness_hours[0].start_time"
+                        @input="buisness_hours[0].start_time = $event"
                         type="time"
                       ></v-text-field>
                     </v-col>
@@ -269,8 +265,8 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        :value="infoDatas.data.buisness_hours[0].end_time"
-                        @input="infoDatas.data.buisness_hours[0].end_time = $event"
+                        :value="buisness_hours[0].end_time"
+                        @input="buisness_hours[0].end_time = $event"
                         type="time"
                       ></v-text-field>
                     </v-col>
@@ -286,8 +282,8 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        :value="infoDatas.data.buisness_hours[1].start_time"
-                        @input="infoDatas.data.buisness_hours[1].start_time = $event"
+                        :value="buisness_hours[1].start_time"
+                        @input="buisness_hours[1].start_time = $event"
                         type="time"
                       ></v-text-field>
                     </v-col>
@@ -297,8 +293,8 @@
                   <v-row>
                     <v-col cols="1">
                       <v-text-field
-                        :value="infoDatas.data.buisness_hours[1].end_time"
-                        @input="infoDatas.data.buisness_hours[1].end_time = $event"
+                        :value="buisness_hours[1].end_time"
+                        @input="buisness_hours[1].end_time = $event"
                         type="time"
                       ></v-text-field>
                     </v-col>
@@ -314,9 +310,9 @@
                   <i class="xi-pen" />
                 </th>
                 <td class="threeInput">
-                  <input type="text" v-model="infoDatas.data.bank" placeholder="정산은행" />
-                  <input type="text" v-model="infoDatas.data.account_owner" placeholder="계좌주" />
-                  <input type="text" v-model="infoDatas.data.bank_account" placeholder="계좌번호" />
+                  <input type="text" v-model="bank" placeholder="정산은행" />
+                  <input type="text" v-model="account_owner" placeholder="계좌주" />
+                  <input type="text" v-model="bank_account" placeholder="계좌번호" />
                 </td>
               </tr>
             </tbody>
@@ -369,7 +365,7 @@
           <!-- 테이블 시작 영역 -->
           <tbody>
             <TextAreaBox
-              v-model="infoDatas.data.shipping_information"
+              v-model="shipping_information"
               placeholder="ex) 도서산간 지역은 배송비가 추가비용이 발생할 수 있습니다. 결제 완료 후 1~3일 후 출고됩니다."
             >
               <template #thName>
@@ -383,7 +379,7 @@
           </tbody>
           <tbody>
             <TextAreaBox
-              v-model="infoDatas.data.refund_information"
+              v-model="refund_information"
               placeholder="ex) 브랜디는 소비자보호법 및 전자상거래법을 기반한 환불보장제를 운영 중에 있습니다. 정당하지 않은 사유로 인한 환불 거부 등은 제재 사유가 될 수 있는 점 참고 부탁드립니다."
             >
               <template #thName>
@@ -424,7 +420,7 @@
         <v-simple-table>
           <!-- 테이블 시작 영역 -->
           <tbody>
-            <InputBox v-model="infoDatas.data.model_height" placeholder="키">
+            <InputBox v-model="model_height" placeholder="키">
               <template #thName>키</template>
               <template #infoText01>
                 <i class="xi-info">ex) 160cm => 160</i>
@@ -432,7 +428,7 @@
             </InputBox>
           </tbody>
           <tbody>
-            <InputBox v-model="infoDatas.data.model_size_top" placeholder="상의 사이즈">
+            <InputBox v-model="model_size_top" placeholder="상의 사이즈">
               <template #thName>상의 사이즈</template>
               <template #infoText01>
                 <i class="xi-info">ex) 55사이즈 => 55</i>
@@ -440,7 +436,7 @@
             </InputBox>
           </tbody>
           <tbody>
-            <InputBox v-model="infoDatas.data.model_size_bottom" placeholder="하의 사이즈">
+            <InputBox v-model="model_size_bottom" placeholder="하의 사이즈">
               <template #thName>하의 사이즈</template>
               <template #infoText01>
                 <i class="xi-info">ex) 27사이즈 => 27</i>
@@ -448,7 +444,7 @@
             </InputBox>
           </tbody>
           <tbody>
-            <InputBox v-model="infoDatas.data.model_size_foot" placeholder="발 사이즈">
+            <InputBox v-model="model_size_foot" placeholder="발 사이즈">
               <template #thName>발 사이즈</template>
               <template #infoText01>
                 <i class="xi-info">ex) 240mm => 240</i>
@@ -480,7 +476,7 @@
             <tr>
               <td>
                 <textarea
-                  v-model="infoDatas.data.feed_message"
+                  v-model="feed_message"
                   placeholder="ex) 안녕하세요 000에요!! 봄에 어울리는 신상이 입고 되었습니다."
                 ></textarea>
               </td>
@@ -519,64 +515,33 @@ import DaumPostcode from "vuejs-daum-postcode";
 
 // .get(`${URL}/seller_details`, {
 export default {
-  name: "SellerRegist",
-  props: {
-    keyId: {
-      type: Number,
-      required: true
-    }
-  },
+  name: "sellerRegist",
   //첫 마운트가 되면 셀러의 기존 입력된 정보들을 불러오게 합니다.
+  mounted: function() {
+    let thisClass = this;
+    eventBus.$on("keyIdBus", id => {
+      axios
+        .get(`${SJ_URL}/seller_details/?seller_key_id=${id}`, {
+          // .get(`${URL}/sellerregist.json`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          debugger;
+          console.log("응답데이터", thisClass.a, response.data.data);
+          thisClass.infoDatas = response.data;
+          console.log("인포데이터", thisClass, thisClass.infoDatas);
+        });
+    });
+  },
 
   data() {
     return {
       infoDatas: {
-        supervisors: [
-          {
-            supervisor_name: "",
-            supervisor_phone_number: "",
-            supervisor_email: ""
-          },
-          {
-            supervisor_name: "",
-            supervisor_phone_number: "",
-            supervisor_email: ""
-          },
-          {
-            supervisor_name: "",
-            supervisor_phone_number: "",
-            supervisor_email: ""
-          }
-        ],
-        buisness_hours: [
-          {
-            start_time: "",
-            end_time: ""
-          },
-          {
-            start_time: "",
-            end_time: ""
-          }
-        ]
-      },
-      addressModal: false,
-      tableCount: null
+        data: {}
+      }
     };
-    e;
-  },
-  mounted: function() {
-    console.log(this.keyId);
-    axios
-      .get(`${SJ_URL}/seller_details/?seller_key_id=${this.keyId}`, {
-        // .get(`${URL}/sellerregist.json`, {
-        headers: {
-          Authorization: localStorage.access_token
-        }
-      })
-      .then(response => {
-        this.infoDatas = response.data;
-        this.tableCount = this.infoDatas.data.supervisors.length;
-      });
   },
 
   methods: {
@@ -588,9 +553,9 @@ export default {
     },
     supervisorsMinus: function(index) {
       this.tableCount = this.tableCount - 1;
-      this.infoDatas.data.supervisor[index].name = null;
-      this.infoDatas.data.supervisor[index].phone_number = null;
-      this.infoDatas.data.supervisor[index].email = null;
+      this.supervisors[index].supervisor_name = null;
+      this.supervisors[index].supervisor_phone_number = null;
+      this.supervisors[index].supervisor_email = null;
     },
     handleAddress: function(data) {
       let fullAddress = data.address;
@@ -605,8 +570,8 @@ export default {
         }
         fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
       }
-      this.infoDatas.data.address = fullAddress;
-      this.infoDatas.data.zip_code = data.zonecode;
+      this.address = fullAddress;
+      this.zip_code = data.zonecode;
       console.log(data); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
     },
     // 수정버튼을 누르면 백엔드로 인풋에 입력된 모든 내용을 보냅니다.
@@ -618,25 +583,25 @@ export default {
             {
               profile: "url",
               background_image: "url",
-              simple_introduction: this.infoDatas.data.simple_introduction,
-              detail_introduction: this.infoDatas.data.detail_introduction,
-              site_url: this.infoDatas.data.site_url,
-              supervisors: this.infoDatas.data.supervisors,
-              service_number: this.infoDatas.data.service_number,
-              zip_code: this.infoDatas.data.zip_code,
-              address: this.infoDatas.data.address,
-              detail_address: this.infoDatas.data.detail_address,
-              buisness_hours: this.infoDatas.data.buisness_hours,
-              bank: this.infoDatas.data.bank,
-              account_owner: this.infoDatas.data.account_owner,
-              bank_account: this.infoDatas.data.bank_account,
-              shipping_information: this.infoDatas.data.shipping_information,
-              refund_information: this.infoDatas.data.refund_information,
-              model_height: Number(this.infoDatas.data.model_height),
-              model_size_top: Number(this.infoDatas.data.model_size_top),
-              model_size_bottom: Number(this.infoDatas.data.model_size_bottom),
-              model_size_foot: Number(this.infoDatas.data.model_size_foot),
-              feed_message: this.infoDatas.data.feed_message
+              simple_introduction: this.simple_introduction,
+              detail_introduction: this.detail_introduction,
+              site_url: this.site_url,
+              supervisors: this.supervisors,
+              service_number: this.service_number,
+              zip_code: this.zip_code,
+              address: this.address,
+              detail_address: this.detail_address,
+              buisness_hours: this.buisness_hours,
+              bank: this.bank,
+              account_owner: this.account_owner,
+              bank_account: this.bank_account,
+              shipping_information: this.shipping_information,
+              refund_information: this.refund_information,
+              model_height: Number(this.model_height),
+              model_size_top: Number(this.model_size_top),
+              model_size_bottom: Number(this.model_size_bottom),
+              model_size_foot: Number(this.model_size_foot),
+              feed_message: this.feed_message
             },
             {
               headers: {

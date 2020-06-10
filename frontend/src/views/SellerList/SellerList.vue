@@ -220,7 +220,7 @@
 import axios from "axios";
 import { eventBus } from "../../main";
 import { sellerListHeaders } from "../../config/SellerListDatas";
-import { URL } from "../../config/urlConfig";
+import { URL, SJ_URL } from "../../config/urlConfig";
 
 export default {
   data() {
@@ -247,8 +247,9 @@ export default {
   },
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
-    axios //  .get(`${SJ_URL}/sellers`, {
-      .get(`${URL}/sellerList.json`, {
+    axios
+      .get(`${SJ_URL}/sellers`, {
+        // .get(`${URL}/sellerList.json`, {
         headers: {
           Authorization: localStorage.access_token
         }
@@ -260,9 +261,10 @@ export default {
         console.log(response);
       });
   },
+
   methods: {
     idClick: function(id) {
-      eventBus.$emit("please", id);
+      this.$emit("keyChange", id);
       this.$router.push("/main/seller/sellerregist");
 
       //이때, 아이디 값을 버스에 실어서 보냅시다.
