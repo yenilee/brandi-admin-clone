@@ -519,13 +519,6 @@ import DaumPostcode from "vuejs-daum-postcode";
 
 // .get(`${URL}/seller_details`, {
 export default {
-  name: "SellerRegist",
-  props: {
-    keyId: {
-      type: Number,
-      required: true
-    }
-  },
   //첫 마운트가 되면 셀러의 기존 입력된 정보들을 불러오게 합니다.
 
   data() {
@@ -565,17 +558,26 @@ export default {
     e;
   },
   mounted: function() {
-    console.log(this.keyId);
+    console.log("url data >>>> ", this.$route.params.id);
+    let masterURl = `${SJ_URL}/seller_details/${this.$route.params.id}`;
+    const userURl = `${SJ_URL}/seller_details`;
+
     axios
-      .get(`${SJ_URL}/seller_details/?seller_key_id=${this.keyId}`, {
-        // .get(`${URL}/sellerregist.json`, {
-        headers: {
-          Authorization: localStorage.access_token
+      .get(
+        this.$route.params.id > 0
+          ? `${SJ_URL}/seller_details/${this.$route.params.id}`
+          : `${SJ_URL}/seller_details`,
+        {
+          // .get(`${URL}/sellerregist.json`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
         }
-      })
+      )
       .then(response => {
         this.infoDatas = response.data;
         this.tableCount = this.infoDatas.data.supervisors.length;
+        console.log(this.infoDatas);
       });
   },
 
@@ -588,9 +590,9 @@ export default {
     },
     supervisorsMinus: function(index) {
       this.tableCount = this.tableCount - 1;
-      this.infoDatas.data.supervisor[index].name = null;
-      this.infoDatas.data.supervisor[index].phone_number = null;
-      this.infoDatas.data.supervisor[index].email = null;
+      this.infoDatas.data.supervisor[index].name = 0;
+      this.infoDatas.data.supervisor[index].phone_number = 0;
+      this.infoDatas.data.supervisor[index].email = 0;
     },
     handleAddress: function(data) {
       let fullAddress = data.address;
@@ -614,7 +616,9 @@ export default {
       if (confirm("셀러정보를 수정 하시겠습니까?") == true) {
         axios
           .put(
-            `${SJ_URL}/seller`,
+            this.$route.params.id > 0
+              ? `${SJ_URL}/seller/${this.$route.params.id}`
+              : `${SJ_URL}/seller`,
             {
               profile: "url",
               background_image: "url",
