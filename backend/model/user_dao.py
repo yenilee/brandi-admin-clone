@@ -419,12 +419,12 @@ class UserDao:
 
         # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
         if filters is not None:
-            for key in filters.keys():
-                statement += f" AND {key}=" + str(filters[f'{key}'])
-                print(statement)
+            for k, v in filters.items():
+                statement += f" AND {k} LIKE '%{v}%'"
 
         sellers_list_sql = """
         SELECT DISTINCT
+            sellers.is_deleted,
             sellers.id AS id,
             seller_keys.user AS seller_id,
             seller_keys.id AS seller_key_id,
@@ -535,7 +535,10 @@ class UserDao:
             FROM sellers
             WHERE id = %s;
         """
-        cursor.execute(update_seller_all_sql, user)
+        sellers = cursor.execute(update_seller_all_sql, user)
+        if sellers == 0:
+            return 0
+
         return cursor.lastrowid
 
     def update_status(self, next_status_id, user, db_connection):
@@ -564,3 +567,12 @@ class UserDao:
         WHERE id = %s
         """
         cursor.execute(update_status_sql, (2, user))
+
+    def soft_delete_seller(self, seller_key_id, db_connection):
+        cursor = db_connection.cursor()
+        soft_delete_seller_sql = """
+        UPDATE sellers
+        SET is_deleted = 1
+        WHERE id = %s AND end_date = '2037-12-31 23:59:59';
+        """
+        cursor.execute(soft_delete_seller_sql, seller_key_id)

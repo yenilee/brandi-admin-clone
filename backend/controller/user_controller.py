@@ -5,7 +5,7 @@ from jsonschema      import validate, ValidationError
 from flask           import request, g
 from connection      import get_connection
 from utils           import authorize
-from json_schema     import seller_register_schema
+from json_schema     import seller_register_schema, seller_action_schema
 from flask           import request
 
 
@@ -137,7 +137,7 @@ def create_user_endpoints(app, user_service):
 
     @app.route('/sellers', methods=['GET'])
     @authorize
-    def show_sellers():
+    def get_sellers_list():
 
         """
         셀러 계정 관리 리스트 API [GET]
@@ -509,12 +509,13 @@ def create_user_endpoints(app, user_service):
 
     @app.route('/action', methods = ['PUT'])
     @authorize
-    def change_seller_status():
+    def update_seller_status():
 
         db_connection = None
         try:
             db_connection = get_connection()
             action_type = request.json
+            validate(action_type, seller_action_schema)
 
             if db_connection:
                 if g.auth is not 1:
@@ -526,6 +527,8 @@ def create_user_endpoints(app, user_service):
 
                 return action_response
 
+        except  ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
         except pymysql.err.InternalError as e:
 
             if db_connection:
@@ -536,8 +539,8 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR' +str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500

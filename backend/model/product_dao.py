@@ -2,7 +2,7 @@ import pymysql
 
 class ProductDao:
 
-    def insert_product_key(self, product, db_connection):
+    def insert_product_key(self, seller_key_id, db_connection):
         cursor = db_connection.cursor()
         insert_product_key_sql = """
         INSERT INTO product_keys(
@@ -12,10 +12,10 @@ class ProductDao:
         ) VALUES (
             now(),
             "default",
-            %(seller_id)s
+            %s
         )
         """
-        affected_row = cursor.execute(insert_product_key_sql, product)
+        affected_row = cursor.execute(insert_product_key_sql, seller_key_id)
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -25,9 +25,9 @@ class ProductDao:
     def update_product_number(self, db_connection):
         cursor = db_connection.cursor()
         insert_product_number_sql = """
-        UPDATE product_keys SET product_number = (SELECT CONCAT ('BRANDI', (SELECT max(id))))
-        WHERE product_number = "default";
-        """
+         UPDATE product_keys SET product_number = (SELECT CONCAT ('BRANDI', (SELECT max(id))))
+         WHERE product_number = "default";
+         """
         affected_row = cursor.execute(insert_product_number_sql)
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
@@ -56,18 +56,20 @@ class ProductDao:
     def insert_tags(self, tag, db_connection):
         cursor = db_connection.cursor()
         insert_tags_sql = """
-        INSERT INTO tags (name) VALUES (%s);
+        INSERT INTO tags (name) VALUES (%s)
         """
         affected_row = cursor.execute(insert_tags_sql, tag)
+        print(affected_row)
 
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
+        tags = cursor.lastrowid
 
-        tag_id = cursor.lastrowid
-        return tag_id
+        return tags
 
-    def insert_product_tags(self, product_id, tag, db_connection):
+    def insert_product_tags(self, product_id, tag_id, db_connection):
         cursor = db_connection.cursor()
+
         insert_product_tags_sql = """
         INSERT INTO products_tags(
             product_id,
@@ -77,7 +79,7 @@ class ProductDao:
             %s
             )
         """
-        cursor.execute(insert_product_tags_sql, (product_id, tag))
+        cursor.execute(insert_product_tags_sql, (product_id, tag_id))
 
     def insert_discount(self, product, db_connection):
         cursor = db_connection.cursor()
@@ -99,7 +101,7 @@ class ProductDao:
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
-    def insert_options(self, product, db_connection):
+    def insert_options(self, options, db_connection):
         cursor = db_connection.cursor()
         insert_option_sql = """
         INSERT INTO products_options(
@@ -109,11 +111,11 @@ class ProductDao:
             quantity
             ) VALUES (
             %(product_key_id)s,
-            (SELECT id FROM sizes WHERE name = %(size)s),
-            (SELECT id FROM colors WHERE name = %(color)s),
+            %(size_id)s,
+            %(color_id)s,
             %(quantity)s
         """
-        affected_row = cursor.execute(insert_option_sql, product)
+        affected_row = cursor.execute(insert_option_sql, options)
 
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
@@ -145,10 +147,7 @@ class ProductDao:
             ) VALUES (
                 %(product_key_id)s,
                 %(notices_id)s,
-                (SELECT id FROM attributes_categories
-                WHERE attribute_group_id = %(attribute_group_id)s
-                AND first_category_id = %(first_category_id)s
-                AND second_category_id = %(second_category_id)s),
+                %(attribute_category_id)s,
                 %(color_filter_id)s,
                 %(is_displayed)s,
                 %(is_onsale)s,
@@ -158,7 +157,7 @@ class ProductDao:
                 "2037-12-31 23:59:59",
                 %(simple_description)s,
                 %(details)s,
-                (SELECT user FROM seller_keys WHERE id = %(seller_id)s),
+                %(seller_key_id)s,
                 %(maximum_quantity)s,
                 %(minimum_quantity)s,
                 %(discount_rate)s,
@@ -169,6 +168,36 @@ class ProductDao:
                 );
         """
         cursor.execute(insert_product_sql, product)
+        return cursor.lastrowid
+
+    def get_colors(self, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_colors = "SELECT id, name FROM colors"
+        cursor.execute(get_colors)
+
+        return cursor.fetchall()
+
+    def get_sizes(self, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_sizes = "SELECT id, name FROM sizes"
+        cursor.execute(get_sizes)
+
+        return cursor.fetchall()
+
+    def get_attribute_category_id(self, product, db_connection):
+        cursor = db_connection.cursor()
+
+        get_attribute_category_id_sql = """
+        SELECT attributes_categories.id
+        FROM attributes_categories
+        WHERE attribute_group_id = %(attribute_group_id)s
+        AND first_category_id = %(first_category_id)s
+        AnD second_category_id = %(second_category_id)s
+        """
+        cursor.execute(get_attribute_category_id_sql, product)
+        attribute_category_id = cursor.fetchone()[0]
+
+        return attribute_category_id
 
     def get_sellers_for_master(self, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
@@ -190,20 +219,20 @@ class ProductDao:
 
         return cursor.fetchall()
 
-    def get_attribute_group_id(self, user, db_connection):
+    def get_attribute_group_id(self, seller_key_id, db_connection):
         cursor = db_connection.cursor()
 
         get_attribute_group_sql = """
         SELECT attribute_group_id
         FROM seller_attributes
         INNER JOIN sellers ON sellers.seller_attribute_id = seller_attributes.id
-        WHERE sellers.seller_key_id = %(seller_id)s
+        WHERE sellers.seller_key_id = %s
         """
-        cursor.execute(get_attribute_group_sql, user)
+        cursor.execute(get_attribute_group_sql, seller_key_id)
         attribute_group_id = cursor.fetchone()[0]
         return attribute_group_id
 
-    def get_first_category(self, user, db_connection):
+    def get_first_category(self, attribute_group_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         get_categories_sql = """
         SELECT DISTINCT
@@ -212,14 +241,14 @@ class ProductDao:
             first.name AS first_category_name
         FROM attributes_categories
         INNER JOIN first_categories AS first ON attributes_categories.first_category_id = first.id
-        WHERE attribute_group_id = %(attribute_group_id)s
+        WHERE attribute_group_id = %s
         """
-        cursor.execute(get_categories_sql, user)
+        cursor.execute(get_categories_sql, attribute_group_id)
         get_categories = cursor.fetchall()
 
         return get_categories
 
-    def get_second_category(self, product, db_connection):
+    def get_second_category(self, attribute_group_id, first_category_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         get_categories_sql = """
         SELECT DISTINCT
@@ -227,10 +256,10 @@ class ProductDao:
             second.name AS second_category_name
         FROM attributes_categories
         INNER JOIN second_categories AS second ON attributes_categories.second_category_id = second.id
-        WHERE attribute_group_id = %(attribute_group_id)s
-        AND first_category_id = %(first_category_id)s
+        WHERE attribute_group_id = %s
+        AND first_category_id = %s
         """
-        cursor.execute(get_categories_sql, product)
+        cursor.execute(get_categories_sql, (attribute_group_id, first_category_id))
         get_categories = cursor.fetchall()
 
         return get_categories
@@ -279,15 +308,15 @@ class ProductDao:
         # 필터링 구문
         filter_statement = ""
 
-        # 셀러명이 포함된 검색기능 
+        # 셀러명이 포함된 검색기능
         if 'user' in filters:
             filter_statement = filter_statement + " AND seller_keys.user LIKE '%" + filters['user'] + "%'"
-        # 상품명이 포함된 검색기능 
+        # 상품명이 포함된 검색기능
         if 'product_name' in filters:
             filter_statement = filter_statement + " AND products.name LIKE '%" + filters['user'] + "%'"
         # 상품 코드
         if 'product_code' in filters:
-            filter_statement = filter_statement + ' AND product_keys.product_number=' + "'" + filters['product_code'] + "'" 
+            filter_statement = filter_statement + ' AND product_keys.product_number=' + "'" + filters['product_code'] + "'"
         # 셀러 속성
         if 'seller_attribute_id' in filters:
             filter_statement = filter_statement + ' AND sellers.seller_attribute_id=' + filters['seller_attribute_id']
@@ -306,6 +335,29 @@ class ProductDao:
 
         # 리스트 조회 쿼리에서 반환된 row의 개수를 담는다
         count = cursor.execute(products_list_sql + filter_statement)
-        # 상품 리스트와 상품의 개수를 return 
-        return cursor.fetchall(),count       
-     
+
+        # 상품 리스트와 상품의 개수를 return
+        return cursor.fetchall(),count
+
+
+    def get_recent_product_id(self, product, db_connection):
+        # 가장 최근에 수정된 레코드의 id를 가져온다
+        cursor = db_connection.cursor()
+        get_recent_product_id_sql = """
+        SELECT id
+        FROM products
+        WHERE product_key_id = %s AND end_date = '2037-12-31 23:59:59';
+        """
+        cursor.execute(get_recent_product_id_sql, product)
+        return cursor.fetchone()
+
+    def get_recent_product(self, product, db_connection):
+        cursor = db_connection.cursor()
+        get_recent_product_sql = """
+        SELECT * FROM products 
+        WHERE product_key_id = %s
+        """
+        cursor.execute( get_recent_product_sql, product)
+        return cursor.fetchone()
+
+
