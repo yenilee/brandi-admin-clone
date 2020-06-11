@@ -86,13 +86,6 @@
                     <td>
                       <input
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.seller_number"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        v-on:keyup.enter="search()"
                         v-model="searchDatas.manager_name"
                         type="text"
                       />
@@ -113,14 +106,22 @@
                     <td>
                       <input
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_phone_number"
+                        v-model="searchDatas.seller_number"
+                        type="text"
+                      />
+                    </td>
+
+                    <td>
+                      <input
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas.manager_email"
                         type="text"
                       />
                     </td>
                     <td>
                       <input
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_email"
+                        v-model="searchDatas.manager_phone_number"
                         type="text"
                       />
                     </td>
@@ -250,39 +251,29 @@ export default {
   },
   //로컬에 목업데이터를 위치해놓고, 해당 데이터들을 get하고 있습니다.
   mounted: function() {
-    axios
-      .get(`${SJ_URL}/sellers`, {
-        // .get(`${URL}/sellerList.json`, {
-        headers: {
-          Authorization: localStorage.access_token
-        }
-      })
-      .then(response => {
-        this.infoDatas = response.data.sellers;
-        this.usersData = response.data.number_of_sellers;
-        this.pagesData = response.data.number_of_pages;
-        console.log(response);
-      });
+    this.getListDatas();
   },
 
   methods: {
+    getListDatas: function() {
+      axios
+        .get(`${SJ_URL}/sellers`, {
+          // .get(`${URL}/sellerList.json`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.infoDatas = response.data.sellers;
+          this.usersData = response.data.number_of_sellers;
+          this.pagesData = response.data.number_of_pages;
+          console.log(response);
+        });
+    },
     idClick: function(id) {
-      console.log("url data >>>> ", this.$route.query.page);
+      // console.log("url data >>>> ", this.$route.query.page);
       // this.$router.push(`/main/seller/sellerregist:${id}`);
       this.$router.push({ name: "sellerregist", params: { id: id } });
-
-      //이때, 아이디 값을 버스에 실어서 보냅시다.
-      // axios
-      //   .get(`${SJ_URL}/seller_details/?seller_key_id=${id}`, {
-      //     headers: {
-      //       Authorization: localStorage.access_token
-      //     }
-      //   })
-      //   .then(response => {
-      //     console.log("여기야", response);
-      //     this.$router.push(`/main/seller/sellerregist`);
-      //   })
-      //   .catch(error => console.log(error));
     },
     actionClick: function(action, id) {
       if (
@@ -332,6 +323,9 @@ export default {
         })
         .catch(error => {
           console.log(error.response.data.message);
+        })
+        .then(response => {
+          this.getListDatas();
         });
     },
     search: function() {
