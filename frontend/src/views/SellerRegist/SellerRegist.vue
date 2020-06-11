@@ -550,6 +550,7 @@ export default {
         this.infoDatas = response.data;
         this.tableCount = this.infoDatas.data.supervisors.length;
         console.log("infoDatas>>>>>>>", this.infoDatas);
+        console.log("response>>>>>>>>>", this.infoDatas);
       });
   },
 

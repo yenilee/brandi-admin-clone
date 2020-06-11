@@ -68,79 +68,100 @@
                 <tbody>
                   <tr>
                     <td>
-                      <input v-on:keyup.enter="search()" v-model="searchDatas.id" type="text" />
-                    </td>
-                    <td>
-                      <input v-on:keyup.enter="search()" v-model="searchDatas.user" type="text" />
-                    </td>
-                    <td>
-                      <input v-on:keyup.enter="search()" v-model="searchDatas.eng_name" type="text" />
-                    </td>
-                    <td>
                       <input
+                        @keydown="() => lengthCheck(0)"
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.seller_kor_name"
+                        v-model="searchDatas[0].id"
                         type="text"
                       />
                     </td>
                     <td>
                       <input
+                        @keydown="() => lengthCheck(1)"
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_name"
+                        v-model="searchDatas[1].id"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        @keydown="() => lengthCheck(2)"
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas[2].id"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        @keydown="() => lengthCheck(3)"
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas[3].id"
+                        type="text"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        @keydown="() => lengthCheck(4)"
+                        v-on:keyup.enter="search()"
+                        v-model="searchDatas[4].id"
                         type="text"
                       />
                     </td>
                     <td>
                       <select
                         class="sellerStatus"
-                        name="sellerStatus"
-                        v-model="searchDatas.status_id"
+                        @click="() => lengthCheck(7)"
+                        v-model="searchDatas[7].id"
                       >
-                        <option value="status">입점대기</option>
-                        <option value="status">입점</option>
-                        <option value="status">퇴점</option>
-                        <option value="status">퇴점대기</option>
-                        <option value="status">휴점</option>
+                        <option value>선택</option>
+                        <option value="1">입점대기</option>
+                        <option value="2">입점</option>
+                        <option value="5">퇴점</option>
+                        <option value="4">퇴점대기</option>
+                        <option value="3">휴점</option>
                       </select>
                     </td>
                     <td>
                       <input
+                        @keydown="() => lengthCheck(5)"
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.seller_number"
+                        v-model="searchDatas[5].id"
                         type="text"
                       />
                     </td>
 
                     <td>
                       <input
+                        @keydown="() => lengthCheck(6)"
                         v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_email"
+                        v-model="searchDatas[6].id"
                         type="text"
                       />
                     </td>
                     <td>
-                      <input
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas.manager_phone_number"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <select class="sellerStatus" v-model="searchDatas.detail_attribute">
-                        <option value="status">쇼핑몰</option>
-                        <option value="status">마켓</option>
-                        <option value="status">로드샵</option>
-                        <option value="status">디자이너브랜드</option>
-                        <option value="status">제너럴브랜드</option>
-                        <option value="status">내셔널브랜드</option>
-                        <option value="status">뷰티</option>
+                      <select
+                        class="sellerStatus"
+                        @click="() => lengthCheck(8)"
+                        v-model="searchDatas[8].id"
+                      >
+                        <option value>선택</option>
+                        <option value="1">쇼핑몰</option>
+                        <option value="2">마켓</option>
+                        <option value="3">로드샵</option>
+                        <option value="4">디자이너브랜드</option>
+                        <option value="5">제너럴브랜드</option>
+                        <option value="6">내셔널브랜드</option>
+                        <option value="7">뷰티</option>
                       </select>
                     </td>
                     <td></td>
+
                     <td></td>
-                    <!-- 달력이 있어야 할 곳 -->
-                    <!-- 달력 -->
                     <td></td>
+                    <td class="actionBtns">
+                      <div class="searchBtn" @click="search()">Search</div>
+                      <div class="resetBtn" @click="reset()">Reset</div>
+                    </td>
                   </tr>
 
                   <tr v-for="item in infoDatas" :key="item.id">
@@ -224,7 +245,7 @@
 import axios from "axios";
 import { eventBus } from "../../main";
 import { sellerListHeaders } from "../../config/SellerListDatas";
-import { URL, SJ_URL } from "../../config/urlConfig";
+import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 
 export default {
   data() {
@@ -233,19 +254,17 @@ export default {
       infoDatas: [],
       usersData: null,
       pagesData: null,
-      searchDatas: {
-        id: "",
-        user: "",
-        eng_name: "",
-        seller_kor_name: "",
-        seller_number: "",
-        manager_name: "",
-        status_id: "",
-        manager_phone_number: "",
-        manager_email: "",
-        detail_attribute: "",
-        created_at: ""
-      },
+      searchDatas: [
+        { name: "sellers.id", id: "", state: false },
+        { name: "seller_keys.user", id: "", state: false },
+        { name: "sellers.eng_name", id: "", state: false },
+        { name: "sellers.name", id: "", state: false },
+        { name: "supervisor_infos.name", id: "", state: false },
+        { name: "supervisor_infos.phone_number", id: "", state: false },
+        { name: "supervisor_infos.email", id: "", state: false },
+        { name: "seller_status.id", id: "", state: false },
+        { name: "seller_attributes.id", id: "", state: false }
+      ],
       dates: ["2020-06-03", "2020-06-24"]
     };
   },
@@ -255,6 +274,11 @@ export default {
   },
 
   methods: {
+    lengthCheck: function(index) {
+      this.searchDatas[index].id.lenght == 0
+        ? (this.searchDatas[index].state = false)
+        : (this.searchDatas[index].state = true);
+    },
     getListDatas: function() {
       axios
         .get(`${SJ_URL}/sellers`, {
@@ -329,9 +353,38 @@ export default {
         });
     },
     search: function() {
+      let queryString = [];
       //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
-      alert(this.searchDatas.id);
+      // console.log("url data >>>> ", this.$route.query.page);
+      // this.$router.push("sellers?seller_attributes.name=쇼핑몰");
+      // axios.get(`${SJ_URL}/sellers`);
+      // alert(this.searchDatas.id);
+      this.searchDatas.filter(item => {
+        item.state && item.id.length != 0
+          ? queryString.push(`${item.name}=${item.id}&&`)
+          : "";
+      });
+      console.log("query", queryString);
+      console.log("join", queryString.join(""));
+      axios
+        .get(`${SJ_URL}/sellers?${queryString.join("")}`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.infoDatas = response.data.sellers;
+          this.usersData = response.data.number_of_sellers;
+          this.pagesData = response.data.number_of_pages;
+          console.log(response);
+        });
+    },
+    reset: function() {
+      this.searchDatas.map(item => {
+        item.id = "";
+      });
+      this.search();
     }
   }
 };
@@ -462,6 +515,32 @@ export default {
           border-radius: 3px;
           margin-left: 5px;
         }
+      }
+    }
+    .actionBtns {
+      div {
+        border: 1px solid red;
+        padding: 5px 10px;
+        font-size: 13px;
+        line-height: 1.5;
+        border-radius: 3px;
+        font-weight: 800;
+        display: inline-block;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        margin-right: 10px;
+      }
+      .searchBtn {
+        color: #fff;
+        background-color: #f0ad4e;
+        border-color: #eea236;
+      }
+      .resetBtn {
+        color: #fff;
+        background-color: #d9534f;
+        border-color: #d43f3a;
       }
     }
   }
