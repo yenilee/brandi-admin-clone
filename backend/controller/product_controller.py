@@ -1,4 +1,5 @@
 import pymysql
+import traceback
 
 from flask       import request, g
 from connection  import get_connection
@@ -102,7 +103,7 @@ def create_product_endpoints(app, product_service):
         discount_end         : 할인 종료 시간
         maximum_quantity     : 최대판매수량
         minimum_quantity     : 최소판매수량
-        tag_name             : 상품 태그 (List)
+        tag_name             : 상품 태그 (TYPE: List)
 
         Returns:
 
@@ -120,6 +121,7 @@ def create_product_endpoints(app, product_service):
                 seller_key_id = g.user
                 register_response = product_service.create_new_product(product, seller_key_id, db_connection)
                 db_connection.commit()
+
                 return register_response
 
         except  ValidationError as e:
@@ -131,8 +133,8 @@ def create_product_endpoints(app, product_service):
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        # except pymysql.err.ProgrammingError as e:
+        #     return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500

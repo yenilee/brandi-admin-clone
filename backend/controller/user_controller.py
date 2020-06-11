@@ -171,8 +171,8 @@ def create_user_endpoints(app, user_service):
                 sellers_response = user_service.get_seller_list(filters, db_connection)
                 return sellers_response
 
-        except pymysql.err.InternalError:
-            return {'message': 'DATABASE_SERVER_ERROR'}, 500
+        except pymysql.err.InternalError as e:
+            return {'message': 'DATABASE_SERVER_ERROR'+str(e)}, 500
 
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
