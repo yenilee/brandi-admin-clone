@@ -65,8 +65,8 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
@@ -485,8 +485,8 @@ def create_user_endpoints(app, user_service):
                 seller_infos = user_service.get_seller_details(g.user, db_connection)
                 return seller_infos
 
-        except pymysql.err.InternalError:
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+        except pymysql.err.InternalError as e:
+            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
 
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500

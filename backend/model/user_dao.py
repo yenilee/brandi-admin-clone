@@ -180,8 +180,8 @@ class UserDao:
         SELECT
         id,
         seller_id,
-        start_time,
-        end_time,
+        TIME_FORMAT(start_time, '%%H:%%i:%%s') AS start_time,
+        TIME_FORMAT(end_time, '%%H:%%i:%%s') AS end_time,
         is_weekend,
         is_deleted
         FROM buisness_hours
@@ -285,6 +285,16 @@ class UserDao:
             %(last_row_id)s,
             %(service_number)s,
             1
+        ),
+        (
+            %(last_row_id)s,
+            null,
+            2
+        ),
+        (
+            %(last_row_id)s,
+            null,
+            3
         )
         """
         cursor.execute(supervisor_register_sql, new_user)
@@ -303,6 +313,12 @@ class UserDao:
             '09:00:00',
             '18:00:00',
             0
+        ),
+        (
+            %(last_row_id)s,
+            null,
+            null,
+            1
         )
         """
         cursor.execute(supervisor_register_sql, new_user)
