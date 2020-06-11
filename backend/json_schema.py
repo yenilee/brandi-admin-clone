@@ -445,3 +445,315 @@ seller_register_schema = {
         }
     }
 }
+
+product_register_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "color_filter_id": 2,
+            "first_category_id": 1,
+            "second_category_id": 25,
+            "is_displayed": 1,
+            "is_onsale": 1,
+            "name": "멋진 옷",
+            "is_detail_reference": 1,
+            "simple_description": "good",
+            "details": "사세요",
+            "maximum_quantity": 10,
+            "price": 8000,
+            "wholesale_price": 8000,
+            "discount_rate": 0,
+            "discount_start": "2018-05-31",
+            "discount_end": "2019-04-10",
+            "manufacturer": "브랜디",
+            "manufacture_date": "1991-04-01 12:00:59",
+            "origin": "한국",
+            "tag_name": [
+                "큐트",
+                "러블리"
+            ]
+        }
+    ],
+    "required": [
+        "first_category_id",
+        "second_category_id",
+        "is_displayed",
+        "is_onsale",
+        "name",
+        "is_detail_reference",
+        "details",
+        "price",
+        "discount_rate",
+        "tag_name"
+    ],
+    "additionalProperties": True,
+    "properties": {
+        "color_filter_id": {
+            "$id": "#/properties/color_filter_id",
+            "type": "integer",
+            "title": "The color_filter_id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                2
+            ]
+        },
+        "first_category_id": {
+            "$id": "#/properties/first_category_id",
+            "type": "integer",
+            "title": "The first_category_id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "second_category_id": {
+            "$id": "#/properties/second_category_id",
+            "type": "integer",
+            "title": "The second_category_id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                25
+            ]
+        },
+        "is_displayed": {
+            "$id": "#/properties/is_displayed",
+            "type": "integer",
+            "title": "The is_displayed schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "is_onsale": {
+            "$id": "#/properties/is_onsale",
+            "type": "integer",
+            "title": "The is_onsale schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "name": {
+            "$id": "#/properties/name",
+            "type": "string",
+            "title": "The name schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "멋진 옷"
+            ]
+        },
+        "is_detail_reference": {
+            "$id": "#/properties/is_detail_reference",
+            "type": "integer",
+            "title": "The is_detail_reference schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "simple_description": {
+            "$id": "#/properties/simple_description",
+            "type": "string",
+            "title": "The simple_description schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "good"
+            ]
+        },
+        "details": {
+            "$id": "#/properties/details",
+            "type": "string",
+            "title": "The details schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "사세요"
+            ]
+        },
+        "maximum_quantity": {
+            "$id": "#/properties/maximum_quantity",
+            "type": ["integer", "null"],
+            "title": "The maximum_quantity schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10
+            ]
+        },
+        "minimum_quantity": {
+            "$id": "#/properties/minimum_quantity",
+            "type": ["integer", "null"],
+            "title": "The minimum_quantity schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                10
+            ]
+        },
+        "price": {
+            "$id": "#/properties/price",
+            "type": ["integer", "null"],
+            "title": "The price schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                8000
+            ]
+        },
+        "wholesale_price": {
+            "$id": "#/properties/wholesale_price",
+            "type": ["integer", "null"],
+            "title": "The wholesale_price schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                8000
+            ]
+        },
+        "discount_rate": {
+            "$id": "#/properties/discount_rate",
+            "type": "integer",
+            "title": "The discount_rate schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0
+            ]
+        },
+        "discount_start": {
+            "$id": "#/properties/discount_start",
+            "type": ["string", "null"],
+            "title": "The discount_start schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "2018-05-31"
+            ]
+        },
+        "discount_end": {
+            "$id": "#/properties/discount_end",
+            "type": ["string", "null"],
+            "title": "The discount_end schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "2019-04-10"
+            ]
+        },
+        "manufacturer": {
+            "$id": "#/properties/manufacturer",
+            "type": ["string", "null"],
+            "title": "The manufacturer schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "브랜디"
+            ]
+        },
+        "manufacture_date": {
+            "$id": "#/properties/manufacture_date",
+            "type": ["string", "null"],
+            "title": "The manufacture_date schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "1991-04-01 12:00:59"
+            ]
+        },
+        "origin": {
+            "$id": "#/properties/origin",
+            "type": ["string", "null"],
+            "title": "The origin schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "한국"
+            ]
+        },
+        "tag_name": {
+            "$id": "#/properties/tag_name",
+            "type": "array",
+            "title": "The tag_name schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    "큐트",
+                    "러블리"
+                ]
+            ],
+            "additionalItems": True,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/tag_name/items/anyOf/0",
+                        "type": "string",
+                        "title": "The first anyOf schema",
+                        "description": "An explanation about the purpose of this instance.",
+                        "default": "",
+                        "examples": [
+                            "큐트",
+                            "러블리"
+                        ]
+                    }
+                ],
+                "$id": "#/properties/tag_name/items"
+            }
+        }
+    }
+}
+
+seller_action_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "user": 9,
+            "action_type": "입점 승인"
+        }
+    ],
+    "required": [
+        "user",
+        "action_type"
+    ],
+    "additionalProperties": True,
+    "properties": {
+        "user": {
+            "$id": "#/properties/user",
+            "type": "integer",
+            "title": "The user schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                9
+            ]
+        },
+        "action_type": {
+            "$id": "#/properties/action_type",
+            "type": "string",
+            "title": "The action_type schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "입점 승인"
+            ]
+        }
+    }
+}

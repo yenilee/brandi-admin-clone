@@ -1,12 +1,15 @@
 import pymysql
 
-from flask      import request, g
-from connection import get_connection
-from utils      import authorize
+from flask       import request, g
+from connection  import get_connection
+from utils       import authorize
+from jsonschema  import validate, ValidationError
+from json_schema import product_register_schema
 
 def create_product_endpoints(app, product_service):
     product_service = product_service
 
+    # 마스터가 상품 등록할 때 셀러 ID 받는 로직 짜야됨
     @app.route('/product/registration', methods=['GET'])
     @authorize
     def get_register_page():
@@ -31,8 +34,12 @@ def create_product_endpoints(app, product_service):
         try:
             db_connection = get_connection()
             if db_connection:
-                user = { 'seller_id' : g.user }
-                register_response = product_service.get_category_colorfilter(user, db_connection)
+                seller_key_id = g.user
+                register_response = product_service.get_register_page(seller_key_id, db_connection)
+
+                if g.auth == 1:
+                    sellers = product_service.get_sellers_for_master(g.auth, db_connection)
+                    return {'seller_list' : sellers, 'page_info' : register_response}, 200
                 return register_response
 
         except pymysql.err.InternalError as e:
@@ -52,60 +59,6 @@ def create_product_endpoints(app, product_service):
 
         except Exception as e:
             db_connection.rollback()
-            return {'message': str(e)}, 500
-
-        finally:
-            if db_connection:
-                db_connection.close()
-
-    @app.route('/product/sellers', methods = ['GET'])
-    @authorize
-    def get_seller_list():
-
-        """
-        마스터 상품 등록 페이지 셀러 선택 API [GET]
-
-        Args:
-
-        [Header]
-        Authorization : 로그인 토큰
-
-        Returns:
-
-        success    : {"sellers" : sellers_kor_names}, code : 200
-        key error  : {"message" : "KEY_ERROR"}, code : 400
-
-        마스터 권한 아닐 시 : {'message' : 'UNAUTHORIZED'}, code : 400
-        """
-
-        db_connection = None
-        try:
-            db_connection = get_connection()
-            if db_connection:
-
-                # 권한 ID가 마스터가 아닐 경우 권한 없음 에러 미시지 표시
-                if g.auth is not 1:
-                    return {'message' : 'UNAUTHORIZED'}, 401
-
-                sellers_kor_names = product_service.get_sellers_for_master(g.user, db_connection)
-                return {"sellers" : sellers_kor_names}, 200
-
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
-        except Exception as e:
             return {'message': str(e)}, 500
 
         finally:
@@ -162,11 +115,15 @@ def create_product_endpoints(app, product_service):
         try:
             db_connection = get_connection()
             if db_connection:
+                validate(product, product_register_schema)
 
-                product['seller_id'] = g.user
-                register_response = product_service.create_new_product(product, db_connection)
+                seller_key_id = g.user
+                register_response = product_service.create_new_product(product, seller_key_id, db_connection)
                 db_connection.commit()
                 return register_response
+
+        except  ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
 
         except pymysql.err.InternalError as e:
             return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
@@ -183,9 +140,9 @@ def create_product_endpoints(app, product_service):
         except pymysql.err.IntegrityError as e:
             return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
 
-        except Exception as e:
-            db_connection.rollback()
-            return {'message': str(e)}, 500
+        # except Exception as e:
+        #     db_connection.rollback()
+        #     return {'message': str(e)}, 500
 
         finally:
             if db_connection:
@@ -237,4 +194,39 @@ def create_product_endpoints(app, product_service):
 
         finally:
             if db_connection:
+                db_connection.close()
+
+    @app.route('/product/second-category', methods = ['GET'])
+    @authorize
+    def get_second_category():
+        db_connection = None
+        first_category_id = request.json['first_category_id']
+
+        try:
+            db_connection = get_connection()
+            if db_connection:
+                seller_key_id = g.user
+                register_response = product_service.get_second_category(seller_key_id, first_category_id, db_connection)
+                return register_response
+
+        except pymysql.err.InternalError as e:
+            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
+
+        except pymysql.err.OperationalError:
+            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError as e:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError as e:
+            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
+
+        except Exception as e:
+            db_connection.rollback()
+            return {'message': str(e)}, 500
+
+        finally:
                 db_connection.close()

@@ -200,7 +200,7 @@ class UserService:
 
     def update_status(self, user, action_type, db_connection):
         try:
-            # 예전 기록 중 최신 수정 데이터를 갖고 있는 셀러의 ID를 불러오기
+            # 예전 기록 중 셀러의 최신 수정 데이터를 갖고 있는 ID를 불러오기
             previous_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)[0]
 
             # 위에서 가져온 ID의 데이터 종료일을 현재로 바꿔줌
@@ -211,6 +211,10 @@ class UserService:
 
             # request에 담긴 action을 기반으로 다음 status 불러오기
             next_status_id = self.user_dao.get_next_status(action_type, db_connection)
+
+            # 퇴점 신청 처리일 경우 is_deleted를 1로 바꿔서 soft delete 실행
+            if next_status_id == 6 or next_status_id == 7:
+                self.user_dao.soft_delete_seller(recent_seller_id, db_connection)
 
             # 입점 승인 요청일 경우 권한 ID를 2에서 3으로 바꿈
             if action_type['action_type'] == '입점 승인':
