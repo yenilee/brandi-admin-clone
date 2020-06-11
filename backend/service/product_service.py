@@ -26,9 +26,6 @@ class ProductService:
             # 위에서 등록한 KEY ID row에 상품 코드(문자+숫자 조합) 업데이트
             self.product_dao.update_product_number(db_connection)
 
-            # 상품 옵션(색상, 사이즈 조합) insert
-            # self.product_dao.insert_options(product, db_connection)
-
             # 상품 고시 정보를 상세 상품 정보에 표시할 경우 notices id를 null 값으로 표시
             product['notices_id'] = None
 
@@ -37,17 +34,23 @@ class ProductService:
             if product['is_detail_reference'] is 0:
                 product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
 
-
             # 셀러 속성 값에 따른 셀러 속성 그룹 id를 변수에 저장
             product['attribute_group_id'] = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
             product['attribute_category_id'] = self.product_dao.get_attribute_category_id(product, db_connection)
 
+            options = product['options']
+
             # request body를 insert
             # 위에서 받은 속성 그룹 id와 1, 2차 카테고리 조합해 속성 카테고리 조합 id 등록
-            product_id = self.product_dao.insert_product(product, db_connection)
+            product['options']['product_id'] = self.product_dao.insert_product(product, db_connection)
+            product_id = product['options']['product_id']
+
+            options = product['options']
+
+            self.product_dao.insert_options(options, db_connection)
 
             # 여러개의 상품 태그를 리스트에 담아 받고, 반복분으로 각각 insert
-            tags = [self.product_dao.insert_tags(tag, db_connection) for tag in product['tag_name']]
+            tags = [self.product_dao.insert_tags(tag, db_connection) for tag in product['tags']]
 
             for tag_id in tags:
                 self.product_dao.insert_product_tags(product_id, tag_id, db_connection)

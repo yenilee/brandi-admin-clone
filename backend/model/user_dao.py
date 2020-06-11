@@ -441,7 +441,7 @@ class UserDao:
                 FROM product_keys
                 WHERE sellers.seller_key_id = product_keys.seller_key_id) AS number_of_product,
             sellers.site_url AS site_url,
-            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at
+            DATE_FORMAT(seller_keys.created_at, '%Y-%m-%d %H:%i:%s') AS created_at
         FROM sellers
         INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id
         INNER JOIN seller_status ON sellers.seller_status_id = seller_status.id

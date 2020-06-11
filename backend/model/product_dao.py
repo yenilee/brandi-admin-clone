@@ -55,14 +55,16 @@ class ProductDao:
 
     def insert_tags(self, tag, db_connection):
         cursor = db_connection.cursor()
+
         insert_tags_sql = """
-        INSERT INTO tags (name) VALUES (%s)
+        INSERT INTO tags(name) VALUES (%s)
         """
+
         affected_row = cursor.execute(insert_tags_sql, tag)
-        print(affected_row)
 
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
+
         tags = cursor.lastrowid
 
         return tags
@@ -110,10 +112,11 @@ class ProductDao:
             color_id,
             quantity
             ) VALUES (
-            %(product_key_id)s,
+            %(product_id)s,
             %(size_id)s,
             %(color_id)s,
             %(quantity)s
+            )
         """
         affected_row = cursor.execute(insert_option_sql, options)
 
@@ -192,7 +195,7 @@ class ProductDao:
         FROM attributes_categories
         WHERE attribute_group_id = %(attribute_group_id)s
         AND first_category_id = %(first_category_id)s
-        AnD second_category_id = %(second_category_id)s
+        AND second_category_id = %(second_category_id)s
         """
         cursor.execute(get_attribute_category_id_sql, product)
         attribute_category_id = cursor.fetchone()[0]

@@ -469,7 +469,7 @@ product_register_schema = {
             "manufacturer": "브랜디",
             "manufacture_date": "1991-04-01 12:00:59",
             "origin": "한국",
-            "tag_name": [
+            "tags": [
                 "큐트",
                 "러블리"
             ]
@@ -485,7 +485,7 @@ product_register_schema = {
         "details",
         "price",
         "discount_rate",
-        "tag_name"
+        "tags"
     ],
     "additionalProperties": True,
     "properties": {
@@ -679,10 +679,10 @@ product_register_schema = {
                 "한국"
             ]
         },
-        "tag_name": {
-            "$id": "#/properties/tag_name",
+        "tags": {
+            "$id": "#/properties/tags",
             "type": "array",
-            "title": "The tag_name schema",
+            "title": "The tags schema",
             "description": "An explanation about the purpose of this instance.",
             "default": [],
             "examples": [
@@ -695,7 +695,7 @@ product_register_schema = {
             "items": {
                 "anyOf": [
                     {
-                        "$id": "#/properties/tag_name/items/anyOf/0",
+                        "$id": "#/properties/tags/items/anyOf/0",
                         "type": "string",
                         "title": "The first anyOf schema",
                         "description": "An explanation about the purpose of this instance.",
@@ -706,7 +706,7 @@ product_register_schema = {
                         ]
                     }
                 ],
-                "$id": "#/properties/tag_name/items"
+                "$id": "#/properties/tags/items"
             }
         }
     }
