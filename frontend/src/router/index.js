@@ -51,6 +51,7 @@ const routes = [
           {
             path: 'sellerlist',
             component: SellerList,
+            name: 'sellerlist'
           },
           {
             path: ':id',

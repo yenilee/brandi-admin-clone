@@ -523,35 +523,7 @@ export default {
 
   data() {
     return {
-      infoDatas: {
-        supervisors: [
-          {
-            supervisor_name: "",
-            supervisor_phone_number: "",
-            supervisor_email: ""
-          },
-          {
-            supervisor_name: "",
-            supervisor_phone_number: "",
-            supervisor_email: ""
-          },
-          {
-            supervisor_name: "",
-            supervisor_phone_number: "",
-            supervisor_email: ""
-          }
-        ],
-        buisness_hours: [
-          {
-            start_time: "",
-            end_time: ""
-          },
-          {
-            start_time: "",
-            end_time: ""
-          }
-        ]
-      },
+      infoDatas: {},
       addressModal: false,
       tableCount: null
     };
@@ -577,7 +549,8 @@ export default {
       .then(response => {
         this.infoDatas = response.data;
         this.tableCount = this.infoDatas.data.supervisors.length;
-        console.log(this.infoDatas);
+        console.log("infoDatas>>>>>>>", this.infoDatas);
+        console.log("response>>>>>>>>>", this.infoDatas);
       });
   },
 

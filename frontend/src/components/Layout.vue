@@ -48,7 +48,6 @@
 
 <script>
 import { items } from "../config/Items";
-// export const eventBus = new Vue();
 
 export default {
   data() {
