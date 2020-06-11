@@ -9,4 +9,4 @@ WECODE    = '10.58.3.11'
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host = IP, port = 5000)
+    app.run(host = REVIEW_IP, port = 5000)
