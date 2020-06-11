@@ -1,5 +1,6 @@
 <template >
   <div>
+    <SrTitle />
     <!-- 기본 정보 시작 영역 -->
     <div class="cmpWrap">
       <div class="cmpTitle">
@@ -75,7 +76,7 @@
             </tbody>
             <!-- 셀러 한줄 소개 -->
             <tbody>
-              <InputBox v-model="simple_introduction" placeholder="셀러 한줄 소개">
+              <InputBox v-model="infoDatas.simple_introduction" placeholder="셀러 한줄 소개">
                 <template #thName>
                   셀러 한줄 소개
                   <i class="xi-pen" />
@@ -504,104 +505,43 @@
 
 <script>
 import axios from "axios";
-import { SJ_URL } from "../../../config/urlConfig";
-import ImageBox from "../Slots/ImageBox";
-import InputBox from "../Slots/InputBox";
-import TextAreaBox from "../Slots/TextAreaBox";
+import { eventBus } from "../../main";
+import { SJ_URL, URL } from "../../config/urlConfig";
+import SrTitle from "./Components/SrTitle";
+import ImageBox from "./Slots/ImageBox";
+import InputBox from "./Slots/InputBox";
+import TextAreaBox from "./Slots/TextAreaBox";
 import DaumPostcode from "vuejs-daum-postcode";
 
 // .get(`${URL}/seller_details`, {
 export default {
+  name: "sellerRegist",
   //첫 마운트가 되면 셀러의 기존 입력된 정보들을 불러오게 합니다.
   mounted: function() {
-    axios
-      .get(`${SJ_URL}/seller_details`, {
-        headers: {
-          Authorization: localStorage.access_token
-        }
-      })
-      .then(response => {
-        console.log(response);
-        this.infoDatas = response.data;
-        this.profile = this.infoDatas.data.profile;
-        this.background_image = this.infoDatas.data.background_image;
-        this.simple_introduction = this.infoDatas.data.simple_introduction;
-        this.detail_introduction = this.infoDatas.data.detail_introduction;
-        this.background_image = this.infoDatas.data.background_image;
-        this.site_url = this.infoDatas.data.site_url;
-        this.supervisors = [
-          {
-            supervisor_name: this.infoDatas.data.supervisors[0]
-              ? this.infoDatas.data.supervisors[0].name
-              : null,
-            supervisor_phone_number: this.infoDatas.data.supervisors[0]
-              ? this.infoDatas.data.supervisors[0].phone_number
-              : null,
-            supervisor_email: this.infoDatas.data.supervisors[0]
-              ? this.infoDatas.data.supervisors[0].email
-              : null,
-            order: 1
-          },
-          {
-            supervisor_name: this.infoDatas.data.supervisors[1]
-              ? this.infoDatas.data.supervisors[1].name
-              : null,
-            supervisor_phone_number: this.infoDatas.data.supervisors[1]
-              ? this.infoDatas.data.supervisors[1].phone_number
-              : null,
-            supervisor_email: this.infoDatas.data.supervisors[1]
-              ? this.infoDatas.data.supervisors[1].email
-              : null,
-            order: 2
-          },
-          {
-            supervisor_name: this.infoDatas.data.supervisors[2]
-              ? this.infoDatas.data.supervisors[2].name
-              : null,
-            supervisor_phone_number: this.infoDatas.data.supervisors[2]
-              ? this.infoDatas.data.supervisors[2].phone_number
-              : null,
-            supervisor_email: this.infoDatas.data.supervisors[2]
-              ? this.infoDatas.data.supervisors[2].email
-              : null,
-            order: 3
+    let thisClass = this;
+    eventBus.$on("keyIdBus", id => {
+      axios
+        .get(`${SJ_URL}/seller_details/?seller_key_id=${id}`, {
+          // .get(`${URL}/sellerregist.json`, {
+          headers: {
+            Authorization: localStorage.access_token
           }
-        ];
-        this.service_number = this.infoDatas.data.service_number;
-        this.zip_code = this.infoDatas.data.zip_code;
-        this.address = this.infoDatas.data.address;
-        this.detail_address = this.infoDatas.data.detail_address;
-        (this.buisness_hours = [
-          {
-            start_time: this.infoDatas.data.buisness_hours[0].start_time,
-            end_time: this.infoDatas.data.buisness_hours[0].end_time,
-            is_weekend: "0"
-          },
-          {
-            start_time:
-              this.infoDatas.data.buisness_hours.length == 1
-                ? null
-                : this.infoDatas.data.buisness_hours[1].start_time,
-            end_time:
-              this.infoDatas.data.buisness_hours.length == 1
-                ? null
-                : this.infoDatas.data.buisness_hours[1].end_time,
-            is_weekend: "1"
-          }
-        ]),
-          (this.bank = this.infoDatas.data.bank);
-        this.account_owner = this.infoDatas.data.account_owner;
-        this.bank_account = this.infoDatas.data.bank_account;
-        this.shipping_information = this.infoDatas.data.shipping_information;
-        this.refund_information = this.infoDatas.data.refund_information;
-        this.model_height = this.infoDatas.data.model_height;
-        this.model_size_top = this.infoDatas.data.model_size_top;
-        this.model_size_bottom = this.infoDatas.data.model_size_bottom;
-        this.model_size_foot = this.infoDatas.data.model_size_foot;
-        this.feed_message = this.infoDatas.data.feed_message;
-        this.tableCount = this.infoDatas.data.supervisors.length;
-        this.btnCount = this.infoDatas.data.supervisors.length;
-      });
+        })
+        .then(response => {
+          debugger;
+          console.log("응답데이터", thisClass.a, response.data.data);
+          thisClass.infoDatas = response.data;
+          console.log("인포데이터", thisClass, thisClass.infoDatas);
+        });
+    });
+  },
+
+  data() {
+    return {
+      infoDatas: {
+        data: {}
+      }
+    };
   },
 
   methods: {
@@ -689,37 +629,9 @@ export default {
       }
     }
   },
-  data() {
-    return {
-      infoDatas: [],
-      profile: "",
-      background_image: "",
-      simple_introduction: "",
-      detail_introduction: "",
-      background_image: "",
-      site_url: "",
-      supervisors: [],
-      service_number: "",
-      zip_code: "",
-      address: "",
-      detail_address: "",
-      buisness_hours: "",
-      bank: "",
-      account_owner: "",
-      bank_account: "",
-      shipping_information: "",
-      refund_information: "",
-      model_height: "",
-      model_size_top: "",
-      model_size_bottom: "",
-      model_size_foot: "",
-      feed_message: "",
-      addressModal: false,
-      tableCount: null
-    };
-  },
 
   components: {
+    SrTitle,
     ImageBox,
     InputBox,
     TextAreaBox,

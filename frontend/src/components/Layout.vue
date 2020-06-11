@@ -39,6 +39,7 @@
         </template>
       </v-list>
     </v-navigation-drawer>
+    <!-- 보여지는 페이지 공간 -->
     <div class="about">
       <slot></slot>
     </div>
@@ -47,6 +48,8 @@
 
 <script>
 import { items } from "../config/Items";
+// export const eventBus = new Vue();
+
 export default {
   data() {
     return {
