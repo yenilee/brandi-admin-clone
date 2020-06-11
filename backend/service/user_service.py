@@ -146,6 +146,10 @@ class UserService:
         try:
             # 사용자 정보
             user_info        = self.user_dao.get_seller_details(user, db_connection)
+            
+            if user_info == 0:
+                return {'message' : 'NO_SELLER_SELECTED'}, 500
+
             # 담당자 정보
             supervisor_info  = self.user_dao.get_supervisors(user, db_connection)
             # 영업시간
@@ -164,7 +168,7 @@ class UserService:
             return {'message' : 'KEY_ERROR'}, 400
 
         except TypeError:
-            return {'message' : 'TYPE_ERROR' + str(e)}, 400
+            return {'message' : 'TYPE_ERROR'}, 400
 
     def get_seller_list(self, filters, db_connection):
         try:
@@ -209,6 +213,15 @@ class UserService:
             # 최신 셀러의 데이터를 insert하고 현재의 ID 값을 가져옴
             recent_seller_id = self.user_dao.update_seller_all(previous_seller_id, db_connection)
 
+            # 셀러의 이전 ID 값과 최신 ID값을 조합
+            user_id = {}
+            user_id['previous_id'] = previous_seller_id
+            user_id['recent_id'] = recent_seller_id
+
+            # 이전 ID 값의 담당자 정보와 고객센터 운영시간 정보를 가져와 새로운 데이터를 insert 한다 
+            self.user_dao.update_supervisor(user_id, db_connection)
+            self.user_dao.update_buisness_hour(user_id, db_connection)
+
             # request에 담긴 action을 기반으로 다음 status 불러오기
             next_status_id = self.user_dao.get_next_status(action_type, db_connection)
 
@@ -229,7 +242,6 @@ class UserService:
             db_connection.rollback()
             return {'message' : 'KEY_ERROR'}, 400
 
-        except TypeError as e:
+        except TypeError:
             db_connection.rollback()
-            return {'message' : 'TYPE_ERROR' + str(e)}, 400
-
+            return {'message' : 'TYPE_ERROR'}, 400

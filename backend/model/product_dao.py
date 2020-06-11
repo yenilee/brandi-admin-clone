@@ -279,69 +279,66 @@ class ProductDao:
         color_filters = cursor.fetchall()
         return color_filters
 
-    def get_productlist(self, db_connection):
-        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
-        # 판매 미판매 여부는 boolean field라서 IF 구문을 활용해 1이면 판매, 0이면 미판매 문자열을 출력
-        # 할인가는 판매가 - 할인율 계산하는 로직을 짜서 구현
-        # 할인여부는 IF 구문을 사용해 할인율이 0이 아니면 '할인', 0이면 '미할인'
-
+    def get_productlist(self, filters, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)      
+        # 할인가 할인줄일 때는 할인율 계산하는 로직을 짜서 구현, 할인중이 아닐때는 판매가로 
         products_list_sql = """
         SELECT
         products.id,
         product_keys.id AS product_keys_id,
         DATE_FORMAT(product_keys.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,    
         products.name AS name,
-        product_keys.product_number,
+        product_keys.product_number AS product_code,
         seller_attributes.name AS seller_attributes_name,
         seller_keys.user,        
-        CAST(products.price AS unsigned) AS price, 
-        CAST((products.price - (products.discount_rate / 100 * products.price)) AS unsigned) AS discount_price,
+        products.price AS price, 
+        IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, CAST((products.price - (products.discount_rate / 100 * products.price)) AS signed), products.price) AS discount_price,
         is_onsale,
         is_displayed,
-        IF(products.discount_rate != 0, 1, 0) AS is_discount        
+        IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, 1, 0) AS is_discount          
         FROM
         products
         INNER JOIN product_keys ON products.product_key_id = product_keys.id
         INNER JOIN seller_keys ON product_keys.seller_key_id = seller_keys.id      
         INNER JOIN sellers ON seller_keys.id = sellers.seller_key_id AND sellers.end_date = '2037-12-31 23:59:59'
         INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
-        WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2       
-        ORDER BY products.id DESC;
+        WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2
         """
 
-        # cursor.execute 결과를 확인해 SELECT에 걸린 상품이 하나도 없으면 0을 리턴
-        if cursor.execute(products_list_sql) == 0:
-            return 0  
+        # 필터링 구문
+        filter_statement = ""
 
-        return cursor.fetchall()
+        # 셀러명이 포함된 검색기능
+        if 'user' in filters:
+            filter_statement = filter_statement + " AND seller_keys.user LIKE '%" + filters['user'] + "%'"
+        # 상품명이 포함된 검색기능
+        if 'product_name' in filters:
+            filter_statement = filter_statement + " AND products.name LIKE '%" + filters['user'] + "%'"
+        # 상품 코드
+        if 'product_code' in filters:
+            filter_statement = filter_statement + ' AND product_keys.product_number=' + "'" + filters['product_code'] + "'"
+        # 셀러 속성
+        if 'seller_attribute_id' in filters:
+            filter_statement = filter_statement + ' AND sellers.seller_attribute_id=' + filters['seller_attribute_id']
+        # 판매 여부
+        if 'is_onsale' in filters:
+            filter_statement = filter_statement + ' AND products.is_onsale=' + filters['is_onsale']
+        # 진열 여부
+        if 'is_displayed' in filters:
+            filter_statement = filter_statement + ' AND products.is_displayed=' + filters['is_displayed']
+        # 할인 여부
+        if 'is_discount' in filters:
+            filter_statement = filter_statement + ' AND (products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end)=' + filters['is_discount']
 
-    def update_product(self, product, db_connection):
-        cursor = db_connection.cursor()
-        update_product_sql = """
-        UPDATE products
-        SET
-            %(notices_id)s,
-            %(attributes_categories_id)s,
-            %(color_filter_id)s,
-            %(is_displayed)s,
-            %(is_onsale)s,
-            %(name)s,
-            %(is_detail_reference)s,
-            %(start_date)s,
-            %(end_date)s,
-            %(simple_description)s,
-            %(details)s,
-            %(editor)s,
-            %(maximum_quantity)s,
-            %(minimum_quantity)s,
-            %(discount_rate)s,
-            %(price)s,
-            %(wholesale_price)s,
-            %(discount_start)s,
-            %(discount_end)s
-        WHERE product_key_id = % AND end_date = '2037-12-31 23:59:59'
-        """
-        cursor.execute(update_product_sql, product)
+        # 필터링 구문 종합 상품 ID 내림차순
+        filter_statement = filter_statement + ' ORDER BY products.id DESC;'
+
+        # 리스트 조회 쿼리에서 반환된 row의 개수를 담는다
+        count = cursor.execute(products_list_sql + filter_statement)
+
+        # 상품 리스트와 상품의 개수를 return
+        return cursor.fetchall(),count
+
 
     def get_recent_product_id(self, product, db_connection):
         # 가장 최근에 수정된 레코드의 id를 가져온다
@@ -362,3 +359,5 @@ class ProductDao:
         """
         cursor.execute( get_recent_product_sql, product)
         return cursor.fetchone()
+
+

@@ -130,7 +130,7 @@ seller_register_schema = {
         },
         "supervisors": {
             "$id": "#/properties/supervisors",
-            "type": "array",
+            "type": ["array", "null"],
             "title": "The supervisors schema",
             "description": "An explanation about the purpose of this instance.",
             "default": [],
@@ -167,11 +167,7 @@ seller_register_schema = {
                                 "order": "1"
                             }
                         ],
-                        "required": [
-                            "supervisor_name",
-                            "supervisor_phone_number",
-                            "supervisor_email",
-                            "order"
+                        "required": [   
                         ],
                         "additionalProperties": True,
                         "properties": {
@@ -328,7 +324,7 @@ seller_register_schema = {
                             },
                             "is_weekend": {
                                 "$id": "#/properties/buisness_hours/items/anyOf/0/properties/is_weekend",
-                                "type": "string",
+                                "type": "integer",
                                 "title": "The is_weekend schema",
                                 "description": "An explanation about the purpose of this instance.",
                                 "default": "",

@@ -161,17 +161,41 @@ def create_product_endpoints(app, product_service):
     @app.route('/products', methods=['GET'])
     @authorize
     def get_product_list():
+        """
+        상품 리스트 API (마스터) [GET]
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰
+
+        [Query String]
+        user                : 셀러명
+        product_code        : 상품 코드
+        is_onsale           : 판매 여부 (Boolean)
+        is_displayed        : 진열 여부 (Boolean)
+        is_discount         : 할인 여부 (Boolean)
+        seller_attribute_id : 셀러 속성 ID (쇼핑몰 : 1, 마켓 : 2, 로드샵 : 3, 디자이너브랜드 : 4, 제너럴브랜드 : 5, 내셔널브랜드 : 6, 뷰티 : 7)
+
+        Returns:
+
+        success      : code : 200
+        key error    : {"message" : "KEY_ERROR"}, code : 400
+        type error   : {"message" : "TYPE_ERROR"}, code : 400
+        unauthorized : {"message" : "UNAUTHORIZED"}
+        """
 
         #데코레이터를 통해 마스터 권한 확인 
         if g.auth is not 1:
             return {'message' : 'UNAUTHORIZED'}, 401
 
         db_connection = None
-
         try:
+            #필터 Query String
+            filters = request.args
             db_connection = get_connection()
             if db_connection:                
-                products_list_response = product_service.get_product_list(db_connection)
+                products_list_response = product_service.get_product_list(filters, db_connection)
                 return products_list_response
 
         except pymysql.err.InternalError:
@@ -180,8 +204,8 @@ def create_product_endpoints(app, product_service):
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500

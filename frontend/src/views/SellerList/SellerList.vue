@@ -142,10 +142,13 @@
                     <td></td>
                   </tr>
 
-                  <tr v-for="item in infoDatas" :key="item.name">
+                  <tr v-for="item in infoDatas" :key="item.id">
                     <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
                     <td>{{ item.id }}</td>
-                    <td>{{ item.seller_id}}</td>
+                    <td
+                      @click="() => idClick(item.seller_key_id)"
+                      class="sellerIdText"
+                    >{{ item.seller_id}}</td>
                     <td>{{ item.seller_eng_name }}</td>
                     <td>{{ item.seller_kor_name }}</td>
                     <td>{{ item.manager_name }}</td>
@@ -166,18 +169,22 @@
                         <button
                           style="background-color: #5bc0de; border-color: #46b8da;"
                           v-if="action === '입점 승인'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                         <button
                           style="background-color: #d9534f;border-color: #d43f3a;"
                           v-if="action === '입점 거절' || action === '퇴점 신청 처리' || action === '퇴점 확정 처리'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                         <button
                           style="background-color: #f0ad4e; border-color: #eea236;"
                           v-if="action === '휴점 신청'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                         <button
                           style="background-color: #5cb85c; border-color: #4cae4c;"
                           v-if="action === '퇴점 철회 처리' || action === '휴점 해제'"
+                          @click="() => actionClick(action,item.seller_key_id)"
                         >{{action}}</button>
                       </div>
                     </td>
@@ -197,7 +204,7 @@
             <i class="xi-angle-right-min"></i>
           </button>
           <span>of {{pagesData}} | View</span>
-          <select name="cars" id="cars">
+          <select name id>
             <option value="volvo">10</option>
             <option value="saab">20</option>
             <option value="opel">50</option>
@@ -214,8 +221,9 @@
 
 <script>
 import axios from "axios";
+import { eventBus } from "../../main";
 import { sellerListHeaders } from "../../config/SellerListDatas";
-import { SJ_URL } from "../../config/urlConfig";
+import { URL, SJ_URL } from "../../config/urlConfig";
 
 export default {
   data() {
@@ -244,6 +252,7 @@ export default {
   mounted: function() {
     axios
       .get(`${SJ_URL}/sellers`, {
+        // .get(`${URL}/sellerList.json`, {
         headers: {
           Authorization: localStorage.access_token
         }
@@ -255,7 +264,76 @@ export default {
         console.log(response);
       });
   },
+
   methods: {
+    idClick: function(id) {
+      console.log("url data >>>> ", this.$route.query.page);
+      // this.$router.push(`/main/seller/sellerregist:${id}`);
+      this.$router.push({ name: "sellerregist", params: { id: id } });
+
+      //이때, 아이디 값을 버스에 실어서 보냅시다.
+      // axios
+      //   .get(`${SJ_URL}/seller_details/?seller_key_id=${id}`, {
+      //     headers: {
+      //       Authorization: localStorage.access_token
+      //     }
+      //   })
+      //   .then(response => {
+      //     console.log("여기야", response);
+      //     this.$router.push(`/main/seller/sellerregist`);
+      //   })
+      //   .catch(error => console.log(error));
+    },
+    actionClick: function(action, id) {
+      if (
+        action === "입점 승인" ||
+        action === "입점 거절" ||
+        action === "휴점 해제"
+      ) {
+        if (confirm(`${action} 하시겠습니까?`) == true) {
+          this.actionBtnChange(action, id);
+        }
+      }
+
+      if (
+        action === "휴점 신청" ||
+        action === "퇴점 철회 처리" ||
+        action === "퇴점 신청 처리"
+      ) {
+        if (
+          confirm(
+            `${action} 시 셀러의 모든 상품이 미진열/미판매로 전환 되고,상품 관리를 할 수 없게 됩니다. ${action} 하시겠습니까?`
+          ) === true
+        ) {
+          this.actionBtnChange(action, id);
+        }
+      }
+    },
+    actionBtnChange: function(action, id) {
+      axios
+        .put(
+          `${SJ_URL}/action`,
+          {
+            user: id,
+            action_type: action
+          },
+
+          {
+            headers: {
+              Authorization: localStorage.access_token
+            }
+          }
+        )
+        .then(response => {
+          console.log(response);
+          if (response.status === 200) {
+            alert("정상처리 되었습니다.");
+          }
+        })
+        .catch(error => {
+          console.log(error.response.data.message);
+        });
+    },
     search: function() {
       //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
@@ -324,6 +402,15 @@ export default {
     border: 1px solid #d3d3d3;
     margin: 0 15px;
     border-radius: 5px;
+
+    .sellerIdText {
+      color: #0d638f;
+
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
+    }
 
     input,
     .sellerStatus {

@@ -89,7 +89,7 @@ class UserDao:
         SELECT authority_id
         FROM sellers
         INNER JOIN seller_keys ON seller_keys.id = sellers.seller_key_id
-        WHERE seller_keys.user = %(user)s
+        WHERE seller_keys.user = %(user)s AND end_date = '2037-12-31 23:59:59'
         """
         cursor.execute(check_user_auth_sql, get_user)
         user = cursor.fetchone()[0]
@@ -152,14 +152,21 @@ class UserDao:
         INNER JOIN seller_keys AS user ON sellers.seller_key_id = user.id
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(seller_infos_get_sql, user)
+        # cursor.execute 결과를 확인해 SELECT에 걸린 상품이 하나도 없으면 0을 리턴
+        if cursor.execute(seller_infos_get_sql, user) == 0:
+            return 0
+
         return cursor.fetchall()
 
     def get_supervisors(self, user, db_connection):
         #셀러 담당자 정보 조회
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         supervisor_infos_get_sql = """
-        SELECT *
+        SELECT 
+        name as supervisor_name,
+        phone_number as supervisor_phone_number,
+        email as supervisor_email,
+        `order`
         FROM supervisor_infos
         WHERE seller_id = (SELECT id FROM sellers WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59');
         """
@@ -170,7 +177,13 @@ class UserDao:
         #셀러 영업시간 조회
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         buisness_hours_get_sql = """
-        SELECT *
+        SELECT
+        id,
+        seller_id,
+        start_time,
+        end_time,
+        is_weekend,
+        is_deleted
         FROM buisness_hours
         WHERE seller_id = (SELECT id FROM sellers WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59');
         """
@@ -242,6 +255,24 @@ class UserDao:
         """
         cursor.execute(supervisor_register_sql, supervisor)
 
+    def insert_buisness_hour(self, buisness_hour, db_connection):
+        # 영업시간 정보 삽입
+        cursor = db_connection.cursor()
+        supervisor_register_sql = """
+        INSERT INTO buisness_hours (
+           seller_id,
+           start_time,
+           end_time,
+           is_weekend
+        ) VALUES (
+            (SELECT id FROM sellers WHERE end_date = '2037-12-31 23:59:59' AND seller_key_id = %(user)s),
+            %(start_time)s,
+            %(end_time)s,
+            %(is_weekend)s
+        )
+        """
+        cursor.execute(supervisor_register_sql, buisness_hour)
+
     def insert_initial_supervisor(self, new_user, db_connection):
         # 초기 회원가입 시 담당자 정보에 셀러 핸드폰번호 초기화
         cursor = db_connection.cursor()
@@ -265,32 +296,60 @@ class UserDao:
         INSERT INTO buisness_hours (
            seller_id,
            start_time,
-           end_time
+           end_time,
+           is_weekend
         ) VALUES (
             %(last_row_id)s,
             '09:00:00',
-            '18:00:00'
+            '18:00:00',
+            0
         )
         """
         cursor.execute(supervisor_register_sql, new_user)
 
-    def insert_buisness_hour(self, buisness_hour, db_connection):
-        # 영업시간 정보 삽입
+    def update_supervisor(self, user_id, db_connection):
+        # 셀러의 이전 ID 값의 담당자 정보를 새롭게 업데이트 해준다 
         cursor = db_connection.cursor()
-        supervisor_register_sql = """
-        INSERT INTO buisness_hours (
-           seller_id,
-           start_time,
-           end_time,
-           is_weekend
-        ) VALUES (
-            (SELECT id FROM sellers WHERE end_date = '2037-12-31 23:59:59' AND seller_key_id = %(user)s),
-            %(start_time)s,
-            %(end_time)s,
-            %(is_weekend)s
+        insert_first_supervisor_sql = """
+        INSERT INTO supervisor_infos (
+            seller_id,
+            name,
+            phone_number,
+            email,
+            `order`
         )
+        SELECT
+            %(recent_id)s,
+            name,
+            phone_number,
+            email,
+            `order`
+        FROM
+        supervisor_infos
+        WHERE seller_id = %(previous_id)s
         """
-        cursor.execute(supervisor_register_sql, buisness_hour)
+        cursor.execute(insert_first_supervisor_sql, user_id)
+
+    def update_buisness_hour(self, user_id, db_connection):
+        # 셀러의 이전 ID 값의 고객센터 영업시간 정보를 새롭게 업데이트 해준다 
+        cursor = db_connection.cursor()
+        insert_first_buisness_hour_sql = """
+        INSERT INTO buisness_hours (
+            seller_id,
+            start_time,
+            end_time,
+            is_weekend
+        )
+        SELECT
+            %(recent_id)s,
+            start_time,
+            end_time,
+            is_weekend
+        FROM
+        buisness_hours
+        WHERE seller_id = %(previous_id)s
+        """
+        cursor.execute(insert_first_buisness_hour_sql, user_id)  
 
     def insert_new_seller(self, recent_id, db_connection):
         #셀러 정보 수정 시 가장 최근 셀러 기록에서 기본정보 (셀러 키 ID, 권한, 속성, 셀러 정보, 비밀번호, 이름, 영문 이름를 가져와 새로운 셀러 레코드 생성
@@ -382,7 +441,7 @@ class UserDao:
                 FROM product_keys
                 WHERE sellers.seller_key_id = product_keys.seller_key_id) AS number_of_product,
             sellers.site_url AS site_url,
-            DATE_FORMAT(start_date, '%Y-%m-%d %H:%i:%s') AS created_at
+            DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s') AS created_at
         FROM sellers
         INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id
         INNER JOIN seller_status ON sellers.seller_status_id = seller_status.id
@@ -500,19 +559,6 @@ class UserDao:
         cursor.execute(seller_actions_sql)
         seller_actions = cursor.fetchall()
         return seller_actions
-
-    def check_user_auth(self, get_user, db_connection):
-        cursor = db_connection.cursor()
-        check_user_auth_sql = """
-        SELECT authority_id
-        FROM sellers
-        INNER JOIN seller_keys ON seller_keys.id = sellers.seller_key_id
-        WHERE seller_keys.user = %(user)s
-        """
-        cursor.execute(check_user_auth_sql, get_user)
-        user = cursor.fetchone()[0]
-        print(user)
-        return user
 
     def update_authority(self, user, db_connection):
         cursor = db_connection.cursor()
