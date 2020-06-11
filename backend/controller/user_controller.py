@@ -1,4 +1,5 @@
 import pymysql
+
 from jsonschema      import validate, ValidationError
 
 from flask           import request, g
@@ -263,8 +264,8 @@ def create_user_endpoints(app, user_service):
                 db_connection.commit()
                 return update_response
 
-        except  ValidationError:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
+        except  ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
 
         except pymysql.err.InternalError:
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
@@ -293,11 +294,176 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 db_connection.close()
 
-    @app.route('/seller_details/', methods = ['GET'])
+    @app.route('/seller/<int:seller_key_id>', methods=['PUT'])
+    @authorize
+    def update_seller_master(seller_key_id):
+        """
+        셀러 수정 (마스터 권한) API [PUT]
+
+        Args:
+
+            [Header]
+                Authorization : 로그인 토큰
+            
+            [URL PARAMETER]
+                seller_key_id : 셀러 고유 ID
+
+            [Body]
+                (기본 정보)
+                profile : 셀러 프로필
+
+                (상세정보)
+                background_image    : 셀러페이지 배경이미지
+                simple_introduction : 셀러 한줄 소개 (required)
+                detail_introduction : 셀러 상세 소개
+                site_url            : 사이트 URL
+                bank                : 정산은행 (required)
+                account_owner       : 계좌주 (required)
+                bank_account        : 계좌번호 (required)
+                order               : 순서
+                service_number      : 고객센터 전화번호 (required)
+                zip_code            : 우편번호
+                address             : 주소 (택배 수령지)
+                detail_address      : 상세주소 (택배 수령지) (required)
+
+                (담당자 정보) (required)
+                supervisor_name         : 담당자명
+                supervisor_phone_number : 담당자 핸드폰번호
+                supervisor_email        : 담당자 이메일
+
+                (고객센터 운영시간)
+                start_time : 9:00:00
+                end_time   : 6:00:00
+                is_weekend : 0    
+
+                (배송정보 및 교환/환불 정보)
+                shipping_information : 배송정보 (required)
+                refund_information   : 교환 / 환불 정보 (required)
+
+                (셀러 모델 사이즈 정보)
+                model_height      : 키
+                model_size_top    : 상의 사이즈
+                model_size_bottom : 하의 사이즈
+                model_size_foot   : 발 사이즈
+
+                (쇼핑피드 업데이트 메세지)
+                feed_message : 쇼핑피드 업데이트 메세지          
+
+        Returns:
+            Success : status code : 200
+
+            Key error                          : {message : KEY_ERROR}, status code : 400
+            Type error                         : {message : TYPE_ERROR}, status code : 400
+            Request Parameter Validation Error : {message : PARAMETER_VALIDATION_ERROR}, status code : 400
+        """
+        db_connection = None
+        seller_infos = request.json
+        
+        try: 
+            #권한이 마스터가 아니면 UNAUTHORIZED return 
+            if g.auth is not 1:
+                return {'message' : 'UNAUTHORIZED'}, 401
+
+            validate(seller_infos, seller_register_schema)
+            db_connection = get_connection()
+
+            if db_connection:
+                update_response = user_service.update_seller(seller_key_id, seller_infos, db_connection)
+                db_connection.commit()
+                return update_response
+
+        except  ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
+
+        except pymysql.err.InternalError:
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+
+        except pymysql.err.OperationalError:
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except Exception as e:
+
+            if db_connection:
+                db_connection.rollback()
+
+            return {'message' : str(e)}, 500
+
+        finally:
+            
+            if db_connection:
+                db_connection.close()
+
+    @app.route('/seller_details/<int:seller_key_id>', methods = ['GET'])
+    @authorize
+    def get_seller_details_master(seller_key_id):
+        """
+        셀러 상세 정보 (마스터권한) [GET]
+
+        Args:
+            [Header]
+                Authorization : 로그인 토큰
+                
+            [URL Parameter]
+                seller_key_id : 셀러 고유 아이디
+
+        Returns:
+
+            Success      : {data : user_info}, status code : 200
+
+            Key error    : {message : KEY_ERROR}, status code : 400
+            Type error   : {message : TYPE_ERROR}, status code : 400
+
+            unauthorized : {message : UNAUTHORIZED}, status code : 401
+        """
+
+        db_connection = None
+        try:
+            db_connection = get_connection()
+            if db_connection: 
+                
+                #권한이 마스터가 아니면 UNAUTHORIZED return 
+                if g.auth is not 1:
+                    return {'message' : 'UNAUTHORIZED'}, 401   
+
+                seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
+                return seller_infos 
+
+        except pymysql.err.InternalError:
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+
+        except pymysql.err.OperationalError:
+            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except Exception as e:
+            return {'message' : str(e)}, 500
+
+        finally:
+            if db_connection:
+                db_connection.close()
+
+    @app.route('/seller_details', methods = ['GET'])
     @authorize
     def get_seller_details():
         """
-        셀러 상세 정보 [GET]
+        셀러 상세 정보 (셀러권한) [GET]
 
         Args:
             [Header]
@@ -315,12 +481,7 @@ def create_user_endpoints(app, user_service):
         try:
             db_connection = get_connection()
             if db_connection: 
-                # 마스터일 경우 query string의 인자로 셀러의 상세 정보를 가져온다
-                if g.auth is 1:
-                    seller_key_id = request.args.get('seller_key_id')
-                    seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
-                    return seller_infos 
-                # 일반 셀러의 경우 토큰의 고유 id 값으로 상세 정보를 가져온다. 
+                # 일반 셀러의 경우 토큰의 셀러 고유 id 값으로 상세 정보를 가져온다. 
                 seller_infos = user_service.get_seller_details(g.user, db_connection)
                 return seller_infos
 
@@ -330,8 +491,8 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
@@ -370,7 +531,7 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 db_connection.rollback()
 
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
+            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
 
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
@@ -392,4 +553,3 @@ def create_user_endpoints(app, user_service):
         finally:
             if db_connection:
                 db_connection.close()
-

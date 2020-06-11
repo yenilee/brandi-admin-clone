@@ -46,7 +46,7 @@ class ProductService:
             # 여러개의 상품 태그를 리스트에 담아 받고, 반복분으로 각각 insert
             tags = [self.product_dao.insert_tags(tag, db_connection) for tag in product['tag_name']]
 
-            [ self.product_dao.insert_product_tags(product_key_id, tag, db_connection) for tag in tags]
+            # [ self.product_dao.insert_product_tags(product_key_id, tag, db_connection) for tag in tags]
 
             return "", 200
 
@@ -141,21 +141,18 @@ class ProductService:
             return {'message': 'TYPE ERROR' + str(e)}, 400
 
     def get_product_list(self, filters, db_connection):
-        try:
+        try:            
+            
+            products, count = self.product_dao.get_productlist(filters, db_connection)
 
-            #filter args validation
-            products = self.product_dao.get_productlist(filters, db_connection)
-            product_count = self.product_dao.get_product_count(db_connection)
+            #product_count : 검색된 상품의 개수
+            #products      : 상품 리스트
+            return {
+            'product_count' : count,
+            'products' : products}, 200
 
-            if products == 0:
-                return {'message' : 'NO_PRODUCTS_SELECTED'}, 500
+        except KeyError:           
+            return {'message': 'KEY_ERROR'}, 400
 
-            return { 
-            'product_count' : product_count, 
-            'products' : products,}, 200
-
-        except KeyError as e:           
-            return {'message': 'KEY_ERROR' + str(e)}, 400
-
-        except TypeError as e:            
-            return {'message': 'TYPE ERROR' + str(e)}, 400
+        except TypeError:            
+            return {'message': 'TYPE ERROR'}, 400
