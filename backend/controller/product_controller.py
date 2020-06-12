@@ -118,8 +118,8 @@ def create_product_endpoints(app, product_service):
             if db_connection:
                 validate(product, product_register_schema)
 
-                seller_key_id = g.user
-                register_response = product_service.create_new_product(product, seller_key_id, db_connection)
+                product['seller_key_id'] = g.user
+                register_response = product_service.create_new_product(product, g.user, db_connection)
                 db_connection.commit()
 
                 return register_response
@@ -256,3 +256,37 @@ def create_product_endpoints(app, product_service):
 
         finally:
                 db_connection.close()
+
+    @app.route('/product/<int:product_key_id>', methods = ['PUT'])
+    @authorize
+    def update_product(product_key_id):
+        db_connection = None
+        product = request.json
+
+        try:
+            db_connection = get_connection()
+            if db_connection:
+                update_response = product_service.update_product(product_key_id, db_connection)
+                return {'get_product' : update_response },200
+
+        except pymysql.err.InternalError as e:
+            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
+
+        except pymysql.err.OperationalError:
+            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError as e:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError as e:
+            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
+
+        except Exception as e:
+            db_connection.rollback()
+            return {'message': str(e)}, 500
+
+        finally:
+            db_connection.close()
