@@ -296,6 +296,7 @@ class ProductDao:
         seller_keys.user,        
         products.price AS price, 
         IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, CAST((products.price - (products.discount_rate / 100 * products.price)) AS signed), products.price) AS discount_price,
+        products.discount_rate,
         is_onsale,
         is_displayed,
         IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, 1, 0) AS is_discount          
@@ -305,7 +306,7 @@ class ProductDao:
         INNER JOIN seller_keys ON product_keys.seller_key_id = seller_keys.id      
         INNER JOIN sellers ON seller_keys.id = sellers.seller_key_id AND sellers.end_date = '2037-12-31 23:59:59'
         INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
-        WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2
+        WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2   
         """
 
         # 필터링 구문
@@ -333,15 +334,57 @@ class ProductDao:
         if 'is_discount' in filters:
             filter_statement = filter_statement + ' AND (products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end)=' + filters['is_discount']
 
-        # 필터링 구문 종합 상품 ID 내림차순
-        filter_statement = filter_statement + ' ORDER BY products.id DESC;'
-
+        # 필터링 구문 종합 상품 등록일 내림차순
+        filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC;' 
         # 리스트 조회 쿼리에서 반환된 row의 개수를 담는다
-        count = cursor.execute(products_list_sql + filter_statement)
+        cursor.execute(products_list_sql + filter_statement)
 
         # 상품 리스트와 상품의 개수를 return
-        return cursor.fetchall(),count
+        return cursor.fetchall()
+        
+    def get_product_count(self, filters, db_connection):
+        # 필터링된 상품 개수
+        cursor = db_connection.cursor()      
+        products_list_sql = """
+        SELECT
+        COUNT(products.id) AS product_count        
+        FROM
+        products
+        INNER JOIN product_keys ON products.product_key_id = product_keys.id
+        INNER JOIN seller_keys ON product_keys.seller_key_id = seller_keys.id      
+        INNER JOIN sellers ON seller_keys.id = sellers.seller_key_id AND sellers.end_date = '2037-12-31 23:59:59'
+        WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2
+        """
 
+        # 필터링 구문
+        filter_statement = ""
+
+        # 셀러명이 포함된 검색기능
+        if 'user' in filters:
+            filter_statement = filter_statement + " AND seller_keys.user LIKE '%" + filters['user'] + "%'"
+        # 상품명이 포함된 검색기능
+        if 'product_name' in filters:
+            filter_statement = filter_statement + " AND products.name LIKE '%" + filters['user'] + "%'"
+        # 상품 코드
+        if 'product_code' in filters:
+            filter_statement = filter_statement + ' AND product_keys.product_number=' + "'" + filters['product_code'] + "'"
+        # 셀러 속성
+        if 'seller_attribute_id' in filters:
+            filter_statement = filter_statement + ' AND sellers.seller_attribute_id=' + filters['seller_attribute_id']
+        # 판매 여부
+        if 'is_onsale' in filters:
+            filter_statement = filter_statement + ' AND products.is_onsale=' + filters['is_onsale']
+        # 진열 여부
+        if 'is_displayed' in filters:
+            filter_statement = filter_statement + ' AND products.is_displayed=' + filters['is_displayed']
+        # 할인 여부
+        if 'is_discount' in filters:
+            filter_statement = filter_statement + ' AND (products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end)=' + filters['is_discount']
+    
+        cursor.execute(products_list_sql + filter_statement)
+
+        # 검색된 상품의 개수를 return
+        return cursor.fetchone()[0]
 
     def get_recent_product_id(self, product, db_connection):
         # 가장 최근에 수정된 레코드의 id를 가져온다
@@ -362,5 +405,6 @@ class ProductDao:
         """
         cursor.execute( get_recent_product_sql, product)
         return cursor.fetchone()
+
 
 
