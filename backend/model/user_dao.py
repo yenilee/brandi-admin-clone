@@ -436,6 +436,8 @@ class UserDao:
         # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
         if filters is not None:
             for k, v in filters.items():
+                if k == 'sellers.id':
+                    statement += f" AND {k} = {v}"
                 statement += f" AND {k} LIKE '%{v}%'"
 
         sellers_list_sql = """
@@ -465,6 +467,8 @@ class UserDao:
         LEFT JOIN `supervisor_infos` ON supervisor_infos.seller_id = sellers.id AND supervisor_infos.order=1
         LEFT JOIN product_keys ON sellers.seller_key_id = product_keys.seller_key_id
         WHERE end_date = '2037-12-31 23:59:59' 
+        AND sellers.seller_status_id <> 6 
+        AND sellers.seller_status_id <> 7
         AND (authority_id = 2 OR authority_id = 3) """ + statement + " ORDER BY sellers.id DESC"
 
         if cursor.execute(sellers_list_sql) == 0:
@@ -472,14 +476,14 @@ class UserDao:
         sellers = cursor.fetchall()
         return sellers
 
-    def get_next_status(self, action_type, db_connection):
+    def get_next_status(self, action_type_name, db_connection):
         cursor = db_connection.cursor()
         change_status_sql = """
         SELECT next_status_id 
         FROM seller_actions
         WHERE action_type = %(action_type)s
         """
-        cursor.execute(change_status_sql, action_type)
+        cursor.execute(change_status_sql, action_type_name)
         next_status_id = cursor.fetchone()[0]
         return next_status_id
 
@@ -576,13 +580,13 @@ class UserDao:
         seller_actions = cursor.fetchall()
         return seller_actions
 
-    def update_authority(self, user, db_connection):
+    def update_authority(self, authority_user, db_connection):
         cursor = db_connection.cursor()
         update_status_sql = """
         UPDATE sellers SET authority_id = %s
         WHERE id = %s
         """
-        cursor.execute(update_status_sql, (2, user))
+        cursor.execute(update_status_sql, (2, authority_user))
 
     def soft_delete_seller(self, seller_key_id, db_connection):
         cursor = db_connection.cursor()
