@@ -259,13 +259,16 @@ def create_user_endpoints(app, user_service):
             validate(seller_infos, seller_register_schema)
             db_connection = get_connection()
 
+            #변경실행자에 대한 정보를 request에 담아준다 
+            seller_infos['editor'] = g.user
+
             if db_connection:
                 update_response = user_service.update_seller(g.user, seller_infos, db_connection)
                 db_connection.commit()
                 return update_response
 
-        except  ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
+        except  ValidationError:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
 
         except pymysql.err.InternalError:
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
@@ -365,7 +368,10 @@ def create_user_endpoints(app, user_service):
                 return {'message' : 'UNAUTHORIZED'}, 401
 
             validate(seller_infos, seller_register_schema)
-            db_connection = get_connection()
+            #변경실행자에 대한 정보를 request에 담아준다 
+            seller_infos['editor'] = g.user
+
+            db_connection = get_connection()  
 
             if db_connection:
                 update_response = user_service.update_seller(seller_key_id, seller_infos, db_connection)

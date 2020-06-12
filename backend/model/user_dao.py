@@ -195,18 +195,21 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         seller_histories_get_sql = """
         SELECT
-            DATE_FORMAT(start_date, '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
-            status.name,
-            editor
-        FROM sellers
+        DATE_FORMAT(MAX(start_date), '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
+        status.name,
+        MAX(editor) AS editor
+        FROM
+        sellers
         INNER JOIN seller_status AS status ON sellers.seller_status_id = status.id
-        WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
+        WHERE seller_key_id = %s
+        GROUP BY status.name
+        ORDER BY created_at
         """
         cursor.execute(seller_histories_get_sql, user)
         return cursor.fetchall()
 
     def update_seller(self, seller_infos, db_connection):
-        #  셀러 나머지 정보 (한줄 소개, 간략 소개, 배경 이미지, 계좌 정보, 배송, 환불 정보 등) 업데이트
+        #  셀러 나머지 정보 (한줄 소개, 간략 소개, 배경 이미지, 계좌 정보, 배송, 환불 정보, 변경 실행자 등) 업데이트
         cursor = db_connection.cursor()
         seller_register_sql = """
         UPDATE sellers
@@ -229,7 +232,8 @@ class UserDao:
             model_size_top = %(model_size_top)s,
             model_size_bottom = %(model_size_bottom)s,
             model_size_foot = %(model_size_foot)s,
-            feed_message = %(feed_message)s
+            feed_message = %(feed_message)s,
+            editor = (SELECT user from seller_keys WHERE id = %(editor)s)
 
         WHERE seller_key_id = %(user)s AND end_date = '2037-12-31 23:59:59'
         """
@@ -366,45 +370,6 @@ class UserDao:
         WHERE seller_id = %(previous_id)s
         """
         cursor.execute(insert_first_buisness_hour_sql, user_id)  
-
-    def insert_new_seller(self, recent_id, db_connection):
-        #셀러 정보 수정 시 가장 최근 셀러 기록에서 기본정보 (셀러 키 ID, 권한, 속성, 셀러 정보, 비밀번호, 이름, 영문 이름를 가져와 새로운 셀러 레코드 생성
-        cursor = db_connection.cursor()
-        insert_seller_infos_sql = """
-        INSERT INTO sellers (
-        seller_key_id,
-        authority_id,
-        seller_attribute_id,
-        seller_status_id,
-        editor,
-        password,
-        phone_number,
-        name,
-        eng_name,
-        service_number,
-        site_url,
-        start_date,
-        end_date
-        )
-        SELECT
-            seller_key_id,
-            authority_id,
-            seller_attribute_id,
-            seller_status_id,
-            editor,
-            password,
-            phone_number,
-            name,
-            eng_name,
-            service_number,
-            site_url,
-            now(),
-            end_date
-        FROM
-            sellers
-        WHERE id = %s;
-        """
-        cursor.execute(insert_seller_infos_sql, recent_id)
 
     def update_history(self, previous_id, db_connection):
         # 이전의 셀러 레코드의 유효종료일을 현재 시점으로 업데이트
