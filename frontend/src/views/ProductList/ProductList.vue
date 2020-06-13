@@ -1,14 +1,13 @@
 <template>
   <div class="plWrap">
     <div class="slTitleBox">
-      <div class="slTitle">셀러 계정 관리</div>
-      <div class="slSubTitle">셀러 회원 목록 / 관리</div>
+      <div class="slTitle">상품 관리</div>
     </div>
     <div class="slCategory">
       <i class="xi-home">
-        회원 관리
-        <i class="xi-angle-right-min">셀러 계정 관리</i>
-        <i class="xi-angle-right-min">셀러 회원 리스트</i>
+        상품 관리
+        <i class="xi-angle-right-min">상품 관리</i>
+        <i class="xi-angle-right-min">상품 리스트</i>
       </i>
     </div>
     <div class="filterBox">
@@ -246,7 +245,7 @@ export default {
       });
 
       axios
-        .get(`${SJ_URL}/products?${queryString.join("")}`, {
+        .get(`${YE_URL}/products?${queryString.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -258,7 +257,7 @@ export default {
     },
     getListDatas: function() {
       axios
-        .get(`${SJ_URL}/products`, {
+        .get(`${YE_URL}/products`, {
           headers: {
             Authorization: localStorage.access_token
           }
