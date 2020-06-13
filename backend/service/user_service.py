@@ -107,13 +107,13 @@ class UserService:
             return {'message' : 'TYPE ERROR'}, 400
 
     def update_seller(self, user, seller_infos, db_connection):
-        try: 
-            # 셀러 ID를 가져온다 
+        try:       
+            # 수정할 셀러의 고유 ID를 request에 추가 
             seller_infos['user'] = user
 
-            #가장 최근에 저장된 셀러의 기본 정보(셀러 키 ID, 권한, 속성, 비밀번호 등)을 가져와 새로운 셀러 레코드를 생성한다
+            #가장 최근에 저장된 수정할 셀러의 기본 정보(셀러 키 ID, 권한, 속성, 비밀번호 등)을 가져와 새로운 셀러 레코드를 생성한다
             recent_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)
-            self.user_dao.insert_new_seller(recent_seller_id, db_connection)
+            self.user_dao.update_seller_all(recent_seller_id, db_connection)
             # 이전 데이터와 새로운 데이터의 이력을 바꿔준다
             self.user_dao.update_history(recent_seller_id, db_connection)
 
@@ -134,9 +134,9 @@ class UserService:
             self.user_dao.update_seller(seller_infos, db_connection)
             return "", 200
 
-        except KeyError:
+        except KeyError as e:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR'}, 400
+            return {'message' : 'KEY_ERROR' + str(e)}, 400
 
         except TypeError:
             db_connection.rollback()
@@ -144,17 +144,20 @@ class UserService:
 
     def get_seller_details(self, user, db_connection):
         try:
+            # user - 셀러권한 : 자기 자신의 고유 ID, 마스터권한 : url parameter로 받은 셀러 고유 ID
+
             # 사용자 정보
             user_info        = self.user_dao.get_seller_details(user, db_connection)
             
+            # 셀러가 존재하지 않을 경우 
             if user_info == 0:
                 return {'message' : 'NO_SELLER_SELECTED'}, 500
 
-            # 담당자 정보
+            # 담당자 정보 가져오기
             supervisor_info  = self.user_dao.get_supervisors(user, db_connection)
-            # 영업시간
+            # 영업시간 가져오기
             buisness_hours   = self.user_dao.get_buisness_hours(user, db_connection)
-            # 셀러 수정이력
+            # 셀러 수정이력 가져오기
             seller_histories = self.user_dao.get_seller_histories(user, db_connection)
             # JSON 결합 
             user_info[0]['supervisors']      = supervisor_info

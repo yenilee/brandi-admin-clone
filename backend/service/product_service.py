@@ -19,43 +19,61 @@ class ProductService:
 
     def create_new_product(self, product, seller_key_id, db_connection):
         try:
-            # 상품 KEY ID insert
-            product['seller_key_id'] = seller_key_id
-            product['product_key_id'] = self.product_dao.insert_product_key(seller_key_id, db_connection)
+            # request value 중 option은 리스트 안에 딕셔너리가 여러개 있는 형태이므로, 우선 제외하고 데이터 insert
+            options = product.pop('options', None)
 
-            # 위에서 등록한 KEY ID row에 상품 코드(문자+숫자 조합) 업데이트
+            # 상품 KEY ID insert하고, 해당 row에 상품 번호(문자+숫자 조합)를 추가
+            product['product_key_id'] = self.product_dao.insert_product_key(seller_key_id, db_connection)
             self.product_dao.update_product_number(db_connection)
 
             # 상품 고시 정보를 상세 상품 정보에 표시할 경우 notices id를 null 값으로 표시
             product['notices_id'] = None
 
             # 상세 상품 정보에 기입하지 않고 직접 등록할 경우 제조 관련 정보를 field(3개) insert
-
             if product['is_detail_reference'] is 0:
                 product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
 
-            # 셀러 속성 값에 따른 셀러 속성 그룹 id를 변수에 저장
+            # 셀러 속성 값에 따른 셀러 속성 그룹, 속성 그룹 id+카테고리 id 조합을 변수에 저장
             product['attribute_group_id'] = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
             product['attribute_category_id'] = self.product_dao.get_attribute_category_id(product, db_connection)
 
-            options = product['options']
+            # request body에서 받은 id와 데이터 조합으로 Product 등록
+            product_id = self.product_dao.insert_product(product, db_connection)
 
-            # request body를 insert
-            # 위에서 받은 속성 그룹 id와 1, 2차 카테고리 조합해 속성 카테고리 조합 id 등록
-            product['options']['product_id'] = self.product_dao.insert_product(product, db_connection)
-            product_id = product['options']['product_id']
-
-            options = product['options']
+            # product id를 options의 각 딕셔너리에 담고, option 조합 db에 추가
+            for option in options:
+                option['product_id'] = product_id
 
             self.product_dao.insert_options(options, db_connection)
 
-            # 여러개의 상품 태그를 리스트에 담아 받고, 반복분으로 각각 insert
-            tags = [self.product_dao.insert_tags(tag, db_connection) for tag in product['tags']]
+            # tag가 db에 없을 경우 db에 태그를 추가한 뒤 id를 받고, 있을 경우 id를 찾아서 tag_id 리스트에 추가함
+            tags = []
+            for tag_name in product['tags']:
+                if self.product_dao.find_tags(tag_name, db_connection) == 0:
+                    tags.append(self.product_dao.insert_tags(tag_name, db_connection))
+                tags.append(self.product_dao.find_tags(tag_name, db_connection))
 
-            for tag_id in tags:
-                self.product_dao.insert_product_tags(product_id, tag_id, db_connection)
+            # db에 있는 태그의 id, 혹은 새로 받은 태그의 id를 상품 & 태그 조합 테이블에 추가
+            [self.product_dao.insert_product_tags(product_id, tag_id, db_connection) for tag_id in tags]
 
             return "", 200
+
+        except KeyError as e:
+            db_connection.rollback()
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            db_connection.rollback()
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def update_product(self, product_key_id, db_connection):
+        try:
+            product_previous_id = self.product_dao.get_product_previous_id(product_key_id, db_connection)
+            recent_product_id = self.product_dao.get_recent_product(product_previous_id, db_connection)
+
+            self.product_dao.update_recent_product_history(recent_product_id, db_connection)
+
+            return recent_product_id
 
         except KeyError as e:
             db_connection.rollback()
@@ -163,16 +181,18 @@ class ProductService:
     def get_product_list(self, filters, db_connection):
         try:            
             
-            products, count = self.product_dao.get_productlist(filters, db_connection)
+            #상품 리스트, 상품 개수 unpacking
+            products = self.product_dao.get_productlist(filters, db_connection)
+            count    = self.product_dao.get_product_count(filters, db_connection)
 
             #product_count : 검색된 상품의 개수
-            #products      : 상품 리스트
+            #products      : 상품 리스트            
             return {
-            'product_count' : count,
-            'products' : products}, 200
+                'product_count' : count,
+                'products' : products}, 200
 
         except KeyError:           
             return {'message': 'KEY_ERROR'}, 400
 
-        except TypeError:            
-            return {'message': 'TYPE ERROR'}, 400
+        except TypeError as e:            
+            return {'message': 'TYPE ERROR' + str(e)}, 400
