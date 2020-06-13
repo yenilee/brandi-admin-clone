@@ -5,7 +5,7 @@ from flask       import request, g
 from connection  import get_connection
 from utils       import authorize
 from jsonschema  import validate, ValidationError
-from json_schema import product_register_schema
+from json_schema import product_register_schema, product_list_queryset_schema
 
 def create_product_endpoints(app, product_service):
     product_service = product_service
@@ -133,8 +133,8 @@ def create_product_endpoints(app, product_service):
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
 
-        # except pymysql.err.ProgrammingError as e:
-        #     return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
@@ -142,9 +142,9 @@ def create_product_endpoints(app, product_service):
         except pymysql.err.IntegrityError as e:
             return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
 
-        # except Exception as e:
-        #     db_connection.rollback()
-        #     return {'message': str(e)}, 500
+        except Exception as e:
+            db_connection.rollback()
+            return {'message': str(e)}, 500
 
         finally:
             if db_connection:
@@ -173,7 +173,9 @@ def create_product_endpoints(app, product_service):
 
         [Query String]
         user                : 셀러명
+        product_name        : 상품명
         product_code        : 상품 코드
+        product_number      : 상품 번호
         is_onsale           : 판매 여부 (Boolean)
         is_displayed        : 진열 여부 (Boolean)
         is_discount         : 할인 여부 (Boolean)
@@ -193,12 +195,18 @@ def create_product_endpoints(app, product_service):
 
         db_connection = None
         try:
-            #필터 Query String
+            #필터 query string validation
             filters = request.args
+            #필터 query string validation
+            validate(filters, product_list_queryset_schema)            
+     
             db_connection = get_connection()
             if db_connection:                
                 products_list_response = product_service.get_product_list(filters, db_connection)
                 return products_list_response
+
+        except ValidationError:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
 
         except pymysql.err.InternalError:
             return {'message': 'DATABASE_SERVER_ERROR'}, 500

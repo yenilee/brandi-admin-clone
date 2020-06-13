@@ -1,3 +1,4 @@
+# 상품 등록 수정 parameter validation
 seller_register_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
@@ -750,6 +751,96 @@ seller_action_schema = {
             "examples": [
                 "입점 승인"
             ]
+        }
+    }
+}
+
+# 상품 리스트 필터링 parameter validation
+product_list_queryset_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "user": "test",
+            "product_code": "brandi13",
+            "is_onsale": 1,
+            "is_displayed": 0,
+            "is_discount": 0,
+            "seller_attribute_id": 2,
+            "product_number": 1
+        }
+    ],
+    "required": [],
+    "additionalProperties": True,
+    "properties": {
+        "user": {
+            "$id": "#/properties/user",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "test"
+            ],
+            "pattern": "[A-Za-z0-9]"
+        },
+        "product_code": {
+            "$id": "#/properties/product_code",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "brandi13"
+            ],
+            "pattern" : "[A-Za-z0-9]]"
+        },
+        "is_onsale": {
+            "$id": "#/properties/is_onsale",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-1]"
+        },
+        "is_displayed": {
+            "$id": "#/properties/is_displayed",
+            "type": "string",
+            "title": "The is_displayed schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0
+            ],
+            "pattern" : "[0-1]"
+        },
+        "is_discount": {
+            "$id": "#/properties/is_discount",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                0
+            ],
+            "pattern" : "[0-1]"
+        },
+        "seller_attribute_id": {
+            "$id": "#/properties/seller_attribute_id",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                2
+            ],
+            "pattern" : "[0-7]"
+        },
+        "product_number": {
+            "$id": "#/properties/product_number",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-9]"
         }
     }
 }
