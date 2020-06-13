@@ -5,6 +5,7 @@ from flask       import request, g
 from connection  import get_connection
 from utils       import authorize
 from jsonschema  import validate, ValidationError
+
 from json_schema import product_register_schema, product_list_queryset_schema
 
 def create_product_endpoints(app, product_service):
@@ -205,8 +206,8 @@ def create_product_endpoints(app, product_service):
                 products_list_response = product_service.get_product_list(filters, db_connection)
                 return products_list_response
 
-        except ValidationError:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
+        except ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
         except pymysql.err.InternalError:
             return {'message': 'DATABASE_SERVER_ERROR'}, 500
