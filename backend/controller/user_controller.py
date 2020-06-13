@@ -267,7 +267,7 @@ def create_user_endpoints(app, user_service):
                 db_connection.commit()
                 return update_response
 
-        except  ValidationError:
+        except ValidationError:
             return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
 
         except pymysql.err.InternalError:

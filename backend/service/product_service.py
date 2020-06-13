@@ -179,13 +179,11 @@ class ProductService:
             return {'message': 'TYPE ERROR' + str(e)}, 400
 
     def get_product_list(self, filters, db_connection):
-        try:            
-            
-            #상품 리스트, 상품 개수 unpacking
+        try:        
             products = self.product_dao.get_productlist(filters, db_connection)
             count    = self.product_dao.get_product_count(filters, db_connection)
 
-            #product_count : 검색된 상품의 개수
+            #product_count : 검색된 상품의 개수 
             #products      : 상품 리스트            
             return {
                 'product_count' : count,
@@ -194,5 +192,5 @@ class ProductService:
         except KeyError:           
             return {'message': 'KEY_ERROR'}, 400
 
-        except TypeError as e:            
-            return {'message': 'TYPE ERROR' + str(e)}, 400
+        except TypeError:            
+            return {'message': 'TYPE ERROR'}, 400
