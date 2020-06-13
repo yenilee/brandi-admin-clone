@@ -126,7 +126,7 @@
     </div>
     <div class="count">전체 조회건 수 : {{infoDatas.product_count}}</div>
     <div class="tableBox">
-      <!-- 테이블 시작 부분입니다. -->
+      <!-- 테이블 시작 부분입니다.. -->
       <template>
         <v-simple-table>
           <template v-slot:default>
