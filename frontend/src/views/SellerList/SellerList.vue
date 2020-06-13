@@ -243,7 +243,6 @@
 
 <script>
 import axios from "axios";
-import { eventBus } from "../../main";
 import { sellerListHeaders } from "../../config/SellerListDatas";
 import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 
@@ -362,11 +361,9 @@ export default {
       // alert(this.searchDatas.id);
       this.searchDatas.filter(item => {
         item.state && item.id.length != 0
-          ? queryString.push(`${item.name}=${item.id}&&`)
+          ? queryString.push(`${item.name}=${item.id}&`)
           : "";
       });
-      console.log("query", queryString);
-      console.log("join", queryString.join(""));
       axios
         .get(`${SJ_URL}/sellers?${queryString.join("")}`, {
           headers: {
