@@ -107,15 +107,13 @@ class UserService:
             return {'message' : 'TYPE ERROR'}, 400
 
     def update_seller(self, user, seller_infos, db_connection):
-        try: 
-            # user - 셀러권한 : 자기 자신의 고유 ID, 마스터권한 : url parameter로 받은 셀러 고유 ID
-
-            # 고유 ID를 request에 추가 
+        try:       
+            # 수정할 셀러의 고유 ID를 request에 추가 
             seller_infos['user'] = user
 
-            #가장 최근에 저장된 셀러의 기본 정보(셀러 키 ID, 권한, 속성, 비밀번호 등)을 가져와 새로운 셀러 레코드를 생성한다
+            #가장 최근에 저장된 수정할 셀러의 기본 정보(셀러 키 ID, 권한, 속성, 비밀번호 등)을 가져와 새로운 셀러 레코드를 생성한다
             recent_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)
-            self.user_dao.insert_new_seller(recent_seller_id, db_connection)
+            self.user_dao.update_seller_all(recent_seller_id, db_connection)
             # 이전 데이터와 새로운 데이터의 이력을 바꿔준다
             self.user_dao.update_history(recent_seller_id, db_connection)
 
@@ -136,9 +134,9 @@ class UserService:
             self.user_dao.update_seller(seller_infos, db_connection)
             return "", 200
 
-        except KeyError:
+        except KeyError as e:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR'}, 400
+            return {'message' : 'KEY_ERROR' + str(e)}, 400
 
         except TypeError:
             db_connection.rollback()

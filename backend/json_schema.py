@@ -1,9 +1,8 @@
+# 상품 등록 수정 parameter validation
 seller_register_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
     "type": "object",
-    "title": "The root schema",
-    "description": "The root schema comprises the entire JSON document.",
     "default": {},
     "examples": [
         {
@@ -79,8 +78,6 @@ seller_register_schema = {
         "profile": {
             "$id": "#/properties/profile",
             "type": "string",
-            "title": "The profile schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "url"
@@ -89,8 +86,6 @@ seller_register_schema = {
         "background_image": {
             "$id": "#/properties/background_image",
             "type": "string",
-            "title": "The background_image schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "url"
@@ -99,8 +94,6 @@ seller_register_schema = {
         "simple_introduction": {
             "$id": "#/properties/simple_introduction",
             "type": "string",
-            "title": "The simple_introduction schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "안녕 난 진아야 안녕"
@@ -110,8 +103,6 @@ seller_register_schema = {
         "detail_introduction": {
             "$id": "#/properties/detail_introduction",
             "type": ["string", "null"],
-            "title": "The detail_introduction schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "셀러 상세 소개"
@@ -120,8 +111,6 @@ seller_register_schema = {
         "site_url": {
             "$id": "#/properties/site_url",
             "type": "string",
-            "title": "The site_url schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "http://www.naver.com"
@@ -131,8 +120,6 @@ seller_register_schema = {
         "supervisors": {
             "$id": "#/properties/supervisors",
             "type": ["array", "null"],
-            "title": "The supervisors schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": [],
             "examples": [
                 [
@@ -156,8 +143,6 @@ seller_register_schema = {
                     {
                         "$id": "#/properties/supervisors/items/anyOf/0",
                         "type": "object",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
                         "default": {},
                         "examples": [
                             {
@@ -167,15 +152,13 @@ seller_register_schema = {
                                 "order": "1"
                             }
                         ],
-                        "required": [   
+                        "required": [
                         ],
                         "additionalProperties": True,
                         "properties": {
                             "supervisor_name": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/supervisor_name",
-                                "type": ["string", "null"],                       
-                                "title": "The supervisor_name schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type": ["string", "null"],                 
                                 "default": "",
                                 "examples": [
                                     "담당자1"
@@ -183,9 +166,7 @@ seller_register_schema = {
                             },
                             "supervisor_phone_number": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/supervisor_phone_number",
-                                "type": ["string", "null"],
-                                "title": "The supervisor_phone_number schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type": ["string", "null"],                       
                                 "default": "",
                                 "examples": [
                                     "담당자1 핸드폰번호"
@@ -194,9 +175,7 @@ seller_register_schema = {
                             },
                             "supervisor_email": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/supervisor_email",
-                                "type":["string", "null"],
-                                "title": "The supervisor_email schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type":["string", "null"],                          
                                 "default": "",
                                 "examples": [
                                     "담당자1 이메일"
@@ -204,9 +183,7 @@ seller_register_schema = {
                             },
                             "order": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/order",
-                                "type": "integer",
-                                "title": "The order schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type": "integer",                       
                                 "default": "",
                                 "examples": [
                                     "1"
@@ -220,9 +197,7 @@ seller_register_schema = {
         },
         "service_number": {
             "$id": "#/properties/service_number",
-            "type": "string",
-            "title": "The service_number schema",
-            "description": "An explanation about the purpose of this instance.",
+            "type": "string",      
             "default": "",
             "examples": [
                 "010-5338-7244"
@@ -232,8 +207,6 @@ seller_register_schema = {
         "zip_code": {
             "$id": "#/properties/zip_code",
             "type": "string",
-            "title": "The zip_code schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "우편번호"
@@ -242,8 +215,6 @@ seller_register_schema = {
         "address": {
             "$id": "#/properties/address",
             "type": "string",
-            "title": "The address schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "주소 (택배 수령지)"
@@ -252,8 +223,6 @@ seller_register_schema = {
         "detail_address": {
             "$id": "#/properties/detail_address",
             "type": "string",
-            "title": "The detail_address schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "상세주소 (택배 수령지)"
@@ -262,8 +231,6 @@ seller_register_schema = {
         "buisness_hours": {
             "$id": "#/properties/buisness_hours",
             "type": "array",
-            "title": "The buisness_hours schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": [],
             "examples": [
                 [
@@ -285,8 +252,6 @@ seller_register_schema = {
                     {
                         "$id": "#/properties/buisness_hours/items/anyOf/0",
                         "type": "object",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
                         "default": {},
                         "examples": [
                             {
@@ -305,8 +270,6 @@ seller_register_schema = {
                             "start_time": {
                                 "$id": "#/properties/buisness_hours/items/anyOf/0/properties/start_time",
                                 "type": ["string", "null"],
-                                "title": "The start_time schema",
-                                "description": "An explanation about the purpose of this instance.",
                                 "default": "",
                                 "examples": [
                                     "9:00:00"
@@ -315,8 +278,6 @@ seller_register_schema = {
                             "end_time": {
                                 "$id": "#/properties/buisness_hours/items/anyOf/0/properties/end_time",
                                 "type": ["string", "null"],
-                                "title": "The end_time schema",
-                                "description": "An explanation about the purpose of this instance.",
                                 "default": "",
                                 "examples": [
                                     "6:00:00"
@@ -325,8 +286,6 @@ seller_register_schema = {
                             "is_weekend": {
                                 "$id": "#/properties/buisness_hours/items/anyOf/0/properties/is_weekend",
                                 "type": "integer",
-                                "title": "The is_weekend schema",
-                                "description": "An explanation about the purpose of this instance.",
                                 "default": "",
                                 "examples": [
                                     "0"
@@ -341,8 +300,6 @@ seller_register_schema = {
         "bank": {
             "$id": "#/properties/bank",
             "type": "string",
-            "title": "The bank schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "정산은행"
@@ -351,8 +308,6 @@ seller_register_schema = {
         "account_owner": {
             "$id": "#/properties/account_owner",
             "type": "string",
-            "title": "The account_owner schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "계좌주"
@@ -361,8 +316,6 @@ seller_register_schema = {
         "bank_account": {
             "$id": "#/properties/bank_account",
             "type": "string",
-            "title": "The bank_account schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "계좌번호"
@@ -372,8 +325,6 @@ seller_register_schema = {
         "shipping_information": {
             "$id": "#/properties/shipping_information",
             "type": "string",
-            "title": "The shipping_information schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "배송정보"
@@ -382,8 +333,6 @@ seller_register_schema = {
         "refund_information": {
             "$id": "#/properties/refund_information",
             "type": "string",
-            "title": "The refund_information schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "교환 / 환불 정보"
@@ -392,8 +341,6 @@ seller_register_schema = {
         "model_height": {
             "$id": "#/properties/model_height",
             "type": "integer",
-            "title": "The model_height schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 177
@@ -402,8 +349,6 @@ seller_register_schema = {
         "model_size_top": {
             "$id": "#/properties/model_size_top",
             "type": "integer",
-            "title": "The model_size_top schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 50
@@ -412,8 +357,6 @@ seller_register_schema = {
         "model_size_bottom": {
             "$id": "#/properties/model_size_bottom",
             "type": "integer",
-            "title": "The model_size_bottom schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 30
@@ -422,8 +365,6 @@ seller_register_schema = {
         "model_size_foot": {
             "$id": "#/properties/model_size_foot",
             "type": "integer",
-            "title": "The model_size_foot schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 255
@@ -432,8 +373,6 @@ seller_register_schema = {
         "feed_message": {
             "$id": "#/properties/feed_message",
             "type": ["string", "null"],
-            "title": "The feed_message schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "안녕하세요 OOO에요! 봄에 어울리는 신상이 입고 되었습니다."
@@ -446,8 +385,6 @@ product_register_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
     "type": "object",
-    "title": "The root schema",
-    "description": "The root schema comprises the entire JSON document.",
     "default": {},
     "examples": [
         {
@@ -502,8 +439,6 @@ product_register_schema = {
         "first_category_id": {
             "$id": "#/properties/first_category_id",
             "type": "integer",
-            "title": "The first_category_id schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 1
@@ -512,8 +447,6 @@ product_register_schema = {
         "second_category_id": {
             "$id": "#/properties/second_category_id",
             "type": "integer",
-            "title": "The second_category_id schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 25
@@ -522,8 +455,6 @@ product_register_schema = {
         "is_displayed": {
             "$id": "#/properties/is_displayed",
             "type": "integer",
-            "title": "The is_displayed schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 1
@@ -532,8 +463,6 @@ product_register_schema = {
         "is_onsale": {
             "$id": "#/properties/is_onsale",
             "type": "integer",
-            "title": "The is_onsale schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 1
@@ -542,8 +471,6 @@ product_register_schema = {
         "name": {
             "$id": "#/properties/name",
             "type": "string",
-            "title": "The name schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "멋진 옷"
@@ -552,8 +479,6 @@ product_register_schema = {
         "is_detail_reference": {
             "$id": "#/properties/is_detail_reference",
             "type": "integer",
-            "title": "The is_detail_reference schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 1
@@ -562,8 +487,6 @@ product_register_schema = {
         "simple_description": {
             "$id": "#/properties/simple_description",
             "type": "string",
-            "title": "The simple_description schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "good"
@@ -572,8 +495,6 @@ product_register_schema = {
         "details": {
             "$id": "#/properties/details",
             "type": "string",
-            "title": "The details schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "사세요"
@@ -582,8 +503,6 @@ product_register_schema = {
         "maximum_quantity": {
             "$id": "#/properties/maximum_quantity",
             "type": ["integer", "null"],
-            "title": "The maximum_quantity schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 10
@@ -592,8 +511,6 @@ product_register_schema = {
         "minimum_quantity": {
             "$id": "#/properties/minimum_quantity",
             "type": ["integer", "null"],
-            "title": "The minimum_quantity schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 10
@@ -602,8 +519,6 @@ product_register_schema = {
         "price": {
             "$id": "#/properties/price",
             "type": ["integer", "null"],
-            "title": "The price schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 8000
@@ -612,8 +527,6 @@ product_register_schema = {
         "wholesale_price": {
             "$id": "#/properties/wholesale_price",
             "type": ["integer", "null"],
-            "title": "The wholesale_price schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 8000
@@ -622,8 +535,6 @@ product_register_schema = {
         "discount_rate": {
             "$id": "#/properties/discount_rate",
             "type": "integer",
-            "title": "The discount_rate schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 0
@@ -632,8 +543,6 @@ product_register_schema = {
         "discount_start": {
             "$id": "#/properties/discount_start",
             "type": ["string", "null"],
-            "title": "The discount_start schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "2018-05-31"
@@ -642,8 +551,6 @@ product_register_schema = {
         "discount_end": {
             "$id": "#/properties/discount_end",
             "type": ["string", "null"],
-            "title": "The discount_end schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "2019-04-10"
@@ -652,8 +559,6 @@ product_register_schema = {
         "manufacturer": {
             "$id": "#/properties/manufacturer",
             "type": ["string", "null"],
-            "title": "The manufacturer schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "브랜디"
@@ -662,8 +567,6 @@ product_register_schema = {
         "manufacture_date": {
             "$id": "#/properties/manufacture_date",
             "type": ["string", "null"],
-            "title": "The manufacture_date schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "1991-04-01 12:00:59"
@@ -672,8 +575,6 @@ product_register_schema = {
         "origin": {
             "$id": "#/properties/origin",
             "type": ["string", "null"],
-            "title": "The origin schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "한국"
@@ -682,8 +583,6 @@ product_register_schema = {
         "tags": {
             "$id": "#/properties/tags",
             "type": "array",
-            "title": "The tags schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": [],
             "examples": [
                 [
@@ -697,8 +596,6 @@ product_register_schema = {
                     {
                         "$id": "#/properties/tags/items/anyOf/0",
                         "type": "string",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
                         "default": "",
                         "examples": [
                             "큐트",
@@ -716,8 +613,6 @@ seller_action_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
     "type": "object",
-    "title": "The root schema",
-    "description": "The root schema comprises the entire JSON document.",
     "default": {},
     "examples": [
         {
@@ -734,8 +629,6 @@ seller_action_schema = {
         "user": {
             "$id": "#/properties/user",
             "type": "integer",
-            "title": "The user schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 9
@@ -744,12 +637,98 @@ seller_action_schema = {
         "action_type": {
             "$id": "#/properties/action_type",
             "type": "string",
-            "title": "The action_type schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "입점 승인"
             ]
+        }
+    }
+}
+
+# 상품 리스트 필터링 parameter validation
+product_list_queryset_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "examples": [
+        {
+            "user": "test",
+            "product_code": "brandi13",
+            "is_onsale": 1,
+            "is_displayed": 0,
+            "is_discount": 0,
+            "seller_attribute_id": 2,
+            "product_number": 1
+        }
+    ],
+    "required": [],
+    "additionalProperties": True,
+    "properties": {
+        "user": {
+            "$id": "#/properties/user",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "test"
+            ],
+            "pattern": "[A-Za-z0-9]"
+        },
+        "product_code": {
+            "$id": "#/properties/product_code",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "brandi13"
+            ],
+            "pattern" : "[A-Za-z0-9]"
+        },
+        "is_onsale": {
+            "$id": "#/properties/is_onsale",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-1]"
+        },
+        "is_displayed": {
+            "$id": "#/properties/is_displayed",
+            "type": "string",
+            "title": "The is_displayed schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0
+            ],
+            "pattern" : "[0-1]"
+        },
+        "is_discount": {
+            "$id": "#/properties/is_discount",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                0
+            ],
+            "pattern" : "[0-1]"
+        },
+        "seller_attribute_id": {
+            "$id": "#/properties/seller_attribute_id",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                2
+            ],
+            "pattern" : "[0-7]"
+        },
+        "product_number": {
+            "$id": "#/properties/product_number",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-9]"
         }
     }
 }

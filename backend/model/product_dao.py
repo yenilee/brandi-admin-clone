@@ -355,7 +355,8 @@ class ProductDao:
         return color_filters
 
     def get_productlist(self, filters, db_connection):
-        cursor = db_connection.cursor(pymysql.cursors.DictCursor)      
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor) 
+        # 필터링된 상품 리스트     
         # 할인가 할인줄일 때는 할인율 계산하는 로직을 짜서 구현, 할인중이 아닐때는 판매가로 
         products_list_sql = """
         SELECT
@@ -382,20 +383,20 @@ class ProductDao:
         """
 
         # 필터링 구문
-        filter_statement = ""
+        filter_statement = "" 
 
         # 셀러명이 포함된 검색기능
         if 'user' in filters:
             filter_statement = filter_statement + " AND seller_keys.user LIKE '%" + filters['user'] + "%'"
         # 상품명이 포함된 검색기능
         if 'product_name' in filters:
-            filter_statement = filter_statement + " AND products.name LIKE '%" + filters['user'] + "%'"
+            filter_statement = filter_statement + " AND products.name LIKE '%" + filters['product_name'] + "%'"
         # 상품 코드
         if 'product_code' in filters:
             filter_statement = filter_statement + ' AND product_keys.product_number=' + "'" + filters['product_code'] + "'"
-        # 셀러 속성
-        if 'seller_attribute_id' in filters:
-            filter_statement = filter_statement + ' AND sellers.seller_attribute_id=' + filters['seller_attribute_id']
+        # 상품 번호 (product pk)   
+        if 'product_number' in filters:
+            filter_statement = filter_statement + ' AND product_keys.id=' + "'" + filters['product_number'] + "'"
         # 판매 여부
         if 'is_onsale' in filters:
             filter_statement = filter_statement + ' AND products.is_onsale=' + filters['is_onsale']
@@ -405,11 +406,21 @@ class ProductDao:
         # 할인 여부
         if 'is_discount' in filters:
             filter_statement = filter_statement + ' AND (products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end)=' + filters['is_discount']
+        # 셀러 속성
+        if 'seller_attribute_id' in filters:
+            # 셀러 속성 ID를 모두 가져온다
+            seller_attributes = filters.getlist('seller_attribute_id')
+            filter_statement = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
+            # 다중 셀러 속성 필터링 구문 추가
+            for seller_attribute in seller_attributes:
+                filter_statement = filter_statement + ' OR sellers.seller_attribute_id = ' + seller_attribute
+            filter_statement = filter_statement + ')'
 
         # 필터링 구문 종합 상품 등록일 내림차순
         filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC;' 
+
         # 리스트 조회 쿼리에서 반환된 row의 개수를 담는다
-        cursor.execute(products_list_sql + filter_statement)
+        cursor.execute(products_list_sql + filter_statement)        
 
         # 상품 리스트와 상품의 개수를 return
         return cursor.fetchall()
@@ -429,20 +440,20 @@ class ProductDao:
         """
 
         # 필터링 구문
-        filter_statement = ""
+        filter_statement = "" 
 
         # 셀러명이 포함된 검색기능
         if 'user' in filters:
             filter_statement = filter_statement + " AND seller_keys.user LIKE '%" + filters['user'] + "%'"
         # 상품명이 포함된 검색기능
         if 'product_name' in filters:
-            filter_statement = filter_statement + " AND products.name LIKE '%" + filters['user'] + "%'"
+            filter_statement = filter_statement + " AND products.name LIKE '%" + filters['product_name'] + "%'"
         # 상품 코드
         if 'product_code' in filters:
             filter_statement = filter_statement + ' AND product_keys.product_number=' + "'" + filters['product_code'] + "'"
-        # 셀러 속성
-        if 'seller_attribute_id' in filters:
-            filter_statement = filter_statement + ' AND sellers.seller_attribute_id=' + filters['seller_attribute_id']
+        # 상품 번호 (product pk)    
+        if 'product_number' in filters:
+            filter_statement = filter_statement + ' AND product_keys.id=' + "'" + filters['product_number'] + "'"
         # 판매 여부
         if 'is_onsale' in filters:
             filter_statement = filter_statement + ' AND products.is_onsale=' + filters['is_onsale']
@@ -452,8 +463,22 @@ class ProductDao:
         # 할인 여부
         if 'is_discount' in filters:
             filter_statement = filter_statement + ' AND (products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end)=' + filters['is_discount']
+        # 셀러 속성
+        if 'seller_attribute_id' in filters:
+            # 셀러 속성 ID를 모두 가져온다
+            seller_attributes = filters.getlist('seller_attribute_id')
+            filter_statement = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
+            # 다중 셀러 속성 필터링 구문 추가
+            for seller_attribute in seller_attributes:
+                filter_statement = filter_statement + ' OR sellers.seller_attribute_id = ' + seller_attribute
+            filter_statement = filter_statement + ')'
+
+        # 필터링 구문 종합 상품 등록일 내림차순
+        filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC;'
     
         cursor.execute(products_list_sql + filter_statement)
+        # 필터링된 상품의 개수를 return 
+        return cursor.fetchone()[0]
 
     def get_product_previous_id(self, product_key_id, db_connection):
         # 가장 최근에 수정된 레코드의 id를 가져온다
@@ -652,4 +677,3 @@ class ProductDao:
         WHERE id = %(product_id)s
         """
         cursor.execute(update_product_sql, product)
-

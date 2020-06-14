@@ -243,11 +243,10 @@ class ProductService:
 
     def get_product_list(self, filters, db_connection):
         try:
-            #상품 리스트, 상품 개수 unpacking
             products = self.product_dao.get_productlist(filters, db_connection)
             count    = self.product_dao.get_product_count(filters, db_connection)
 
-            #product_count : 검색된 상품의 개수
+            #product_count : 검색된 상품의 개수 
             #products      : 상품 리스트            
             return {
                 'product_count' : count,
@@ -281,3 +280,4 @@ class ProductService:
             self.config['S3']['S3_BUCKET'],
             "image_large"
         )
+
