@@ -436,7 +436,7 @@ class UserDao:
         # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
         if filters is not None:
             for k, v in filters.items():
-                if k == 'sellers.id':
+                if k == 'sellers.id' or k == 'seller_keys.id':
                     statement += f" AND {k} = {v}"
                 statement += f" AND {k} LIKE '%{v}%'"
 

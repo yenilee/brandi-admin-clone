@@ -491,10 +491,10 @@ product_register_schema = {
     "properties": {
         "color_filter_id": {
             "$id": "#/properties/color_filter_id",
-            "type": "integer",
+            "type": ["integer", "null"],
             "title": "The color_filter_id schema",
             "description": "An explanation about the purpose of this instance.",
-            "default": 0,
+            "default": None,
             "examples": [
                 2
             ]
