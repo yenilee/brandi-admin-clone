@@ -1,10 +1,4 @@
-import pymysql
-import json
-# import boto3
-
-from collections   import defaultdict
-# from PIL         import Image
-# from config      import S3
+from const import AUTH
 
 class ProductService:
 
@@ -20,7 +14,7 @@ class ProductService:
     def get_sellers_for_master(self, auth, filters, db_connection):
         try:
             # 권한 ID가 마스터가 아닐 경우 권한 없음 에러 메시지 표시
-            if auth is not 1:
+            if auth is not AUTH['MASTER']:
                 return {'message': 'UNAUTHORIZED'}, 401
 
             # 셀러 권한 ID들의 한국 이름, 프로필 불러오기
@@ -115,6 +109,11 @@ class ProductService:
 
     def create_new_product(self, product, seller_key_id, db_connection):
         try:
+            # 할인율은 명시되었는데 기간이 없을 때, 에러 메시지를 띄워줌
+            if product['discount_rate'] is not None:
+                if product['discount_start'] is None or product['discount_end'] is None:
+                    return {'message' : 'DISCOUNT PERIOD NEEDED'}
+
             # request value 중 option은 리스트 안에 딕셔너리가 여러개 있는 형태이므로, 우선 제외하고 데이터 insert
             options = product.pop('options', None)
 
@@ -127,7 +126,11 @@ class ProductService:
 
             # 상세 상품 정보에 기입하지 않고 직접 등록할 경우 제조 관련 정보를 field(3개) insert
             if product['is_detail_reference'] is 0:
-                product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
+                notice_id_check = self.product_dao.select_notices_id(product['manufacture'], db_connection)
+
+                if notice_id_check is 0:
+                    product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
+                product['notices_id'] = notice_id_check
 
             # 셀러 속성 값에 따른 셀러 속성 그룹, 속성 그룹 id+카테고리 id 조합을 변수에 저장
             product['attribute_group_id'] = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
@@ -234,6 +237,21 @@ class ProductService:
             [self.product_dao.insert_product_tags(product_id, tag_id, db_connection) for tag_id in tags]
 
             return "", 200
+
+        except KeyError as e:
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def get_product_history(self, product_key_id, db_connection):
+        try:
+            product_history = self.product_dao.get_product_history(product_key_id, db_connection)
+
+            if product_history is 0:
+                return {'message' : 'PRODUCT DOES NOT EXIST'}
+
+            return {'history' : product_history}
 
         except KeyError as e:
             return {'message': 'KEY_ERROR' + str(e)}, 400

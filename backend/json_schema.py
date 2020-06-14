@@ -838,3 +838,340 @@ product_list_queryset_schema = {
         }
     }
 }
+
+product_register_schema_2 = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "seller_key_id": 18,
+            "is_onsale": 1,
+            "is_displayed": 1,
+            "color_filter_id": 1,
+            "first_category_id": 15,
+            "second_category_id": 1,
+            "is_detail_reference": 0,
+            "manufacture": {
+                "manufacturer": "예은",
+                "manufacture_date": "2020-05-15",
+                "origin": "중국"
+            },
+            "name": "청바지",
+            "simple_description": "편해요",
+            "details": "뛰어다닐 수 있어요",
+            "options": [
+                {
+                    "size_id": 5,
+                    "color_id": 4,
+                    "quantity": 88
+                },
+                {
+                    "size_id": 6,
+                    "color_id": 1,
+                    "quantity": 3
+                }
+            ],
+            "wholesale_price": 30000,
+            "price": 68000,
+            "discount_rate": 10,
+            "discount_start": "2020-06-01 08:30:00",
+            "discount_end": "2020-06-03 23:59:59",
+            "maximum_quantity": 1000,
+            "minimum_quantity": 40,
+            "tags": [
+                "태그88",
+                "태그97",
+                "태그94"
+            ]
+        }
+    ],
+    "required": [
+        "seller_key_id",
+        "is_onsale",
+        "is_displayed",
+        "first_category_id",
+        "second_category_id",
+        "is_detail_reference",
+        "name",
+        "simple_description",
+        "details",
+        "options",
+        "wholesale_price",
+        "price",
+        "discount_rate",
+        "discount_start",
+        "discount_end",
+        "maximum_quantity",
+        "minimum_quantity",
+        "tags"
+    ],
+    "additionalProperties": True,
+    "properties": {
+        "seller_key_id": {
+            "$id": "#/properties/seller_key_id",
+            "type": "integer",
+            "title": "The seller_key_id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                18
+            ]
+        },
+        "is_onsale": {
+            "$id": "#/properties/is_onsale",
+            "type": "integer",
+            "title": "The is_onsale schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "is_displayed": {
+            "$id": "#/properties/is_displayed",
+            "type": "integer",
+            "title": "The is_displayed schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "color_filter_id": {
+            "$id": "#/properties/color_filter_id",
+            "type": ["integer", "null"],
+            "title": "The color_filter_id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "null",
+        },
+        "first_category_id": {
+            "$id": "#/properties/first_category_id",
+            "type": "integer",
+            "title": "The first_category_id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                15
+            ]
+        },
+        "second_category_id": {
+            "$id": "#/properties/second_category_id",
+            "type": "integer",
+            "title": "The second_category_id schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                1
+            ]
+        },
+        "is_detail_reference": {
+            "$id": "#/properties/is_detail_reference",
+            "type": "integer",
+            "title": "The is_detail_reference schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0
+            ]
+        },
+        "manufacture": {
+            "$id": "#/properties/manufacture",
+            "type": "object",
+            "title": "The manufacture schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": {},
+            "examples": [
+                {
+                    "manufacturer": "예은",
+                    "manufacture_date": "2020-05-15",
+                    "origin": "중국"
+                }
+            ],
+            "required": [
+                "manufacturer",
+                "manufacture_date",
+                "origin"
+            ],
+            "additionalProperties": True,
+            "properties": {
+                "manufacturer": {
+                    "$id": "#/properties/manufacture/properties/manufacturer",
+                    "type": "string",
+                    "title": "The manufacturer schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "예은"
+                    ]
+                },
+                "manufacture_date": {
+                    "$id": "#/properties/manufacture/properties/manufacture_date",
+                    "type": "string",
+                    "title": "The manufacture_date schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "2020-05-15"
+                    ]
+                },
+                "origin": {
+                    "$id": "#/properties/manufacture/properties/origin",
+                    "type": "string",
+                    "title": "The origin schema",
+                    "description": "An explanation about the purpose of this instance.",
+                    "default": "",
+                    "examples": [
+                        "중국"
+                    ]
+                }
+            }
+        },
+        "name": {
+            "$id": "#/properties/name",
+            "type": "string",
+            "title": "The name schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "청바지"
+            ]
+        },
+        "simple_description": {
+            "$id": "#/properties/simple_description",
+            "type": "string",
+            "title": "The simple_description schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "편해요"
+            ]
+        },
+        "details": {
+            "$id": "#/properties/details",
+            "type": "string",
+            "title": "The details schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": "",
+            "examples": [
+                "뛰어다닐 수 있어요"
+            ]
+        },
+        "options": {
+            "$id": "#/properties/options",
+            "type": "array",
+            "title": "The options schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "size_id": 5,
+                        "color_id": 4,
+                        "quantity": 88
+                    },
+                    {
+                        "size_id": 6,
+                        "color_id": 1,
+                        "quantity": 3
+                    }
+                ]
+            ],
+            "additionalItems": True,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/options/items/anyOf/0",
+                        "type": "object",
+                        "default": {},
+                        "examples": [
+                            {
+                                "size_id": 5,
+                                "color_id": 4,
+                                "quantity": 88
+                            }
+                        ],
+                        "required": [
+                            "size_id",
+                            "color_id",
+                            "quantity"
+                        ],
+                        "additionalProperties": True,
+                        "properties": {
+                            "size_id": {
+                                "$id": "#/properties/options/items/anyOf/0/properties/size_id",
+                                "type": "integer",
+                                "default": 0
+                            },
+                            "color_id": {
+                                "$id": "#/properties/options/items/anyOf/0/properties/color_id",
+                                "type": "integer",
+                                "default": 0
+                            },
+                            "quantity": {
+                                "$id": "#/properties/options/items/anyOf/0/properties/quantity",
+                                "type": "integer",
+                                "default": 0
+                            }
+                        }
+                    }
+                ],
+                "$id": "#/properties/options/items"
+            }
+        },
+        "wholesale_price": {
+            "$id": "#/properties/wholesale_price",
+            "type": ["integer", "null"],
+            "default": 0,
+        },
+        "price": {
+            "$id": "#/properties/price",
+            "type": "integer",
+            "default": 0,
+        },
+        "discount_rate": {
+            "$id": "#/properties/discount_rate",
+            "type": ["integer", "null"],
+            "default": 0,
+        },
+        "discount_start": {
+            "$id": "#/properties/discount_start",
+            "type": ["string", "null"],
+            "default": "",
+        },
+        "discount_end": {
+            "$id": "#/properties/discount_end",
+            "type": ["string", "null"],
+            "default": "",
+        },
+        "maximum_quantity": {
+            "$id": "#/properties/maximum_quantity",
+            "type": ["integer", "null"],
+            "default": 0,
+        },
+        "minimum_quantity": {
+            "$id": "#/properties/minimum_quantity",
+            "type": ["integer", "null"],
+            "default": 0,
+        },
+        "tags": {
+            "$id": "#/properties/tags",
+            "type": "array",
+            "default": [],
+            "additionalItems": True,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/tags/items/anyOf/0",
+                        "type": "string",
+                        "default": "",
+                    }
+                ],
+                "$id": "#/properties/tags/items"
+            }
+        }
+    }
+}
