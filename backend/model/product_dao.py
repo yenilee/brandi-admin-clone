@@ -55,6 +55,22 @@ class ProductDao:
 
         return notice_id
 
+    def select_notices_id(self, product_manufacturer, db_connection):
+        cursor = db_connection.cursor()
+        select_notice_sql = """
+        SELECT id 
+        FROM notices
+        WHERE manufacturer = %(manufacturer)s
+        AND manufacture_date = %(manufacture_date)s
+        AND origin = %(origin)s
+        """
+        affected_row = cursor.execute(select_notice_sql, product_manufacturer)
+        if affected_row == 0:
+            return 0
+
+        notices_id = cursor.fetchone()[0]
+        return notices_id
+
     def find_tags(self, tag_name, db_connection):
         cursor = db_connection.cursor()
 
@@ -156,6 +172,7 @@ class ProductDao:
 
     def insert_product(self, product, db_connection):
         cursor = db_connection.cursor()
+
         insert_product_sql = """
         INSERT INTO products(
             product_key_id,
@@ -191,7 +208,7 @@ class ProductDao:
                 "2037-12-31 23:59:59",
                 %(simple_description)s,
                 %(details)s,
-                (SELECT user FROM seller_keys WHERE id = %(seller_key_id)s),
+                (SELECT user FROM seller_keys WHERE id = %(editor)s),
                 %(maximum_quantity)s,
                 %(minimum_quantity)s,
                 %(discount_rate)s,
@@ -233,19 +250,25 @@ class ProductDao:
 
         return attribute_category_id
 
-    def get_sellers_for_master(self, db_connection):
+    def get_sellers_for_master(self, filters, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+
+        # 밑에서 추가할 SQL statement를 정의
+        statement = ""
+
+        # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
+        if filters is not None:
+            for k, v in filters.items():
+                statement += f" AND binary(sellers.name) LIKE N'%{v}%'"
 
         get_sellers_sql = """
         SELECT
             seller_keys.id AS seller_key_id,
-            sellers.name AS seller_name,
-            sellers.profile AS seller_profile_image
+            sellers.name AS seller_name
         FROM sellers
-        INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id
+        INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id     
         WHERE sellers.authority_id = 2 
-        AND sellers.end_date = '2037-12-31 23:59:59'
-        """
+        """ + statement + " AND sellers.end_date = '2037-12-31 23:59:59' ORDER BY sellers.name ASC LIMIT 10;"
 
         affected_row = cursor.execute(get_sellers_sql)
         if affected_row == 0:
@@ -260,11 +283,16 @@ class ProductDao:
         SELECT attribute_group_id
         FROM seller_attributes
         INNER JOIN sellers ON sellers.seller_attribute_id = seller_attributes.id
-        WHERE sellers.seller_key_id = %s
+        WHERE sellers.seller_key_id = %s AND end_date = '2037-12-31 23:59:59'
         """
-        cursor.execute(get_attribute_group_sql, seller_key_id)
-        attribute_group_id = cursor.fetchone()[0]
-        return attribute_group_id
+        affected_row = cursor.execute(get_attribute_group_sql, seller_key_id)
+
+        if affected_row == 0:
+            return 0
+
+        attribute_group_id = cursor.fetchone()
+
+        return attribute_group_id[0]
 
     def get_first_category(self, attribute_group_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
@@ -282,8 +310,23 @@ class ProductDao:
 
         return get_categories
 
+    def get_seller_attribute(self, seller_key_id, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_seller_attribute_sql = """
+        SELECT seller_attributes.id, seller_attributes.name 
+        FROM seller_attributes
+        INNER JOIN sellers ON sellers.seller_attribute_id = seller_attributes.id
+        WHERE sellers.seller_key_id = %s AND sellers.end_date = '2037-12-31 23:59:59'
+        """
+        affected_row = cursor.execute(get_seller_attribute_sql, seller_key_id)
+        if affected_row == 0:
+            return 0
+
+        return cursor.fetchone()
+
     def get_second_category(self, attribute_group_id, first_category_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+
         get_categories_sql = """
         SELECT DISTINCT
             second.id AS second_category_id,
@@ -449,7 +492,7 @@ class ProductDao:
         # 필터링된 상품의 개수를 return 
         return cursor.fetchone()[0]
 
-    def get_product_previous_id(self, product, db_connection):
+    def get_product_previous_id(self, product_key_id, db_connection):
         # 가장 최근에 수정된 레코드의 id를 가져온다
         cursor = db_connection.cursor()
         get_recent_product_id_sql = """
@@ -457,19 +500,28 @@ class ProductDao:
         FROM products
         WHERE product_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(get_recent_product_id_sql, product)
+        cursor.execute(get_recent_product_id_sql, product_key_id)
         return cursor.fetchone()[0]
 
-    def get_recent_product(self, product_previous_id, db_connection):
+    def get_recent_product(self, product_key_id, seller_key_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+
+        statement = ""
+
+        if seller_key_id is not None:
+            statement = " AND seller_keys.seller_key_id = %s "
+
         get_recent_product_sql = """
         SELECT
+            products.id,
             products.is_deleted,
             products.product_key_id,
             product_keys.product_number,
             products.name,
+            products.notices_id,
             products.is_onsale,
             products.is_displayed,
+            products.is_detail_reference,
             products.simple_description,
             products.details,
             products.wholesale_price,
@@ -482,57 +534,158 @@ class ProductDao:
             DATE_FORMAT(product_keys.created_at, '%%Y-%%m-%%d %%H:%%i:%%s') as created_at,
             DATE_FORMAT(products.start_date, '%%Y-%%m-%%d %%H:%%i:%%s') as start_date,
             DATE_FORMAT(products.end_date, '%%Y-%%m-%%d %%H:%%i:%%s') as end_date,
-            notices.manufacturer,
-            notices.manufacture_date,
-            notices.origin,
-            attributes_categories.id  as attribute_category_id,
-            products_tags.tag_id
+            first_categories.name as first_category,
+            second_categories.name as second_category
         FROM products
         INNER JOIN product_keys ON product_keys.id = products.product_key_id
-        INNER JOIN notices ON products.notices_id = notices.id
         INNER JOIN color_filters ON color_filters.id = products.color_filter_id
         INNER JOIN attributes_categories ON attributes_categories.id = products.attributes_categories_id
-        INNER JOIN products_tags ON products_tags.id = products.id 
-        WHERE products.id = %s
+        INNER JOIN first_categories ON first_categories.id = attributes_categories.first_category_id
+        INNER JOIN second_categories ON second_categories.id = attributes_categories.second_category_id
+        WHERE products.product_key_id = %s AND products.end_date = '2037-12-31 23:59:59'
+        """ + statement
+
+        if seller_key_id is not None:
+            affected_row = cursor.execute(get_recent_product_sql, (seller_key_id, product_key_id))
+
+        affected_row = cursor.execute(get_recent_product_sql, product_key_id)
+
+        if affected_row == 0:
+            return 0
+
+        return cursor.fetchall()[0]
+
+    def get_tag(self, product_id, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_tag_name_sql = """
+        SELECT tags.name
+        FROM tags
+        INNER JOIN products_tags ON products_tags.tag_id = tags.id 
+        WHERE products_tags.product_id = %s
         """
-        cursor.execute(get_recent_product_sql, product_previous_id)
+        affected_row = cursor.execute(get_tag_name_sql, product_id)
+        if affected_row == 0:
+            return 0
+
         return cursor.fetchall()
 
-    def update_recent_product_history(self, previous_id, db_connection):
-        # 이전의 셀러 레코드의 유효종료일을 현재 시점으로 업데이트
+    def get_recent_options(self, product_previous_id, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_recent_options_sql = """
+        SELECT
+            sizes.name as size,
+            colors.name as color,
+            products_options.quantity as quantity
+        FROM products_options
+        INNER JOIN sizes ON sizes.id = products_options.size_id
+        INNER JOIN colors ON colors.id = products_options.color_id
+        WHERE products_options.product_id = %s
+        """
+        cursor.execute(get_recent_options_sql, product_previous_id)
+        return cursor.fetchall()
+
+    def get_recent_manufacture(self, product_previous_id, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_recent_options_sql = """
+        SELECT
+            manufacturer,
+            DATE_FORMAT(manufacture_date,'%%Y-%%m-%%d %%H:%%i:%%s') as manufacture_date,
+            origin
+        FROM products
+        INNER JOIN notices ON products.notices_id = notices.id
+        WHERE products.id = %s
+        """
+        cursor.execute(get_recent_options_sql, product_previous_id)
+        return cursor.fetchall()
+
+    def update_product_history(self, product_previous_id, db_connection):
+        # 이전의 레코드의 유효종료일을 현재 시점으로 업데이트
         cursor = db_connection.cursor()
         update_product_end_date_sql = """
         UPDATE products
         SET end_date = now()
         WHERE id = %s;
         """
-        cursor.execute(update_product_end_date_sql, previous_id)
-        return cursor.fetchone[0]
+        cursor.execute(update_product_end_date_sql, product_previous_id)
+
+    def copy_previous_product(self, product_previous_id, db_connection):
+        cursor = db_connection.cursor()
+        copy_previous_product_sql = """
+        INSERT INTO products(
+            product_key_id,
+            notices_id,
+            attributes_categories_id,
+            color_filter_id,
+            is_displayed,
+            is_onsale,
+            name,
+            is_detail_reference,
+            start_date,
+            end_date,
+            simple_description,
+            details,
+            editor,
+            maximum_quantity,
+            minimum_quantity,
+            discount_rate,
+            price,
+            wholesale_price,
+            discount_start,
+            discount_end)
+        SELECT
+            product_key_id,
+            notices_id,
+            attributes_categories_id,
+            color_filter_id,
+            is_displayed,
+            is_onsale,
+            name,
+            is_detail_reference,
+            now(),
+            '2037-12-31 23:59:59',
+            simple_description,
+            details,
+            editor,
+            maximum_quantity,
+            minimum_quantity,
+            discount_rate,
+            price,
+            wholesale_price,
+            discount_start,
+            discount_end     
+        FROM products 
+        WHERE id = %s;
+        """
+        affected_row = cursor.execute(copy_previous_product_sql, product_previous_id)
+
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
+
+        recent_product_id = cursor.lastrowid
+
+        return recent_product_id
 
     def update_product(self, product, db_connection):
         cursor = db_connection.cursor()
         update_product_sql = """
         UPDATE products
         SET
-            %(notices_id)s,
-            %(attributes_categories_id)s,
-            %(color_filter_id)s,
-            %(is_displayed)s,
-            %(is_onsale)s,
-            %(name)s,
-            %(is_detail_reference)s,
-            %(start_date)s,
-            %(end_date)s,
-            %(simple_description)s,
-            %(details)s,
-            %(editor)s,
-            %(maximum_quantity)s,
-            %(minimum_quantity)s,
-            %(discount_rate)s,
-            %(price)s,
-            %(wholesale_price)s,
-            %(discount_start)s,
-            %(discount_end)s
-        WHERE product_key_id = % AND end_date = '2037-12-31 23:59:59'
+            color_filter_id = %(color_filter_id)s,
+            is_displayed = %(is_displayed)s,
+            is_onsale = %(is_onsale)s,
+            name = %(name)s,
+            is_detail_reference = %(is_detail_reference)s,
+            simple_description = %(simple_description)s,
+            details = %(details)s,
+            notices_id = %(notices_id)s,
+            editor = (SELECT user FROM seller_keys WHERE id = %(user)s),
+            maximum_quantity = %(maximum_quantity)s,
+            minimum_quantity = %(minimum_quantity)s,
+            discount_rate = %(discount_rate)s,
+            price = %(price)s,
+            wholesale_price = %(wholesale_price)s,
+            discount_start = %(discount_start)s,
+            discount_end = %(discount_end)s
+        WHERE id = %(product_id)s
         """
         cursor.execute(update_product_sql, product)

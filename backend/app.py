@@ -26,7 +26,7 @@ class CustomJSONEncoder(JSONEncoder):
 
 def create_app(test_config = None):
     app = Flask(__name__)
-    app.debug = True
+    # app.debug = True
     app.config['JSON_SORT_KEYS'] = False
     app.json_encoder = CustomJSONEncoder
     CORS(app, resources={r'*' : {'origins': '*'}})
