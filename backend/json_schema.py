@@ -1,3 +1,109 @@
+#셀러 회원가입 스키마
+seller_sign_up_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "examples": [
+        {
+            "user": "test3",
+            "seller_attribute_id": 3,
+            "password": "1q2w3e4r!",
+            "phone_number": "010-1111-2222",
+            "name": "테스트03",
+            "eng_name": "brandi",
+            "service_number": "010-1234-1234",
+            "site_url": "http://www.naver.com"
+        }
+    ],
+    "required": [
+        "user",
+        "seller_attribute_id",
+        "password",
+        "phone_number",
+        "name",
+        "eng_name",
+        "service_number",
+        "site_url"
+    ],
+    "additionalProperties": True,
+    "properties": {
+        "user": {
+            "$id": "#/properties/user",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "test3"
+            ],
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{4,20}$"
+        },
+        "seller_attribute_id": {
+            "$id": "#/properties/seller_attribute_id",
+            "type": "integer",
+            "default": 0,
+            "examples": [
+                3
+            ],
+            "maximum": 7,
+            "minimum": 1
+        },
+        "password": {
+            "$id": "#/properties/password",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "1q2w3e4r!"
+            ],
+            "pattern": "(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{7,20}$"
+        },
+        "phone_number": {
+            "$id": "#/properties/phone_number",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "010-1111-2222"
+            ],
+            "pattern": "\\d{3}-\\d{3,4}-\\d{4}$"
+        },
+        "name": {
+            "$id": "#/properties/name",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "테스트03"
+            ],
+            "pattern": "^[ㄱ-ㅣ가-힣-0-9A-Za-z]([0-9ㄱ-ㅣ가-힣A-Za-z]){0,20}$"
+        },
+        "eng_name": {
+            "$id": "#/properties/eng_name",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "brandi"
+            ],
+            "pattern": "^[a-z]*$"
+        },
+        "service_number": {
+            "$id": "#/properties/service_number",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "010-1234-1234"
+            ],
+            "pattern": "(02.{0}|^01.{1}|[0-9]{4})-([0-9]+)-([0-9]{4})"
+        },
+        "site_url": {
+            "$id": "#/properties/site_url",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "http://www.naver.com"
+            ],
+            "pattern": "(http|https):\\/\\/(\\w+:{0,1}\\w*@)?(\\S+)(:[0-9]+)?(\\/|\\/([\\w#!:.?+=&%@!\\-\\/].[^\\s]*$))?"
+        }
+    }
+}
+
 # 상품 등록 수정 parameter validation
 seller_register_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",

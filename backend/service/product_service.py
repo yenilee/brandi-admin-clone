@@ -178,19 +178,19 @@ class ProductService:
             db_connection.rollback()
             return {'message': 'TYPE ERROR' + str(e)}, 400
 
-    def get_product_list(self, filters, db_connection):
+    def get_product_list(self, seller_info, filters, db_connection):
         try:        
-            products = self.product_dao.get_productlist(filters, db_connection)
-            count    = self.product_dao.get_product_count(filters, db_connection)
+            products = self.product_dao.get_productlist(seller_info, filters, db_connection)
+            count    = self.product_dao.get_product_count(seller_info, filters, db_connection)
 
             #product_count : 검색된 상품의 개수 
             #products      : 상품 리스트            
             return {
                 'product_count' : count,
-                'products' : products}, 200
+                'products'      : products}, 200
 
         except KeyError:           
             return {'message': 'KEY_ERROR'}, 400
 
-        except TypeError:            
-            return {'message': 'TYPE ERROR'}, 400
+        except TypeError as e:            
+            return {'message': 'TYPE ERROR' + str(e)}, 400

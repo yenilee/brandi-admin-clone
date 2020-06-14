@@ -190,20 +190,21 @@ def create_product_endpoints(app, product_service):
         unauthorized : {"message" : "UNAUTHORIZED"} code : 401
         """
 
-        #데코레이터를 통해 마스터 권한 확인 
-        if g.auth is not 1:
-            return {'message' : 'UNAUTHORIZED'}, 401
-
         db_connection = None
         try:
             #필터 query string validation
             filters = request.args
             #필터 query string validation
-            validate(filters, product_list_queryset_schema)            
+            validate(filters, product_list_queryset_schema)
+
+            #사용자의 권한과 고유 ID를 담아준다
+            seller_info = {} 
+            seller_info['auth'] = g.auth
+            seller_info['seller_key_id'] = g.user            
      
             db_connection = get_connection()
             if db_connection:                
-                products_list_response = product_service.get_product_list(filters, db_connection)
+                products_list_response = product_service.get_product_list(seller_info, filters, db_connection)
                 return products_list_response
 
         except ValidationError as e:

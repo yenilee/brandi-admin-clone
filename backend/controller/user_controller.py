@@ -1,13 +1,16 @@
 import pymysql
 
 from jsonschema      import validate, ValidationError
-
 from flask           import request, g
 from connection      import get_connection
-from utils           import authorize
-from json_schema     import seller_register_schema, seller_action_schema
-from flask           import request
 
+from utils           import authorize
+from json_schema     import (
+    seller_register_schema,
+    seller_action_schema,
+    seller_sign_up_schema
+    )
+from const           import AUTH
 
 def create_user_endpoints(app, user_service):
     user_service = user_service
@@ -49,11 +52,17 @@ def create_user_endpoints(app, user_service):
             db_connection = get_connection()
             new_user = request.json
 
+            #회원가입 형식 유효성 검사
+            validate(new_user, seller_sign_up_schema)
+
             if db_connection:
                 sign_up_response = user_service.sign_up_seller(new_user, db_connection)
                 db_connection.commit()
 
                 return sign_up_response
+
+        except ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
         except pymysql.err.InternalError:
 
@@ -364,7 +373,7 @@ def create_user_endpoints(app, user_service):
         
         try: 
             #권한이 마스터가 아니면 UNAUTHORIZED return 
-            if g.auth is not 1:
+            if g.auth is not AUTH['MASTER']:
                 return {'message' : 'UNAUTHORIZED'}, 401
 
             validate(seller_infos, seller_register_schema)
@@ -437,7 +446,7 @@ def create_user_endpoints(app, user_service):
             if db_connection: 
                 
                 #권한이 마스터가 아니면 UNAUTHORIZED return 
-                if g.auth is not 1:
+                if g.auth is not AUTH['MASTER']:
                     return {'message' : 'UNAUTHORIZED'}, 401   
 
                 seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
