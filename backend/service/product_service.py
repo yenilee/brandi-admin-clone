@@ -1,6 +1,6 @@
 import pymysql
 import json
-import boto3
+# import boto3
 
 from collections   import defaultdict
 # from PIL         import Image
@@ -16,6 +16,102 @@ class ProductService:
         #     aws_access_key_id     = S3['S3_ACCESS_KEY'],
         #     aws_secret_access_key = S3['S3_SECRET_KEY']
         # )
+
+    def get_sellers_for_master(self, auth, filters, db_connection):
+        try:
+            # 권한 ID가 마스터가 아닐 경우 권한 없음 에러 메시지 표시
+            if auth is not 1:
+                return {'message': 'UNAUTHORIZED'}, 401
+
+            # 셀러 권한 ID들의 한국 이름, 프로필 불러오기
+            sellers_kor_names = self.product_dao.get_sellers_for_master(filters, db_connection)
+            return sellers_kor_names
+
+        except KeyError as e:
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def registration_page_color_filter(self, db_connection):
+        try:
+            # 색상 필터 id, 이름, 이미지 url 불러오기
+            color_filters = self.product_dao.get_color_filters(db_connection)
+            return color_filters
+
+        except KeyError as e:
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def registration_page_options(self, db_connection):
+        try:
+            # 색상 선택지, 사이즈 선택지 불러오기
+            colors = self.product_dao.get_colors(db_connection)
+            sizes = self.product_dao.get_sizes(db_connection)
+
+            return {'option_color'     : colors,
+                    'option_size'      : sizes}
+
+        except KeyError as e:
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def get_attribute_id(self, seller_key_id, db_connection):
+        try:
+            attribute_id = self.product_dao.get_seller_attribute(seller_key_id, db_connection)
+
+            return attribute_id
+
+        except KeyError:
+            return {'message': 'KEY_ERROR'}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def get_first_category(self, seller_key_id, db_connection):
+        try:
+            # 셀러 속성 정보를 기반으로 상품 속성 그룹을 불러오기
+            attribute_group_id = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
+
+            # 셀러 속성 그룹 ID를 선택했을 때 보여지는 1차 카테고리 불러오기
+            categories = self.product_dao.get_first_category(attribute_group_id, db_connection)
+
+            first_categories = [
+                {'id': category['first_category_id'],
+                 'name': category['first_category_name']
+                 } for category in categories]
+
+            return first_categories
+
+        except KeyError as e:
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def get_second_category(self, seller_key_id, first_category_id, db_connection):
+        try:
+            # 셀러 속성 정보를 기반으로 속성 그룹 ID를 불러오기
+            attribute_group_id = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
+
+            # request body에 저장된 1차 카테고리, 위에서 가져온 상품 속성 그룹을 넣어 2차 카테고리 불러오기
+            categories = self.product_dao.get_second_category(attribute_group_id, first_category_id, db_connection)
+
+            second_categories = [
+                {'id': category['second_category_id'],
+                 'name': category['second_category_name']} for category in categories]
+
+            return {'second_categories':second_categories}, 200
+
+        except KeyError as e:
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
 
     def create_new_product(self, product, seller_key_id, db_connection):
         try:
@@ -66,120 +162,87 @@ class ProductService:
             db_connection.rollback()
             return {'message': 'TYPE ERROR' + str(e)}, 400
 
-    def update_product(self, product_key_id, db_connection):
+    def get_product(self, product_key_id, seller_key_id, db_connection):
         try:
+            # 셀러가 가진 상품 key ID를 찾고, 선분 이력으로 가장 최근에 저장된 상품 ID를 가져옴
+            recent_product = self.product_dao.get_recent_product(product_key_id, seller_key_id, db_connection)
+
+            # 만약 리턴되는 ID가 없을 경우, DB에 없는 상품이므로 선택되지 않았다는 메시지를 보내줌
+            if recent_product is 0:
+                return {'message' : 'NO PRODUCT SELECTED'}, 400
+
+            # DB에서 불러온 최근 상품의 id를 변수에 저장
+            recent_product_id = recent_product['id']
+
+            recent_product['options'] = self.product_dao.get_recent_options(recent_product_id, db_connection)
+
+            if recent_product['is_detail_reference'] == 0:
+                recent_product['notices'] = self.product_dao.get_recent_manufacture(recent_product_id, db_connection)
+
+            tags = self.product_dao.get_tag(recent_product_id, db_connection)
+            tag_list = []
+
+            [tag_list.append(tag['name']) for tag in tags]
+            recent_product['tags'] = tag_list
+
+            return {'product_detail' : recent_product}, 200
+
+        except KeyError as e:
+            return {'message': 'KEY_ERROR' + str(e)}, 400
+
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def update_product(self, product_key_id, product, db_connection):
+        try:
+            options = product.pop('options', None)
+
+            # 상품 key id로 최근에 수정한 상품 id를 가져온다
             product_previous_id = self.product_dao.get_product_previous_id(product_key_id, db_connection)
-            recent_product_id = self.product_dao.get_recent_product(product_previous_id, db_connection)
 
-            self.product_dao.update_recent_product_history(recent_product_id, db_connection)
+            # 최근에 수정한 상품의 종료일을 바꿔준다
+            self.product_dao.update_product_history(product_previous_id, db_connection)
 
-            return recent_product_id
+            # 최근 상품 id의 내용을 그대로 가져와서 새로운 상품 id로 row를 추가해준다
+            product['product_id'] = self.product_dao.copy_previous_product(product_previous_id, db_connection)
+            product_id = product['product_id']
+
+            # 상세 상품 정보에 기입하지 않고 직접 등록할 경우 제조 관련 정보를 field(3개) insert
+            notices_id = self.product_dao.select_notices_id(product['manufacture'], db_connection)
+            product['notices_id'] = notices_id
+
+            if notices_id is 0:
+                product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
+
+            # request로 받아온 상품 정보를 업데이트 한다
+            self.product_dao.update_product(product, db_connection)
+
+            # product id를 options의 각 딕셔너리에 담고, option 조합 db에 추가
+            for option in options:
+                option['product_id'] = product_id
+
+            self.product_dao.insert_options(options, db_connection)
+
+            # tag가 db에 없을 경우 db에 태그를 추가한 뒤 id를 받고, 있을 경우 id를 찾아서 tag_id 리스트에 추가함
+            tags = []
+            for tag_name in product['tags']:
+                if self.product_dao.find_tags(tag_name, db_connection) == 0:
+                    tags.append(self.product_dao.insert_tags(tag_name, db_connection))
+                tags.append(self.product_dao.find_tags(tag_name, db_connection))
+
+            # db에 있는 태그의 id, 혹은 새로 받은 태그의 id를 상품 & 태그 조합 테이블에 추가
+            [self.product_dao.insert_product_tags(product_id, tag_id, db_connection) for tag_id in tags]
+
+            return "", 200
 
         except KeyError as e:
-            db_connection.rollback()
             return {'message': 'KEY_ERROR' + str(e)}, 400
 
         except TypeError as e:
-            db_connection.rollback()
-            return {'message': 'TYPE ERROR' + str(e)}, 400
-
-    def get_sellers_for_master(self, auth, db_connection):
-        try:
-            # 권한 ID가 마스터가 아닐 경우 권한 없음 에러 미시지 표시
-            if auth is not 1:
-                return {'message': 'UNAUTHORIZED'}, 401
-
-            # 셀러 권한 ID들의 한국 이름, 프로필 불러오기
-            sellers_kor_names = self.product_dao.get_sellers_for_master(db_connection)
-            return sellers_kor_names
-
-        except KeyError as e:
-            db_connection.rollback()
-            return {'message': 'KEY_ERROR' + str(e)}, 400
-
-        except TypeError as e:
-            return {'message': 'TYPE ERROR' + str(e)}, 400
-
-    def get_register_page(self, seller_key_id, db_connection):
-        try:
-            # 셀러 속성 정보를 기반으로 상품 속성 그룹을 불러오기
-            attribute_group_id = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
-
-            # 셀러 속성 그룹 ID를 선택했을 때 보여지는 1차 카테고리 불러오기
-            categories = self.product_dao.get_first_category(attribute_group_id, db_connection)
-
-            first_categories = [
-                {'id' : category['first_category_id'],
-                 'name' : category['first_category_name']
-            } for category in categories ]
-
-            # 색상 필터 id, 이름, 이미지 url 불러오기
-            color_filters = self.product_dao.get_color_filters(db_connection)
-
-            # 색상 선택지, 사이즈 선택지 불러오기
-            colors = self.product_dao.get_colors(db_connection)
-            sizes = self.product_dao.get_sizes(db_connection)
-
-            return {'first_categories' : first_categories,
-                    'color_filters'    : color_filters,
-                    'option_color'     : colors,
-                    'option_size'      : sizes}
-
-        except KeyError as e:
-            db_connection.rollback()
-            return {'message': 'KEY_ERROR' + str(e)}, 400
-
-        except TypeError as e:
-            db_connection.rollback()
-            return {'message': 'TYPE ERROR' + str(e)}, 400
-
-    def resize_image(self, image_url, db_connection):
-
-        IMAGE_SMALL  = (150, 150)
-        IMAGE_MEDIUM = (320, 320)
-        IMAGE_LARGE  = (640, 640)
-
-        image = Image.open(image_url)
-
-        image_large  = image.resize(IMAGE_LARGE)
-        image_medium = image.resize(IMAGE_MEDIUM)
-        image_small  = image.resize(IMAGE_SMALL)
-
-        filename = 'test'
-        # image_large.show()
-        # image_medium.show()
-        # image_small.show()
-       
-        self.s3.upload_file(
-            image_url,
-            self.config['S3']['S3_BUCKET'],
-            "image_large"
-        )
-
-    def get_second_category(self, seller_key_id, first_category_id, db_connection):
-        try:
-            # 셀러 속성 정보를 기반으로 속성 그룹 IDfmf 불러오기
-            attribute_group_id = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
-
-            # request body에 저장된 1차 카테고리, 위에서 가져온 상품 속성 그룹을 넣어 2차 카테고리 불러오기
-            categories = self.product_dao.get_second_category(attribute_group_id, first_category_id, db_connection)
-
-            second_categories = [
-                {'id': category['second_category_id'],
-                 'name': category['second_category_name']} for category in categories]
-
-            return {'second_categories':second_categories}, 200
-
-        except KeyError as e:
-            db_connection.rollback()
-            return {'message': 'KEY_ERROR' + str(e)}, 400
-
-        except TypeError as e:
-            db_connection.rollback()
             return {'message': 'TYPE ERROR' + str(e)}, 400
 
     def get_product_list(self, filters, db_connection):
-        try:        
+        try:
             products = self.product_dao.get_productlist(filters, db_connection)
             count    = self.product_dao.get_product_count(filters, db_connection)
 
@@ -192,5 +255,29 @@ class ProductService:
         except KeyError:           
             return {'message': 'KEY_ERROR'}, 400
 
-        except TypeError:            
-            return {'message': 'TYPE ERROR'}, 400
+        except TypeError as e:            
+            return {'message': 'TYPE ERROR' + str(e)}, 400
+
+    def resize_image(self, image_url, db_connection):
+
+        IMAGE_SMALL = (150, 150)
+        IMAGE_MEDIUM = (320, 320)
+        IMAGE_LARGE = (640, 640)
+
+        image = Image.open(image_url)
+
+        image_large = image.resize(IMAGE_LARGE)
+        image_medium = image.resize(IMAGE_MEDIUM)
+        image_small = image.resize(IMAGE_SMALL)
+
+        filename = 'test'
+        # image_large.show()
+        # image_medium.show()
+        # image_small.show()
+
+        self.s3.upload_file(
+            image_url,
+            self.config['S3']['S3_BUCKET'],
+            "image_large"
+        )
+
