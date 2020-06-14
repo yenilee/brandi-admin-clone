@@ -689,3 +689,22 @@ class ProductDao:
         WHERE id = %(product_id)s
         """
         cursor.execute(update_product_sql, product)
+
+    def get_product_history(self, product_key_id, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_product_history_sql = """
+        SELECT 
+            DATE_FORMAT(start_date, '%%Y-%%m-%%d %%H:%%i:%%s') as start_date,
+            is_onsale, 
+            is_displayed, 
+            price, 
+            discount_rate, 
+            editor
+        FROM products 
+        WHERE products.product_key_id = %s
+        """
+        affected_row = cursor.execute(get_product_history_sql, product_key_id)
+        if affected_row == 0:
+            return 0
+
+        return cursor.fetchall()
