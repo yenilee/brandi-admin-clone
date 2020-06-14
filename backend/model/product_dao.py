@@ -412,19 +412,18 @@ class ProductDao:
         # 할인 여부
         if 'is_discount' in filters:
             filter_statement = filter_statement + ' AND (products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end)=' + filters['is_discount']
-        # 셀러 속성
+         # 셀러 속성
         if 'seller_attribute_id' in filters:
             # 셀러 속성 ID를 모두 가져온다
-            seller_attributes = filters.getlist('seller_attribute_id')
-            filter_statement  = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
-            # 다중 셀러 속성 필터링 구문 추가
-            for seller_attribute in seller_attributes:
-                filter_statement = filter_statement + ' OR sellers.seller_attribute_id = ' + seller_attribute
-            filter_statement = filter_statement + ')'
+            seller_attributes = filters.getlist('seller_attribute_id', type = int)
+            # 한개의 셀러 속성 필터링 구문 추가 
+            if len(seller_attributes) is 1:
+                filter_statement = filter_statement + " AND sellers.seller_attribute_id=" + str(seller_attributes[0])
+            # 여러개의 셀러 속성 필터링 구문 추가 
+            else:                 
+                filter_statement  = filter_statement + " AND sellers.seller_attribute_id IN " + str(tuple(seller_attributes))
 
-        print(filter_statement)
-
-        # 필터링 구문 종합 상품 등록일 내림차순
+        # 상품 등록일 내림차순
         filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC;' 
 
         # 리스트 조회 쿼리에서 반환된 row의 개수를 담는다
@@ -475,17 +474,18 @@ class ProductDao:
         # 할인 여부
         if 'is_discount' in filters:
             filter_statement = filter_statement + ' AND (products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end)=' + filters['is_discount']
-        # 셀러 속성
+         # 셀러 속성
         if 'seller_attribute_id' in filters:
             # 셀러 속성 ID를 모두 가져온다
-            seller_attributes = filters.getlist('seller_attribute_id')
-            filter_statement  = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
-            # 다중 셀러 속성 필터링 구문 추가
-            for seller_attribute in seller_attributes:
-                filter_statement = filter_statement + ' OR sellers.seller_attribute_id = ' + seller_attribute
-            filter_statement = filter_statement + ')'
+            seller_attributes = filters.getlist('seller_attribute_id', type = int)
+            # 한개의 셀러 속성 필터링 구문 추가 
+            if len(seller_attributes) is 1:
+                filter_statement = filter_statement + " AND sellers.seller_attribute_id=" + str(seller_attributes[0])
+            # 여러개의 셀러 속성 필터링 구문 추가 
+            else:                 
+                filter_statement  = filter_statement + " AND sellers.seller_attribute_id IN " + str(tuple(seller_attributes))
 
-        # 필터링 구문 종합 상품 등록일 내림차순
+        # 상품 등록일 내림차순
         filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC;'
     
         cursor.execute(products_list_sql + filter_statement)
