@@ -60,7 +60,8 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
 
         check_user_sql = """
-        SELECT COUNT(user) AS count
+        SELECT
+            COUNT(user) AS count
         FROM seller_keys
         WHERE user = %(user)s
         """
@@ -163,10 +164,10 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         supervisor_infos_get_sql = """
         SELECT 
-        name as supervisor_name,
-        phone_number as supervisor_phone_number,
-        email as supervisor_email,
-        `order`
+            name as supervisor_name,
+            phone_number as supervisor_phone_number,
+            email as supervisor_email,
+            `order`
         FROM supervisor_infos
         WHERE seller_id = (SELECT id FROM sellers WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59');
         """
@@ -178,12 +179,12 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         buisness_hours_get_sql = """
         SELECT
-        id,
-        seller_id,
-        TIME_FORMAT(start_time, '%%H:%%i:%%s') AS start_time,
-        TIME_FORMAT(end_time, '%%H:%%i:%%s') AS end_time,
-        is_weekend,
-        is_deleted
+            id,
+            seller_id,
+            TIME_FORMAT(start_time, '%%H:%%i:%%s') AS start_time,
+            TIME_FORMAT(end_time, '%%H:%%i:%%s') AS end_time,
+            is_weekend,
+            is_deleted
         FROM buisness_hours
         WHERE seller_id = (SELECT id FROM sellers WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59');
         """
@@ -195,9 +196,9 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         seller_histories_get_sql = """
         SELECT
-        DATE_FORMAT(MAX(start_date), '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
-        status.name,
-        sellers.editor AS editor
+            DATE_FORMAT(MAX(start_date), '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
+            status.name,
+            sellers.editor AS editor
         FROM
         sellers
         INNER JOIN seller_status AS status ON sellers.seller_status_id = status.id
