@@ -441,8 +441,8 @@ def create_product_endpoints(app, product_service):
         except pymysql.err.OperationalError:
             return {'message': 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
+        except pymysql.err.ProgrammingError as e:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
