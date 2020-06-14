@@ -274,7 +274,7 @@ export default {
 
   methods: {
     lengthCheck: function(index) {
-      this.searchDatas[index].id.lenght == 0
+      this.searchDatas[index].id.length == 0
         ? (this.searchDatas[index].state = false)
         : (this.searchDatas[index].state = true);
     },

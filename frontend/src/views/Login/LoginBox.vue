@@ -48,7 +48,7 @@
 
 <script>
 import axios from "axios";
-import { SJ_URL } from "../../config/urlConfig";
+import { SJ_URL, YE_URL } from "../../config/urlConfig";
 export default {
   data() {
     return {
@@ -73,7 +73,7 @@ export default {
 
       if (this.passwordState && this.loginState) {
         axios
-          .post(`${SJ_URL}/sign-in`, {
+          .post(`${YE_URL}/sign-in`, {
             method: "POST",
             user: this.loginValue,
             password: this.passwordValue
