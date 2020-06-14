@@ -197,12 +197,12 @@ class UserDao:
         SELECT
         DATE_FORMAT(MAX(start_date), '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
         status.name,
-        MAX(editor) AS editor
+        sellers.editor AS editor
         FROM
         sellers
         INNER JOIN seller_status AS status ON sellers.seller_status_id = status.id
         WHERE seller_key_id = %s
-        GROUP BY status.name
+        GROUP BY status.name, sellers.editor
         ORDER BY created_at
         """
         cursor.execute(seller_histories_get_sql, user)

@@ -12,43 +12,8 @@ class UserService:
         self.user_dao = user_dao
         self.config   = config
 
-    def check_sign_up_validations(self, new_user):
-            # 회원가입 request parameter 유효성 검사
-
-            #셀러 ID
-            if not re.match(r'^[A-Za-z0-9][A-Za-z0-9_-]{4,20}$', new_user['user']):
-                return {'message' : 'ID_VALIDATION_ERROR'}, 400
-
-            #비밀번호
-            if not re.match(r'(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{7,20}$', new_user['password']):
-                return {'message' : 'PASSWORD_VALIDATION_ERROR'}, 400
-
-            #핸드폰번호
-            if not re.match(r'\d{3}-\d{3,4}-\d{4}$', new_user['phone_number']):
-                return {'message' : 'PHONE_NUMBER_VALIDATION_ERROR'}, 400
-
-            #한글 이름
-            if not re.match(r'^[ㄱ-ㅣ가-힣-0-9A-Za-z]([0-9ㄱ-ㅣ가-힣A-Za-z]){0,20}$', new_user['name']):
-                return {'message' : 'SELLER_NAME_VALIDATION_ERROR'}, 400
-
-            #영문 이름
-            if not re.match(r'^[a-z]*$', new_user['eng_name']):
-                return {'message' : 'SELLER_ENGLISH_NAME_VALIDATION_ERROR'}, 400
-
-            #고객센터 전화번호
-            if not re.match(r'(02.{0}|^01.{1}|[0-9]{4})-([0-9]+)-([0-9]{4})', new_user['service_number']):
-                return {'message' : 'SERVICE_NUMBER_VALIDATION_ERROR'}, 400
-
-            #사이트 URL
-            if not re.match(r'(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/].[^\s]*$))?', new_user['site_url']):
-                return {'message' : 'SITE_URL_VALIDATION_ERROR'}, 400
-
     def sign_up_seller(self, new_user, db_connection):
         try:
-            # 회원가입 Validation 검사
-            if self.check_sign_up_validations(new_user):
-                return self.check_sign_up_validations(new_user)
-
             # 셀러 ID 중복체크 
             seller_id = self.user_dao.count_seller_id(new_user, db_connection)
             

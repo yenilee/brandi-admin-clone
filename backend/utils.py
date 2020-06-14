@@ -2,6 +2,7 @@ import jwt
 
 from functools import wraps
 from flask     import request, Response, g
+
 from config    import SECRET_KEY, ALGORITHM
 
 def authorize(f):

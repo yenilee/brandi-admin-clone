@@ -1,5 +1,7 @@
 import pymysql
 
+from const import AUTH
+
 class ProductDao:
 
     def insert_product_key(self, seller_key_id, db_connection):
@@ -354,33 +356,37 @@ class ProductDao:
         color_filters = cursor.fetchall()
         return color_filters
 
-    def get_productlist(self, filters, db_connection):
+    def get_productlist(self, seller_info, filters, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor) 
         # 필터링된 상품 리스트     
         # 할인가 할인줄일 때는 할인율 계산하는 로직을 짜서 구현, 할인중이 아닐때는 판매가로 
         products_list_sql = """
         SELECT
-        products.id,
-        product_keys.id AS product_keys_id,
-        DATE_FORMAT(product_keys.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,    
-        products.name AS name,
-        product_keys.product_number AS product_code,
-        seller_attributes.name AS seller_attributes_name,
-        seller_keys.user,        
-        products.price AS price, 
-        IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, CAST((products.price - (products.discount_rate / 100 * products.price)) AS signed), products.price) AS discount_price,
-        products.discount_rate,
-        is_onsale,
-        is_displayed,
-        IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, 1, 0) AS is_discount          
+            products.id,
+            product_keys.id AS product_keys_id,
+            DATE_FORMAT(product_keys.created_at, '%Y-%m-%d %H:%i:%s') AS created_at,    
+            products.name AS name,
+            product_keys.product_number AS product_code,
+            seller_attributes.name AS seller_attributes_name,
+            seller_keys.user,        
+            products.price AS price, 
+            IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, CAST((products.price - (products.discount_rate / 100 * products.price)) AS signed), products.price) AS discount_price,
+            products.discount_rate,
+            is_onsale,
+            is_displayed,
+            IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, 1, 0) AS is_discount          
         FROM
-        products
+            products
         INNER JOIN product_keys ON products.product_key_id = product_keys.id
         INNER JOIN seller_keys ON product_keys.seller_key_id = seller_keys.id      
         INNER JOIN sellers ON seller_keys.id = sellers.seller_key_id AND sellers.end_date = '2037-12-31 23:59:59'
         INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
         WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2   
         """
+
+        #셀러일 경우 본인의 상품만 보이도록 조건을 추가한다
+        if seller_info['auth'] is not AUTH['MASTER']:       
+            products_list_sql = products_list_sql + 'AND seller_keys.id =' + str(seller_info['seller_key_id'])       
 
         # 필터링 구문
         filter_statement = "" 
@@ -410,11 +416,13 @@ class ProductDao:
         if 'seller_attribute_id' in filters:
             # 셀러 속성 ID를 모두 가져온다
             seller_attributes = filters.getlist('seller_attribute_id')
-            filter_statement = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
+            filter_statement  = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
             # 다중 셀러 속성 필터링 구문 추가
             for seller_attribute in seller_attributes:
                 filter_statement = filter_statement + ' OR sellers.seller_attribute_id = ' + seller_attribute
             filter_statement = filter_statement + ')'
+
+        print(filter_statement)
 
         # 필터링 구문 종합 상품 등록일 내림차순
         filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC;' 
@@ -425,19 +433,23 @@ class ProductDao:
         # 상품 리스트와 상품의 개수를 return
         return cursor.fetchall()
         
-    def get_product_count(self, filters, db_connection):
+    def get_product_count(self, seller_info, filters, db_connection):
         # 필터링된 상품 개수
         cursor = db_connection.cursor()      
         products_list_sql = """
         SELECT
-        COUNT(products.id) AS product_count        
+            COUNT(products.id) AS product_count        
         FROM
-        products
+            products
         INNER JOIN product_keys ON products.product_key_id = product_keys.id
         INNER JOIN seller_keys ON product_keys.seller_key_id = seller_keys.id      
         INNER JOIN sellers ON seller_keys.id = sellers.seller_key_id AND sellers.end_date = '2037-12-31 23:59:59'
         WHERE products.end_date = '2037-12-31 23:59:59' AND authority_id = 2
         """
+
+        #셀러일 경우 본인 상품의 개수만 가져오도록 조건을 추가한다
+        if seller_info['auth'] is not AUTH['MASTER']:       
+            products_list_sql = products_list_sql + 'AND seller_keys.id =' + str(seller_info['seller_key_id'])    
 
         # 필터링 구문
         filter_statement = "" 
@@ -467,7 +479,7 @@ class ProductDao:
         if 'seller_attribute_id' in filters:
             # 셀러 속성 ID를 모두 가져온다
             seller_attributes = filters.getlist('seller_attribute_id')
-            filter_statement = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
+            filter_statement  = filter_statement + ' AND (sellers.seller_attribute_id = ' + seller_attributes[0]
             # 다중 셀러 속성 필터링 구문 추가
             for seller_attribute in seller_attributes:
                 filter_statement = filter_statement + ' OR sellers.seller_attribute_id = ' + seller_attribute
