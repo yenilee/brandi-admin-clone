@@ -130,7 +130,6 @@ class ProductService:
 
                 if notice_id_check is 0:
                     product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
-                product['notices_id'] = notice_id_check
 
             # 셀러 속성 값에 따른 셀러 속성 그룹, 속성 그룹 id+카테고리 id 조합을 변수에 저장
             product['attribute_group_id'] = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)

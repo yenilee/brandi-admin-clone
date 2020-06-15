@@ -160,8 +160,8 @@ class ProductDao:
             quantity
             ) VALUES (
             %(product_id)s,
-            %(size_id)s,
-            %(color_id)s,
+            (SELECT id FROM sizes WHERE name = %(size)s),
+            (SELECT id FROM colors WHERE name = %(color)s),
             %(quantity)s
             )
         """
@@ -235,6 +235,20 @@ class ProductDao:
 
         return cursor.fetchall()
 
+    def get_seller_attribute(self, seller_key_id, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+        get_seller_attribute_sql = """
+        SELECT seller_attributes.id, seller_attributes.name 
+        FROM seller_attributes
+        INNER JOIN sellers ON sellers.seller_attribute_id = seller_attributes.id
+        WHERE sellers.seller_key_id = %s AND sellers.end_date = '2037-12-31 23:59:59'
+        """
+        affected_row = cursor.execute(get_seller_attribute_sql, seller_key_id)
+        if affected_row == 0:
+            return 0
+
+        return cursor.fetchone()
+
     def get_attribute_category_id(self, product, db_connection):
         cursor = db_connection.cursor()
 
@@ -246,6 +260,7 @@ class ProductDao:
         AND second_category_id = %(second_category_id)s
         """
         cursor.execute(get_attribute_category_id_sql, product)
+
         attribute_category_id = cursor.fetchone()[0]
 
         return attribute_category_id
@@ -309,20 +324,6 @@ class ProductDao:
         get_categories = cursor.fetchall()
 
         return get_categories
-
-    def get_seller_attribute(self, seller_key_id, db_connection):
-        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
-        get_seller_attribute_sql = """
-        SELECT seller_attributes.id, seller_attributes.name 
-        FROM seller_attributes
-        INNER JOIN sellers ON sellers.seller_attribute_id = seller_attributes.id
-        WHERE sellers.seller_key_id = %s AND sellers.end_date = '2037-12-31 23:59:59'
-        """
-        affected_row = cursor.execute(get_seller_attribute_sql, seller_key_id)
-        if affected_row == 0:
-            return 0
-
-        return cursor.fetchone()
 
     def get_second_category(self, attribute_group_id, first_category_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
