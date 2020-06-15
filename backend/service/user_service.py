@@ -27,15 +27,15 @@ class UserService:
             new_user['password'] = bcrypt.hashpw(new_user['password'].encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
             last_row_id = self.user_dao.sign_up_seller(new_user, db_connection)
             new_user['last_row_id'] = last_row_id
-            # 저장된 셀러 ID를 가져와서 초기 관리자, 영업시간 정보를 저장
+            # 저장된 셀러 ID를 가져와서 관리자, 영업시간 정보를 초기화
             self.user_dao.insert_initial_supervisor(new_user, db_connection)
             self.user_dao.insert_initial_buisness_hours(new_user, db_connection)
 
             return "", 200
 
-        except KeyError as e:
+        except KeyError:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR' + str(e)}, 400
+            return {'message' : 'KEY_ERROR'}, 400
 
         except TypeError:
             db_connection.rollback()
@@ -99,9 +99,9 @@ class UserService:
             self.user_dao.update_seller(seller_infos, db_connection)
             return "", 200
 
-        except KeyError as e:
+        except KeyError:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR' + str(e)}, 400
+            return {'message' : 'KEY_ERROR'}, 400
 
         except TypeError:
             db_connection.rollback()
@@ -111,12 +111,12 @@ class UserService:
         try:
             # user - 셀러권한 : 자기 자신의 고유 ID, 마스터권한 : url parameter로 받은 셀러 고유 ID
 
-            # 사용자 정보
-            user_info        = self.user_dao.get_seller_details(user, db_connection)
+            # 사용자 정보 가져오기
+            user_info = self.user_dao.get_seller_details(user, db_connection) 
             
             # 셀러가 존재하지 않을 경우 
             if user_info == 0:
-                return {'message' : 'NO_SELLER_SELECTED'}, 500
+                return {'message' : 'NO_SELLER_SELECTED'}, 400
 
             # 담당자 정보 가져오기
             supervisor_info  = self.user_dao.get_supervisors(user, db_connection)

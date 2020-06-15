@@ -411,7 +411,7 @@ def create_product_endpoints(app, product_service):
         success      : code : 200
         key error    : {"message" : "KEY_ERROR"}, code : 400
         type error   : {"message" : "TYPE_ERROR"}, code : 400
-        unauthorized : {"message" : "UNAUTHORIZED"} code : 401
+        unauthorized : {"message" : "UNAUTHORIZED"}, code : 401
         """
 
         db_connection = None

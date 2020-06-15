@@ -371,7 +371,7 @@ class ProductDao:
             seller_keys.user,        
             products.price AS price, 
             IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, CAST((products.price - (products.discount_rate / 100 * products.price)) AS signed), products.price) AS discount_price,
-            products.discount_rate,
+            IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, products.discount_rate, 0) AS discount_rate,
             is_onsale,
             is_displayed,
             IF(products.discount_rate != 0 AND now() BETWEEN products.discount_start AND products.discount_end, 1, 0) AS is_discount          
