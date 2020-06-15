@@ -110,7 +110,7 @@ class ProductService:
     def create_new_product(self, product, seller_key_id, db_connection):
         try:
             # 할인율은 명시되었는데 기간이 없을 때, 에러 메시지를 띄워줌
-            if product['discount_rate'] is not None:
+            if product['discount_rate'] is not None and product['discount_rate'] is not 0:
                 if product['discount_start'] is None or product['discount_end'] is None:
                     return {'message' : 'DISCOUNT PERIOD NEEDED'}
 
@@ -133,7 +133,10 @@ class ProductService:
 
             # 셀러 속성 값에 따른 셀러 속성 그룹, 속성 그룹 id+카테고리 id 조합을 변수에 저장
             product['attribute_group_id'] = self.product_dao.get_attribute_group_id(seller_key_id, db_connection)
+
             product['attribute_category_id'] = self.product_dao.get_attribute_category_id(product, db_connection)
+            if product['attribute_category_id'] == 0:
+                return {'message': 'NO COMBINATION AVAILABLE'}, 400
 
             # request body에서 받은 id와 데이터 조합으로 Product 등록
             product_id = self.product_dao.insert_product(product, db_connection)
@@ -147,9 +150,12 @@ class ProductService:
             # tag가 db에 없을 경우 db에 태그를 추가한 뒤 id를 받고, 있을 경우 id를 찾아서 tag_id 리스트에 추가함
             tags = []
             for tag_name in product['tags']:
-                if self.product_dao.find_tags(tag_name, db_connection) == 0:
+                tag_check = self.product_dao.find_tags(tag_name, db_connection)
+
+                if tag_check is 0:
                     tags.append(self.product_dao.insert_tags(tag_name, db_connection))
-                tags.append(self.product_dao.find_tags(tag_name, db_connection))
+                else:
+                    tags.append(tag_check)
 
             # db에 있는 태그의 id, 혹은 새로 받은 태그의 id를 상품 & 태그 조합 테이블에 추가
             [self.product_dao.insert_product_tags(product_id, tag_id, db_connection) for tag_id in tags]
@@ -201,6 +207,8 @@ class ProductService:
 
             # 상품 key id로 최근에 수정한 상품 id를 가져온다
             product_previous_id = self.product_dao.get_product_previous_id(product_key_id, db_connection)
+            if product_previous_id == 0:
+                return {'message' : 'NO SELLER SELECTED'}, 400
 
             # 최근에 수정한 상품의 종료일을 바꿔준다
             self.product_dao.update_product_history(product_previous_id, db_connection)
@@ -210,6 +218,7 @@ class ProductService:
             product_id = product['product_id']
 
             # 상세 상품 정보에 기입하지 않고 직접 등록할 경우 제조 관련 정보를 field(3개) insert
+            # 추가 하기 전 동일한 정보가 있다면 id를 받아오고, 없을 경우 새롭게 추가한다
             notices_id = self.product_dao.select_notices_id(product['manufacture'], db_connection)
             product['notices_id'] = notices_id
 
@@ -221,16 +230,19 @@ class ProductService:
 
             # product id를 options의 각 딕셔너리에 담고, option 조합 db에 추가
             for option in options:
-                option['product_id'] = product_id
+                option['product_id'] = product['product_id']
 
             self.product_dao.insert_options(options, db_connection)
 
             # tag가 db에 없을 경우 db에 태그를 추가한 뒤 id를 받고, 있을 경우 id를 찾아서 tag_id 리스트에 추가함
             tags = []
             for tag_name in product['tags']:
-                if self.product_dao.find_tags(tag_name, db_connection) == 0:
+                tag_check = self.product_dao.find_tags(tag_name, db_connection)
+
+                if tag_check is 0:
                     tags.append(self.product_dao.insert_tags(tag_name, db_connection))
-                tags.append(self.product_dao.find_tags(tag_name, db_connection))
+                else:
+                    tags.append(tag_check)
 
             # db에 있는 태그의 id, 혹은 새로 받은 태그의 id를 상품 & 태그 조합 테이블에 추가
             [self.product_dao.insert_product_tags(product_id, tag_id, db_connection) for tag_id in tags]

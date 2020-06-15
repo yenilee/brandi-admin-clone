@@ -73,7 +73,6 @@ class ProductDao:
 
     def find_tags(self, tag_name, db_connection):
         cursor = db_connection.cursor()
-
         find_tags_sql = """
         SELECT id
         FROM tags
@@ -259,7 +258,9 @@ class ProductDao:
         AND first_category_id = %(first_category_id)s
         AND second_category_id = %(second_category_id)s
         """
-        cursor.execute(get_attribute_category_id_sql, product)
+        affected_row = cursor.execute(get_attribute_category_id_sql, product)
+        if affected_row == 0:
+            return 0
 
         attribute_category_id = cursor.fetchone()[0]
 
@@ -274,7 +275,7 @@ class ProductDao:
         # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
         if filters is not None:
             for k, v in filters.items():
-                statement += f" AND binary(sellers.name) LIKE N'%{v}%'"
+                statement += f" AND binary(sellers.name) LIKE '%{v}%'"
 
         get_sellers_sql = """
         SELECT
@@ -287,7 +288,7 @@ class ProductDao:
 
         affected_row = cursor.execute(get_sellers_sql)
         if affected_row == 0:
-            raise Exception("DATA DOES NOT EXIST")
+            return None
 
         return cursor.fetchall()
 
@@ -501,7 +502,9 @@ class ProductDao:
         FROM products
         WHERE product_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(get_recent_product_id_sql, product_key_id)
+        affected_row = cursor.execute(get_recent_product_id_sql, product_key_id)
+        if affected_row == 0:
+            return 0
         return cursor.fetchone()[0]
 
     def get_recent_product(self, product_key_id, seller_key_id, db_connection):
@@ -559,7 +562,7 @@ class ProductDao:
     def get_tag(self, product_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         get_tag_name_sql = """
-        SELECT tags.name
+        SELECT DISTINCT tags.name
         FROM tags
         INNER JOIN products_tags ON products_tags.tag_id = tags.id 
         WHERE products_tags.product_id = %s

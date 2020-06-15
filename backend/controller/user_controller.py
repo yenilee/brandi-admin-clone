@@ -4,11 +4,12 @@ from jsonschema      import validate, ValidationError
 from flask           import request, g
 from connection      import get_connection
 
-from utils           import authorize
+from utils           import authorize, connection_error
 from json_schema     import (
     seller_register_schema,
     seller_action_schema,
-    seller_sign_up_schema
+    seller_sign_up_schema,
+    seller_list_query_schema
     )
 from const           import AUTH
 
@@ -93,6 +94,7 @@ def create_user_endpoints(app, user_service):
                 db_connection.close()
 
     @app.route('/sign-in', methods=['POST'])
+    @connection_error
     def sign_in():
 
         """
@@ -121,21 +123,6 @@ def create_user_endpoints(app, user_service):
 
                 return sign_in_response
 
-        except pymysql.err.InternalError:
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
-
         except  Exception as e:
             db_connection.rollback()
             return {'message' : str(e)}, 500
@@ -145,6 +132,7 @@ def create_user_endpoints(app, user_service):
                 db_connection.close()
 
     @app.route('/sellers', methods=['GET'])
+    @connection_error
     @authorize
     def get_sellers_list():
 
@@ -176,24 +164,13 @@ def create_user_endpoints(app, user_service):
                 filters = None
                 if request.args:
                     filters = request.args
+                    validate(filters, seller_list_query_schema)
 
                 sellers_response = user_service.get_seller_list(filters, db_connection)
                 return sellers_response
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR'+str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
+        except ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
 
         except  Exception as e:
             return {'message': str(e)}, 500
@@ -239,7 +216,7 @@ def create_user_endpoints(app, user_service):
                 (고객센터 운영시간)
                 start_time : 9:00:00
                 end_time   : 6:00:00
-                is_weekend : 0    
+                is_weekend : 0
 
                 (배송정보 및 교환/환불 정보)
                 shipping_information : 배송정보 (required)
@@ -252,7 +229,7 @@ def create_user_endpoints(app, user_service):
                 model_size_foot   : 발 사이즈
 
                 (쇼핑피드 업데이트 메세지)
-                feed_message : 쇼핑피드 업데이트 메세지          
+                feed_message : 쇼핑피드 업데이트 메세지
 
         Returns:
             Success : status code : 200
@@ -263,12 +240,12 @@ def create_user_endpoints(app, user_service):
         """
         db_connection = None
         seller_infos = request.json
-        
-        try: 
+
+        try:
             validate(seller_infos, seller_register_schema)
             db_connection = get_connection()
 
-            #변경실행자에 대한 정보를 request에 담아준다 
+            #변경실행자에 대한 정보를 request에 담아준다
             seller_infos['editor'] = g.user
 
             if db_connection:
@@ -302,7 +279,7 @@ def create_user_endpoints(app, user_service):
             return {'message' : str(e)}, 500
 
         finally:
-            
+
             if db_connection:
                 db_connection.close()
 
@@ -387,8 +364,8 @@ def create_user_endpoints(app, user_service):
                 db_connection.commit()
                 return update_response
 
-        except  ValidationError as e:
-            {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
+        except ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
 
         except pymysql.err.InternalError:
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
@@ -527,20 +504,23 @@ def create_user_endpoints(app, user_service):
                 db_connection.close()
 
     @app.route('/action', methods = ['PUT'])
+    @connection_error
     @authorize
     def update_seller_status():
 
         db_connection = None
         try:
             db_connection = get_connection()
-            action_type = request.json
-            validate(action_type, seller_action_schema)
 
             if db_connection:
+                action_type = request.json
+                validate(action_type, seller_action_schema)
+
                 if g.auth is not 1:
                     return {'message' : 'UNAUTHORIZED'}, 400
 
                 user = action_type['user']
+
                 action_response = user_service.update_status(user, action_type, db_connection)
                 db_connection.commit()
 
@@ -548,25 +528,6 @@ def create_user_endpoints(app, user_service):
 
         except  ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
-        except pymysql.err.InternalError as e:
-
-            if db_connection:
-                db_connection.rollback()
-
-            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR' +str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            db_connection.rollback()
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except Exception as e:
             db_connection.rollback()

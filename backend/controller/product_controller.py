@@ -3,16 +3,17 @@ import traceback
 
 from flask       import request, g
 from connection  import get_connection
-from utils       import authorize
+from utils       import authorize, connection_error
 from jsonschema  import validate, ValidationError
 from const       import AUTH
 
-from json_schema import product_register_schema_2, product_list_queryset_schema
+from json_schema import product_register_schema, product_list_queryset_schema
 
 def create_product_endpoints(app, product_service):
     product_service = product_service
 
     @app.route('/sellers-for-master', methods=['GET'])
+    @connection_error
     @authorize
     def get_register_page_sellers():
         db_connection = None
@@ -32,23 +33,7 @@ def create_product_endpoints(app, product_service):
 
                 return {'seller_list' : sellers }, 200
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
-        except Exception as e:
-            db_connection.rollback()
+        except  Exception as e:
             return {'message': str(e)}, 500
 
         finally:
@@ -56,6 +41,7 @@ def create_product_endpoints(app, product_service):
                 db_connection.close()
 
     @app.route('/product-color-filter', methods=['GET'])
+    @connection_error
     @authorize
     def get_color_filter():
         """
@@ -71,23 +57,7 @@ def create_product_endpoints(app, product_service):
 
                 return {'color_filters' : register_response}, 200
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
-        except Exception as e:
-            db_connection.rollback()
+        except  Exception as e:
             return {'message': str(e)}, 500
 
         finally:
@@ -95,6 +65,7 @@ def create_product_endpoints(app, product_service):
                 db_connection.close()
 
     @app.route('/product-options', methods=['GET'])
+    @connection_error
     @authorize
     def get_option():
         """
@@ -110,23 +81,7 @@ def create_product_endpoints(app, product_service):
 
                 return register_response
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
-        except Exception as e:
-            db_connection.rollback()
+        except  Exception as e:
             return {'message': str(e)}, 500
 
         finally:
@@ -134,6 +89,7 @@ def create_product_endpoints(app, product_service):
                 db_connection.close()
 
     @app.route('/product/first-category', methods=['GET'])
+    @connection_error
     @authorize
     def get_first_category():
         db_connection = None
@@ -156,23 +112,7 @@ def create_product_endpoints(app, product_service):
                     'first_category': first_categories
                     }, 200
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
-        except Exception as e:
-            db_connection.rollback()
+        except  Exception as e:
             return {'message': str(e)}, 500
 
         finally:
@@ -180,6 +120,7 @@ def create_product_endpoints(app, product_service):
                 db_connection.close()
 
     @app.route('/product/second-category', methods = ['GET'])
+    @connection_error
     @authorize
     def get_second_category():
         db_connection = None
@@ -196,29 +137,14 @@ def create_product_endpoints(app, product_service):
                 register_response = product_service.get_second_category(seller_key_id, first_category_id, db_connection)
                 return register_response
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
-        except Exception as e:
-            db_connection.rollback()
+        except  Exception as e:
             return {'message': str(e)}, 500
 
         finally:
                 db_connection.close()
 
     @app.route('/product', methods=['POST'])
+    @connection_error
     @authorize
     def register_product():
 
@@ -269,7 +195,7 @@ def create_product_endpoints(app, product_service):
         try:
             db_connection = get_connection()
             if db_connection:
-                validate(product, product_register_schema_2)
+                validate(product, product_register_schema)
 
                 product['editor'] = g.user
 
@@ -284,21 +210,6 @@ def create_product_endpoints(app, product_service):
         except  ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
         except Exception as e:
             db_connection.rollback()
             return {'message': str(e)}, 500
@@ -308,6 +219,7 @@ def create_product_endpoints(app, product_service):
                 db_connection.close()
 
     @app.route('/product/<int:product_key_id>', methods = ['GET'])
+    @connection_error
     @authorize
     def get_product(product_key_id):
         db_connection = None
@@ -325,29 +237,14 @@ def create_product_endpoints(app, product_service):
 
                 return get_response
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
-
-        except Exception as e:
-            db_connection.rollback()
+        except  Exception as e:
             return {'message': str(e)}, 500
 
         finally:
             db_connection.close()
 
     @app.route('/product/<int:product_key_id>', methods = ['PUT'])
+    @connection_error
     @authorize
     def update_product(product_key_id):
         db_connection = None
@@ -356,27 +253,18 @@ def create_product_endpoints(app, product_service):
             db_connection = get_connection()
 
             if db_connection:
+
                 product = request.json
+                validate(product, product_register_schema)
+
                 product['user'] = g.user
                 update_response = product_service.update_product(product_key_id, product, db_connection)
 
                 db_connection.commit()
                 return update_response
 
-        except pymysql.err.InternalError as e:
-            return {'message': 'DATABASE_SERVER_ERROR' + str(e)}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError as e:
-            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
+        except  ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
 
         except Exception as e:
             db_connection.rollback()
@@ -467,6 +355,7 @@ def create_product_endpoints(app, product_service):
             return image_url
 
     @app.route('/product-history/<int:product_key_id>', methods = ['GET'])
+    @connection_error
     @authorize
     def get_product_history(product_key_id):
         db_connection = None
@@ -480,21 +369,6 @@ def create_product_endpoints(app, product_service):
 
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
-
-        except pymysql.err.InternalError:
-            return {'message': 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except  Exception as e:
             return {'message': str(e)}, 500
