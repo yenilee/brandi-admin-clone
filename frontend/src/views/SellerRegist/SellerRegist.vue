@@ -510,7 +510,7 @@
 <script>
 import axios from "axios";
 import { eventBus } from "../../main";
-import { SJ_URL, URL } from "../../config/urlConfig";
+import { YE_URL, URL } from "../../config/urlConfig";
 import SrTitle from "./Components/SrTitle";
 import ImageBox from "./Slots/ImageBox";
 import InputBox from "./Slots/InputBox";
@@ -531,14 +531,14 @@ export default {
   },
   mounted: function() {
     console.log("url data >>>> ", this.$route.params.id);
-    let masterURl = `${SJ_URL}/seller_details/${this.$route.params.id}`;
-    const userURl = `${SJ_URL}/seller_details`;
+    let masterURl = `${YE_URL}/seller_details/${this.$route.params.id}`;
+    const userURl = `${YE_URL}/seller_details`;
 
     axios
       .get(
         this.$route.params.id > 0
-          ? `${SJ_URL}/seller_details/${this.$route.params.id}`
-          : `${SJ_URL}/seller_details`,
+          ? `${YE_URL}/seller_details/${this.$route.params.id}`
+          : `${YE_URL}/seller_details`,
         {
           // .get(`${URL}/sellerregist.json`, {
           headers: {
@@ -549,8 +549,6 @@ export default {
       .then(response => {
         this.infoDatas = response.data;
         this.tableCount = this.infoDatas.data.supervisors.length;
-        console.log("infoDatas>>>>>>>", this.infoDatas);
-        console.log("response>>>>>>>>>", this.infoDatas);
       });
   },
 
@@ -590,8 +588,8 @@ export default {
         axios
           .put(
             this.$route.params.id > 0
-              ? `${SJ_URL}/seller/${this.$route.params.id}`
-              : `${SJ_URL}/seller`,
+              ? `${YE_URL}/seller/${this.$route.params.id}`
+              : `${YE_URL}/seller`,
             {
               profile: "url",
               background_image: "url",
