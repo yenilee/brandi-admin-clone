@@ -3,6 +3,7 @@
     <div class="slTitleBox">
       <div class="slTitle">셀러 계정 관리</div>
       <div class="slSubTitle">셀러 회원 목록 / 관리</div>
+      <div></div>
     </div>
     <div class="slCategory">
       <i class="xi-home">
@@ -280,7 +281,7 @@ export default {
     },
     getListDatas: function() {
       axios
-        .get(`${SJ_URL}/sellers`, {
+        .get(`${YE_URL}/sellers`, {
           // .get(`${URL}/sellerList.json`, {
           headers: {
             Authorization: localStorage.access_token
@@ -326,7 +327,7 @@ export default {
     actionBtnChange: function(action, id) {
       axios
         .put(
-          `${SJ_URL}/action`,
+          `${YE_URL}/action`,
           {
             user: id,
             action_type: action
@@ -357,7 +358,7 @@ export default {
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
       // console.log("url data >>>> ", this.$route.query.page);
       // this.$router.push("sellers?seller_attributes.name=쇼핑몰");
-      // axios.get(`${SJ_URL}/sellers`);
+      // axios.get(`${YE_URL}/sellers`);
       // alert(this.searchDatas.id);
       this.searchDatas.filter(item => {
         item.state && item.id.length != 0
@@ -365,7 +366,7 @@ export default {
           : "";
       });
       axios
-        .get(`${SJ_URL}/sellers?${queryString.join("")}`, {
+        .get(`${YE_URL}/sellers?${queryString.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
