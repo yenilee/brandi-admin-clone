@@ -59,6 +59,10 @@
           <div
             v-bind:class="{ btn: !attBtn[6].state, clickedBtn: attBtn[6].state}"
             @click="() => attClickCheck(6)"
+          >내셔널브랜드</div>
+          <div
+            v-bind:class="{ btn: !attBtn[7].state, clickedBtn: attBtn[7].state}"
+            @click="() => attClickCheck(7)"
           >뷰티</div>
         </div>
       </div>
@@ -120,7 +124,7 @@
       </div>
       <div class="submitBox">
         <div class="Btn searchBtn" @click="search()">검색</div>
-        <div class="Btn resetBtn">초기화</div>
+        <div class="Btn resetBtn" @click="reset()">초기화</div>
       </div>
     </div>
     <div class="count">전체 조회건 수 : {{infoDatas.product_count}}</div>
@@ -205,6 +209,7 @@ export default {
         { name: "seller_attribute_id", state: 0 },
         { name: "seller_attribute_id", state: 0 },
         { name: "seller_attribute_id", state: 0 },
+        { name: "seller_attribute_id", state: 0 },
         { name: "seller_attribute_id", state: 0 }
       ],
 
@@ -214,38 +219,41 @@ export default {
       attLoad: { state: false },
       attDesigner: { state: false },
       attGeneral: { state: false },
-      attBeauty: { state: false }
+      attBeauty: { state: false },
+
+      query: []
     };
   },
   mounted: function() {
     this.getListDatas();
   },
   methods: {
+    reset: function() {},
     search: function() {
       let queryString = [];
 
       this.twoBtn.filter(item => {
-        item.state < 3 ? queryString.push(`${item.name}=${item.state}&`) : "";
+        item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
 
       this.inputBtn.filter(item => {
         item.state.length > 0
-          ? queryString.push(`${item.name}=${item.state}&`)
+          ? this.query.push(`${item.name}=${item.state}&`)
           : "";
       });
 
       this.selectBtn.filter(item => {
         item.state.length > 0
-          ? queryString.push(`${item.name}=${item.state}&`)
+          ? this.query.push(`${item.name}=${item.state}&`)
           : "";
       });
 
       this.attBtn.filter(item => {
-        item.state ? queryString.push(`${item.name}=${item.state}&`) : "";
+        item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
 
       axios
-        .get(`${YE_URL}/products?${queryString.join("")}`, {
+        .get(`${YE_URL}/products?${this.query.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -253,7 +261,7 @@ export default {
         .then(response => {
           this.infoDatas = response.data;
         });
-      console.log(queryString);
+      console.log(this.query);
     },
     getListDatas: function() {
       axios
@@ -282,6 +290,7 @@ export default {
         this.attBtn[4].state = 0;
         this.attBtn[5].state = 0;
         this.attBtn[6].state = 0;
+        this.attBtn[7].state = 0;
 
         this.attCount = 0;
       } else if (this.attBtn[0].state) {
@@ -304,6 +313,7 @@ export default {
         this.attBtn[4].state = 0;
         this.attBtn[5].state = 0;
         this.attBtn[6].state = 0;
+        this.attBtn[7].state = 0;
       }
       if (this.attCount > 0) {
         this.attBtn[0].state = 0;

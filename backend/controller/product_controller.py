@@ -7,7 +7,7 @@ from utils       import authorize
 from jsonschema  import validate, ValidationError
 from const       import AUTH
 
-from json_schema import product_register_schema, product_list_queryset_schema
+from json_schema import product_register_schema_2, product_list_queryset_schema
 
 def create_product_endpoints(app, product_service):
     product_service = product_service
@@ -269,7 +269,7 @@ def create_product_endpoints(app, product_service):
         try:
             db_connection = get_connection()
             if db_connection:
-                validate(product, product_register_schema)
+                validate(product, product_register_schema_2)
 
                 product['editor'] = g.user
 
@@ -411,7 +411,7 @@ def create_product_endpoints(app, product_service):
         success      : code : 200
         key error    : {"message" : "KEY_ERROR"}, code : 400
         type error   : {"message" : "TYPE_ERROR"}, code : 400
-        unauthorized : {"message" : "UNAUTHORIZED"} code : 401
+        unauthorized : {"message" : "UNAUTHORIZED"}, code : 401
         """
 
         db_connection = None

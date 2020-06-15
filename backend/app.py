@@ -32,13 +32,14 @@ def create_app(test_config = None):
     CORS(app, resources={r'*' : {'origins': '*'}})
 
     app.config.from_pyfile('config.py')
-
+    # DAO 생성
     user_dao     = UserDao()
     product_dao  = ProductDao()
 
+    # Service 생성
     user_service = UserService(user_dao, app.config)
     product_service = ProductService(product_dao, app.config)
-
+    # Controller 생성
     create_user_endpoints(app, user_service)
     create_product_endpoints(app, product_service)
 

@@ -74,15 +74,15 @@ def create_user_endpoints(app, user_service):
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
-        except pymysql.err.IntegrityError as e:
+        except pymysql.err.IntegrityError:
             db_connection.rollback()
-            return {'message' : 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
+            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except Exception as e:
             db_connection.rollback()
@@ -257,9 +257,9 @@ def create_user_endpoints(app, user_service):
         Returns:
             Success : status code : 200
 
-            Key error                          : {message : KEY_ERROR}, status code : 400
-            Type error                         : {message : TYPE_ERROR}, status code : 400
-            Request Parameter Validation Error : {message : PARAMETER_VALIDATION_ERROR}, status code : 400
+            Key error                          : {message : KEY_ERROR}, code : 400
+            Type error                         : {message : TYPE_ERROR}, code : 400
+            Request Parameter Validation Error : {message : PARAMETER_VALIDATION_ERROR}, code : 400
         """
         db_connection = None
         seller_infos = request.json
@@ -277,7 +277,7 @@ def create_user_endpoints(app, user_service):
                 return update_response
 
         except ValidationError:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR'}, 400
+            return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
         except pymysql.err.InternalError:
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
@@ -364,9 +364,9 @@ def create_user_endpoints(app, user_service):
         Returns:
             Success : status code : 200
 
-            Key error                          : {message : KEY_ERROR}, status code : 400
-            Type error                         : {message : TYPE_ERROR}, status code : 400
-            Request Parameter Validation Error : {message : PARAMETER_VALIDATION_ERROR}, status code : 400
+            Key error                          : {message : KEY_ERROR}, code : 400
+            Type error                         : {message : TYPE_ERROR}, code : 400
+            Request Parameter Validation Error : {message : PARAMETER_VALIDATION_ERROR}, code : 400
         """
         db_connection = None
         seller_infos = request.json
@@ -388,7 +388,7 @@ def create_user_endpoints(app, user_service):
                 return update_response
 
         except  ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
+            {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
         except pymysql.err.InternalError:
             return {'message' : 'DATABASE_SERVER_ERROR'}, 500
@@ -432,12 +432,13 @@ def create_user_endpoints(app, user_service):
 
         Returns:
 
-            Success      : {data : user_info}, status code : 200
+            Success             : {data : user_info}, code : 200
 
-            Key error    : {message : KEY_ERROR}, status code : 400
-            Type error   : {message : TYPE_ERROR}, status code : 400
+            Key error           : {message : KEY_ERROR}, code : 400
+            Type error          : {message : TYPE_ERROR}, code : 400
 
-            unauthorized : {message : UNAUTHORIZED}, status code : 401
+            unauthorized        : {message : UNAUTHORIZED}, code : 401
+            no selected sellers : {message : NO_SELLER_SELECTED}, code : 400
         """
 
         db_connection = None
@@ -486,10 +487,13 @@ def create_user_endpoints(app, user_service):
 
         Returns:
 
-            Success    : {data : user_info}, status code : 200
+            Success             : {data : user_info}, code : 200
 
-            Key error  : {message : KEY_ERROR}, status code : 400
-            Type error : {message : TYPE_ERROR}, status code : 400
+            Key error           : {message : KEY_ERROR}, code : 400
+            Type error          : {message : TYPE_ERROR}, code : 400
+
+            unauthorized        : {message : UNAUTHORIZED}, code : 401
+            no selected sellers : {message : NO_SELLER_SELECTED}, code : 400
         """
 
         db_connection = None
@@ -500,14 +504,14 @@ def create_user_endpoints(app, user_service):
                 seller_infos = user_service.get_seller_details(g.user, db_connection)
                 return seller_infos
 
-        except pymysql.err.InternalError as e:
-            return {'message' : 'DATABASE_SERVER_ERROR' + str(e)}, 500
+        except pymysql.err.InternalError:
+            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
 
         except pymysql.err.OperationalError:
             return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
 
-        except pymysql.err.ProgrammingError as e:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
+        except pymysql.err.ProgrammingError:
+            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
 
         except pymysql.err.NotSupportedError:
             return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
