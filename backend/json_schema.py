@@ -104,7 +104,7 @@ seller_sign_up_schema = {
     }
 }
 
-# 상품 등록 수정 parameter validation
+#셀러 등록 수정 parameter validation
 seller_register_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
@@ -487,6 +487,7 @@ seller_register_schema = {
     }
 }
 
+#셀러 상태 변경 시 액션 버튼 request validation
 seller_action_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
@@ -508,22 +509,20 @@ seller_action_schema = {
             "$id": "#/properties/user",
             "type": "integer",
             "default": 0,
-            "examples": [
-                9
-            ]
         },
         "action_type": {
             "$id": "#/properties/action_type",
             "type": "string",
             "default": "",
-            "examples": [
-                "입점 승인"
+            "anyOf": [
+                {"action_type" : "입점 승인"},
+                {"action_type" : "입점 거절"},
             ]
         }
-    }
+    },
 }
 
-# 상품 리스트 필터링 parameter validation
+#상품 리스트 필터링 parameter validation
 product_list_queryset_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
@@ -836,7 +835,7 @@ product_register_schema = {
             "$id": "#/properties/discount_rate",
             "type": ["integer"],
             "default": 0,
-            "minimum" : 1,
+            "minimum" : 0,
             "maximum": 100
         },
         "discount_start": {
@@ -883,4 +882,94 @@ product_register_schema = {
             }
         }
     }
+}
+
+seller_list_query_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "sellers.id": 1,
+            "seller_keys.user": "master",
+            "sellers.eng_name": "seller",
+            "sellers.name": "셀러",
+            "supervisor_infos.name": "매니저",
+            "supervisor_infos.phone_number": "010-4232-1234",
+            "supervisor_infos.email": "seller@gg.com",
+            "seller_status.name": "입점",
+            "seller_attributes.name": "뷰티",
+            "seller_status.id": 1,
+            "seller_attributes.id": 7
+        }
+    ],
+    "required": [],
+    "additionalProperties": True,
+    "properties": {
+        "sellersid": {
+            "$id": "#/properties/sellersid",
+            "type": "integer",
+            "default": 0
+        },
+        "seller_keys.user": {
+            "$id": "#/properties/seller_keys.user",
+            "type": "string",
+            "default": ""
+        },
+        "sellers.eng_name": {
+            "$id": "#/properties/sellers.eng_name",
+            "type": "string",
+            "default": ""
+        },
+        "sellers.name": {
+            "$id": "#/properties/sellers.name",
+            "type": "string",
+            "default": ""
+        },
+        "supervisor_infos.name": {
+            "$id": "#/properties/supervisor_infos.name",
+            "type": "string",
+            "default": ""
+        },
+        "supervisor_infos.phone_number": {
+            "$id": "#/properties/supervisor_infos.phone_number",
+            "type": "string",
+            "default": ""
+        },
+        "supervisor_infos.email": {
+            "$id": "#/properties/supervisor_infos.email",
+            "type": "string",
+            "default": ""
+        },
+        "seller_status.name": {
+            "$id": "#/properties/seller_status.name",
+            "type": "string",
+            "default": ""
+        },
+        "seller_attributes.name": {
+            "$id": "#/properties/seller_attributes.name",
+            "type": "string",
+            "default": ""
+        },
+        "seller_status.id": {
+            "$id": "#/properties/seller_status.id",
+            "type": "integer",
+            "default": 0
+        },
+        "seller_attributes.id": {
+            "$id": "#/properties/seller_attributes.id",
+            "type": "integer",
+            "default": 0
+        }
+    }
+}
+
+action_button_validation = {
+    1 : ['입점 승인', '입점 거절'],
+    2 : ['휴점 신청', '퇴점 신청 처리'],
+    3 : ['휴점 해제', '퇴점 신청 처리'],
+    4 : ['휴점 신청', '퇴점 확정 처리', '퇴점 철회 처리']
 }
