@@ -33,6 +33,7 @@
                     v-if="sellersInputModal === true"
                     type="text"
                     @input="searchSellerList($event.target.value)"
+                    @click="$event.stopPropagation()"
                   />
                   <div v-if="sellersInputModal === true" class="searchResult">
                     <div v-for="seller in sellerList" :key="seller.id">
@@ -85,223 +86,227 @@
           <template>
             <!-- 테이블 시작 영역 -->
             <!-- 셀러 상태 테이블 -->
-            <tbody>
-              <tr class="sellerSelect">
-                <th>셀러 선택</th>
-                <td>
-                  <input
-                    type="text"
-                    placeholder="셀러검색을 해주세요."
-                    v-model="sellerInfo.name"
-                    style="cursor: not-allowed !important;"
-                    disabled
-                  />
-                  <div @click="sellersModal = !sellersModal" class="btn">셀러검색</div>
-                </td>
-              </tr>
-            </tbody>
+
+            <tr class="sellerSelect">
+              <th>셀러 선택</th>
+              <td>
+                <input
+                  type="text"
+                  placeholder="셀러검색을 해주세요."
+                  v-model="sellerInfo.name"
+                  style="cursor: not-allowed !important;"
+                  disabled
+                />
+                <div @click="sellersModal = !sellersModal" class="btn">셀러검색</div>
+              </td>
+            </tr>
+
             <!-- 판매여부 -->
-            <tbody>
-              <tr>
-                <th>판매여부</th>
-                <td class="onSaleBox">
-                  <div>
-                    <input
-                      v-model="productDatas.is_onsale"
-                      type="radio"
-                      id="onSale"
-                      :value="1"
-                      name="saleStatus"
-                    />
-                    <label for="onSale">판매</label>
-                    <input
-                      v-model="productDatas.is_onsale"
-                      type="radio"
-                      id="noSale"
-                      :value="0"
-                      name="saleStatus"
-                    />
-                    <label for="noSale">미판매</label>
-                  </div>
-                  <div>
-                    <i class="xi-info">미판매 선택시 앱에서 Sold Out으로 표시됩니다.</i>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+
+            <tr>
+              <th>판매여부</th>
+              <td class="onSaleBox">
+                <div>
+                  <input
+                    v-model="productDatas.is_onsale"
+                    type="radio"
+                    id="onSale"
+                    :value="1"
+                    name="saleStatus"
+                  />
+                  <label for="onSale">판매</label>
+                  <input
+                    v-model="productDatas.is_onsale"
+                    type="radio"
+                    id="noSale"
+                    :value="0"
+                    name="saleStatus"
+                  />
+                  <label for="noSale">미판매</label>
+                </div>
+                <div>
+                  <i class="xi-info">미판매 선택시 앱에서 Sold Out으로 표시됩니다.</i>
+                </div>
+              </td>
+            </tr>
+
             <!--진열 여부 -->
-            <tbody>
-              <tr>
-                <th>진열여부</th>
-                <td class="onSaleBox">
-                  <div>
-                    <input
-                      v-model="productDatas.is_displayed"
-                      type="radio"
-                      id="displayed"
-                      :value="1"
-                      name="displayStatus"
-                    />
-                    <label for="displayed">진열</label>
-                    <input
-                      v-model="productDatas.is_displayed"
-                      type="radio"
-                      id="nodisplayed"
-                      :value="0"
-                      name="displayStatus"
-                    />
-                    <label for="nodisplayed">미진열</label>
+
+            <tr>
+              <th>진열여부</th>
+              <td class="onSaleBox">
+                <div>
+                  <input
+                    v-model="productDatas.is_displayed"
+                    type="radio"
+                    id="displayed"
+                    :value="1"
+                    name="displayStatus"
+                  />
+                  <label for="displayed">진열</label>
+                  <input
+                    v-model="productDatas.is_displayed"
+                    type="radio"
+                    id="nodisplayed"
+                    :value="0"
+                    name="displayStatus"
+                  />
+                  <label for="nodisplayed">미진열</label>
+                </div>
+                <div>
+                  <i class="xi-info">미진열 선택시 앱에서 노출되지 않습니다.</i>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 카테고리 -->
+
+            <tr>
+              <th>카테고리</th>
+              <td class="categoryBox">
+                <tr>
+                  <th>1차 카테고리</th>
+                  <td>
+                    <select
+                      v-model="productDatas.first_category_id"
+                      @change="getSecondCategory(productDatas.seller_key_id, productDatas.first_category_id)"
+                    >
+                      <option value="0">1차 카테고리를 선택해 주세요.</option>
+                      <option
+                        :value="list.id"
+                        v-for="list in firstCate"
+                        :key="list.id"
+                      >{{list.name}}</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <th>2차 카테고리를 선택해 주세요.</th>
+                  <td>
+                    <select @change="productDatas.second_category_id = $event.target.value">
+                      <option>2차 카테고리</option>
+                      <option
+                        :value="list.id"
+                        v-for="list in secondCate"
+                        :key="list.id"
+                      >{{list.name}}</option>
+                    </select>
+                  </td>
+                </tr>
+              </td>
+            </tr>
+
+            <!-- 상품 정보 고시 -->
+
+            <tr>
+              <th>상품 정보 고시</th>
+              <td class="onSaleBox">
+                <div>
+                  <input
+                    v-model="productDatas.is_detail_reference"
+                    type="radio"
+                    id="detailInfo"
+                    :value="1"
+                    name="infoState"
+                  />
+                  <label for="detailInfo">상품상세 참조</label>
+                  <input
+                    v-model="productDatas.is_detail_reference"
+                    type="radio"
+                    id="writeInfo"
+                    :value="0"
+                    name="infoState"
+                  />
+                  <label for="writeInfo">직접입력</label>
+                  <div v-if="productDatas.is_detail_reference === 0" class="detailBox">
+                    <div class="inputBox">
+                      <div class="inputTitle">제조사(수입사):</div>
+                      <input v-model="productDatas.manufacture.manufacturer" type="text" />
+                    </div>
+                    <div class="inputBox">
+                      <div class="inputTitle">제조일자:</div>
+                      <input v-model="productDatas.manufacture.manufacture_date" type="text" />
+                    </div>
+                    <div class="inputBox">
+                      <div class="inputTitle">원산지:</div>
+                      <select v-model="productDatas.manufacture.origin">
+                        <option>기타</option>
+                        <option value="중국">중국</option>
+                        <option value="한국">한국</option>
+                        <option value="베트남">베트남</option>
+                      </select>
+                    </div>
                   </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- 상품명 -->
+
+            <tr>
+              <th>상품명</th>
+              <td>
+                <div class="box">
+                  <input type="text" v-model="productDatas.name" />
                   <div>
                     <i class="xi-info">미진열 선택시 앱에서 노출되지 않습니다.</i>
                   </div>
-                </td>
-              </tr>
-            </tbody>
-            <!-- 카테고리 -->
-            <tbody>
-              <tr>
-                <th>카테고리</th>
-                <td class="categoryBox">
-                  <tr>
-                    <th>1차 카테고리</th>
-                    <td>
-                      <select
-                        v-model="productDatas.first_category_id"
-                        @change="getSecondCategory(productDatas.seller_key_id, productDatas.first_category_id)"
-                      >
-                        <option value="0">1차 카테고리를 선택해 주세요.</option>
-                        <option
-                          :value="list.id"
-                          v-for="list in firstCate"
-                          :key="list.id"
-                        >{{list.name}}</option>
-                      </select>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>2차 카테고리를 선택해 주세요.</th>
-                    <td>
-                      <select @change="productDatas.second_category_id = $event.target.value">
-                        <option>2차 카테고리</option>
-                        <option
-                          :value="list.id"
-                          v-for="list in secondCate"
-                          :key="list.id"
-                        >{{list.name}}</option>
-                      </select>
-                    </td>
-                  </tr>
-                </td>
-              </tr>
-            </tbody>
-            <!-- 상품 정보 고시 -->
-            <tbody>
-              <tr>
-                <th>상품 정보 고시</th>
-                <td class="onSaleBox">
-                  <div>
-                    <input
-                      v-model="productDatas.is_detail_reference"
-                      type="radio"
-                      id="detailInfo"
-                      :value="1"
-                      name="infoState"
-                    />
-                    <label for="detailInfo">상품상세 참조</label>
-                    <input
-                      v-model="productDatas.is_detail_reference"
-                      type="radio"
-                      id="writeInfo"
-                      :value="0"
-                      name="infoState"
-                    />
-                    <label for="writeInfo">직접입력</label>
-                    <div v-if="productDatas.is_detail_reference === 0" class="detailBox">
-                      <div class="inputBox">
-                        <div class="inputTitle">제조사(수입사):</div>
-                        <input v-model="productDatas.manufacture.manufacturer" type="text" />
-                      </div>
-                      <div class="inputBox">
-                        <div class="inputTitle">제조일자:</div>
-                        <input v-model="productDatas.manufacture.manufacture_date" type="text" />
-                      </div>
-                      <div class="inputBox">
-                        <div class="inputTitle">원산지:</div>
-                        <select v-model="productDatas.manufacture.origin">
-                          <option>기타</option>
-                          <option value="중국">중국</option>
-                          <option value="한국">한국</option>
-                          <option value="베트남">베트남</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-            <!-- 상품명 -->
-            <tbody>
-              <tr>
-                <th>상품명</th>
-                <td>
-                  <div class="box">
-                    <input type="text" v-model="productDatas.name" />
-                    <div>
-                      <i class="xi-info">미진열 선택시 앱에서 노출되지 않습니다.</i>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
+                </div>
+              </td>
+            </tr>
+
             <!-- 한줄 상품 설명 -->
-            <tbody>
-              <tr>
-                <th>한줄 상품 설명</th>
-                <td>
-                  <input type="text" v-model="productDatas.simple_description" />
-                </td>
-              </tr>
-            </tbody>
+
+            <tr>
+              <th>한줄 상품 설명</th>
+              <td>
+                <input type="text" v-model="productDatas.simple_description" />
+              </td>
+            </tr>
+
+            <!-- 상세 상품 설명 -->
+            <tr>
+              <th>상세 상품 설명</th>
+              <td class="editorBox">
+                <vue-editor v-model="productDatas.details"></vue-editor>
+              </td>
+            </tr>
             <!-- 색상필터(썸네일 이미지) -->
-            <tbody>
-              <tr>
-                <th>색상필터(썸네일 이미지)</th>
-                <td class="onSaleBox">
-                  <div style="width: 100%">
-                    <input
-                      v-model="colorModal"
-                      :value="0"
-                      type="radio"
-                      id="unuse"
-                      name="colorFilter"
-                      checked
-                    />
-                    <label for="unuse">사용안함</label>
-                    <input
-                      @click="getColors()"
-                      v-model="colorModal"
-                      :value="1"
-                      type="radio"
-                      id="using"
-                      name="colorFilter"
-                    />
-                    <label @click="getColors()" for="using">사용</label>
-                    <input class="colorInput" type="text" disabled :value="selectedColor[2]" />
-                    <div>
-                      <i
-                        class="xi-info"
-                      >베스트 탭, 카테고리 페이지 및 검색페이지의 필터에 적용되며, 선택하지 않으실 경우 색상필터를 사용한 검색결과에 노출되지 않습니다.</i>
-                    </div>
-                    <div>
-                      <i
-                        class="xi-info"
-                      >썸네일 이미지의 1개 색상만 선택 가능하며, 뷰티 및 다이어트 카테고리의 상품의 경우 선택하실 수 없습니다.</i>
-                    </div>
+
+            <tr>
+              <th>색상필터(썸네일 이미지)</th>
+              <td class="onSaleBox">
+                <div style="width: 100%">
+                  <input
+                    v-model="colorModal"
+                    :value="0"
+                    type="radio"
+                    id="unuse"
+                    name="colorFilter"
+                    checked
+                  />
+                  <label for="unuse">사용안함</label>
+                  <input
+                    @click="getColors()"
+                    v-model="colorModal"
+                    :value="1"
+                    type="radio"
+                    id="using"
+                    name="colorFilter"
+                  />
+                  <label @click="getColors()" for="using">사용</label>
+                  <input class="colorInput" type="text" disabled :value="selectedColor[2]" />
+                  <div>
+                    <i
+                      class="xi-info"
+                    >베스트 탭, 카테고리 페이지 및 검색페이지의 필터에 적용되며, 선택하지 않으실 경우 색상필터를 사용한 검색결과에 노출되지 않습니다.</i>
                   </div>
-                </td>
-              </tr>
-            </tbody>
+                  <div>
+                    <i class="xi-info">썸네일 이미지의 1개 색상만 선택 가능하며, 뷰티 및 다이어트 카테고리의 상품의 경우 선택하실 수 없습니다.</i>
+                  </div>
+                </div>
+              </td>
+            </tr>
           </template>
         </v-simple-table>
       </div>
@@ -313,97 +318,107 @@
       <div class="cmpTable">
         <v-simple-table>
           <template v-slot:default>
-            <tbody>
-              <tr>
-                <th>옵션설정</th>
-                <td>
-                  <input type="radio" id="option" checked />
-                  <label for="option">기본옵션</label>
-                </td>
-              </tr>
-            </tbody>
+            <tr>
+              <th>옵션설정</th>
+              <td>
+                <input style="width: 10px; margin-right: 10px" type="radio" id="option" checked />
+                <label for="option">기본옵션</label>
+              </td>
+            </tr>
+
             <!-- 옵션정보 테이블 시작 -->
-            <tbody>
-              <tr class="optionTable">
-                <th>옵션정보</th>
-                <td>
-                  <v-simple-table>
-                    <template v-slot:default>
-                      <thead>
-                        <tr class="headColor">
-                          <th>옵션 항목</th>
-                          <th>상품 옵션명</th>
-                          <th>옵션값 추가/삭제</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="thColor">
-                          <th>색상</th>
-                          <td v-for="(color, index) in invenColorsCount" :key="color.id">
-                            <div class="optionModal">
-                              <div class="textDiv" @click="colorModalHandle(index)">
-                                <p>{{allOptions.color[index]?allOptions.color[index] : "색상 옵션을 선택해 주세요."}}</p>
-                                <input
-                                  @click=" $event.stopPropagation()"
-                                  v-if="invenColorsCount[index].state === true"
-                                  type="text"
-                                />
-                                <div
-                                  v-if="invenColorsCount[index].state === true"
-                                  class="optionList"
-                                >
-                                  <p
-                                    @click="selectOptionColor(optionColor.name,'color')"
-                                    v-for="optionColor in optionColors"
-                                    :key="optionColor.id"
-                                  >{{optionColor.name}}</p>
-                                </div>
-                              </div>
+
+            <tr class="optionTable" style="background-color: white !important">
+              <th>옵션정보</th>
+              <td class="tdBox">
+                <v-simple-table>
+                  <template v-slot:default>
+                    <thead>
+                      <tr class="headColor">
+                        <th class="headTh" style="width: 20%;">옵션 항목</th>
+                        <th class="headTh">상품 옵션명</th>
+                        <th class="headTh" style="width: 20%;">옵션값 추가/삭제</th>
+                      </tr>
+                    </thead>
+
+                    <tr class="thColor" style="background-color: white !important">
+                      <th class="thLine">색상</th>
+                      <td v-for="(color, index) in invenColorsCount" :key="color.id">
+                        <div class="optionModal">
+                          <div class="textDiv" @click="colorModalHandle(index)">
+                            <div
+                              class="textBox"
+                            >{{allOptions.color[index]?allOptions.color[index] : "색상 옵션을 선택해 주세요."}}</div>
+                            <input
+                              @click=" $event.stopPropagation()"
+                              v-if="invenColorsCount[index].state === true"
+                              type="text"
+                            />
+                            <div v-if="invenColorsCount[index].state === true" class="optionList">
+                              <p
+                                class="listText"
+                                @click="selectOptionColor(optionColor.name,'color',index)"
+                                v-for="optionColor in optionColors"
+                                :key="optionColor.id"
+                              >{{optionColor.name}}</p>
                             </div>
-                          </td>
-                          <th>
-                            <div class="icon" @click="plusColorOption()">
-                              <i class="xi-plus-square-o"></i>
+                          </div>
+                        </div>
+                      </td>
+                      <th class="thLine">
+                        <div
+                          v-if="invenColorsCount.length > 1"
+                          class="icon"
+                          @click="minusColorOption()"
+                        >
+                          <i class="xi-minus"></i>
+                        </div>
+                        <div class="icon" @click="plusColorOption()">
+                          <i class="xi-plus"></i>
+                        </div>
+                      </th>
+                    </tr>
+                    <tr class="thColor" style="background-color: white !important">
+                      <th>사이즈</th>
+                      <td
+                        style="border-bottom: 1px solid lightgray; border-top-width: 0;"
+                        v-for="(size, index) in invenSizesCount"
+                        :key="size.id"
+                      >
+                        <div class="optionModal">
+                          <div class="textDiv" @click="sizeModalHandle(index)">
+                            <div
+                              class="textBox"
+                            >{{allOptions.size[index]?allOptions.size[index] : "사이즈 옵션을 선택해 주세요."}}</div>
+                            <input v-if="invenSizesCount[index].state === true" type="text" />
+                            <div v-if="invenSizesCount[index].state === true" class="optionList">
+                              <p
+                                class="listText"
+                                @click="selectOptionColor(optionSize.name,'size',index)"
+                                v-for="optionSize in optionSizes"
+                                :key="optionSize.id"
+                              >{{optionSize.name}}</p>
                             </div>
-                            <div class="icon" @click="minusColorOption()">
-                              <i class="xi-minus-square-o"></i>
-                            </div>
-                          </th>
-                        </tr>
-                        <tr class="thColor">
-                          <th>사이즈</th>
-                          <td v-for="(size, index) in invenSizesCount" :key="size.id">
-                            <div class="optionModal">
-                              <div class="textDiv" @click="sizeModalHandle(index)">
-                                <p>{{allOptions.size[index]?allOptions.size[index] : "사이즈 옵션을 선택해 주세요."}}</p>
-                                <input v-if="invenSizesCount[index].state === true" type="text" />
-                                <div
-                                  v-if="invenSizesCount[index].state === true"
-                                  class="optionList"
-                                >
-                                  <p
-                                    @click="selectOptionColor(optionSize.name,'size')"
-                                    v-for="optionSize in optionSizes"
-                                    :key="optionSize.id"
-                                  >{{optionSize.name}}</p>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                          <th>
-                            <div class="icon" @click="plusSizeOption()">
-                              <i class="xi-plus-square-o"></i>
-                            </div>
-                            <div class="icon" @click="minusSizeOption()">
-                              <i class="xi-minus-square-o"></i>
-                            </div>
-                          </th>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                </td>
-                <!-- <td>
+                          </div>
+                        </div>
+                      </td>
+                      <th>
+                        <div
+                          class="icon"
+                          v-if="invenSizesCount.length > 1"
+                          @click="minusSizeOption()"
+                        >
+                          <i class="xi-minus"></i>
+                        </div>
+                        <div class="icon" @click="plusSizeOption()">
+                          <i class="xi-plus"></i>
+                        </div>
+                      </th>
+                    </tr>
+                  </template>
+                </v-simple-table>
+              </td>
+              <!-- <td>
                     <tr>
                       <th>재고관리여부</th>
                     </tr>
@@ -431,35 +446,54 @@
                         <label for="inventroy">재고 수량 관리</label>
                       </td>
                     </tr>
-                </td>-->
-                <div class="optionSelected" @click="makingOptions()">적용</div>
-                <v-simple-table>
-                  <template v-slot:default>
-                    <tr>
-                      <th>
-                        <v-simple-table>
-                          <template v-slot:default>
-                            <tr>
-                              <th style="background-color:#eee;" colspan="2">상품 정보 옵션</th>
-                            </tr>
-                            <tr style="background-color:white">
-                              <th>색상</th>
-                              <th>사이즈</th>
-                            </tr>
-                            <tr style="background-color:white">
-                              <th>블랙</th>
-                              <th>라지</th>
-                            </tr>
-                          </template>
-                        </v-simple-table>
-                      </th>
-                      <th>일반재고</th>
-                    </tr>
-                    <tr></tr>
-                  </template>
-                </v-simple-table>
-              </tr>
-            </tbody>
+              </td>-->
+              <div class="optionSelected" @click="makingOptions()">
+                <i class="xi-check">적용</i>
+              </div>
+              <v-simple-table class="reusltTableWrap">
+                <template v-slot:default>
+                  <tr class="resultTable">
+                    <th class="resultTableTh">
+                      <v-simple-table>
+                        <template v-slot:default>
+                          <tr>
+                            <th class="headTh" style="background-color:#eee;" colspan="2">상품 정보 옵션</th>
+                            <th class="headTh" style="background-color:#eee;" rowspan="2">일반 재고</th>
+                            <th class="headTh" style="background-color:#eee;" rowspan="2"></th>
+                          </tr>
+                          <tr>
+                            <th class="headTh">색상</th>
+                            <th class="headTh">사이즈</th>
+                          </tr>
+                          <tr
+                            style="background-color:#eee"
+                            v-for="(option, index) in makingOptionsData"
+                            :key="option.id"
+                          >
+                            <th>{{option.color}}</th>
+                            <th>{{option.size}}</th>
+                            <th class="invenControl">
+                              <input :name="`inven${index}`" id="noInven" type="radio" />
+                              <label :for="`inven${index}`">재고관리 안함</label>
+
+                              <input :name=" `inven${index}`" id="inven" type="radio" />
+
+                              <label :for="`inven${index}`">
+                                <input v-model="makingOptionsData[index].quantity" type="text" />개
+                              </label>
+                            </th>
+                            <th>dsfl</th>
+                          </tr>
+                        </template>
+                      </v-simple-table>
+                    </th>
+                  </tr>
+                  <div style="background-color:white;">
+                    <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
+                  </div>
+                </template>
+              </v-simple-table>
+            </tr>
           </template>
         </v-simple-table>
       </div>
@@ -472,257 +506,8 @@
         <div @click="test01">전송버튼</div>
       </div>
     </div>
+
     <!-- 판매정보 시작 -->
-    <!-- <div class="container">
-      <div class="box">
-        <div id="app">
-          <div class="ProductRegist">
-            <div class="page_content">
-              <div class="portlet">
-                <div class="portlet-title">
-                  <div class="caption">
-                    <i class="xi-pen-o"></i>
-                    <span>판매정보</span>
-                  </div>
-                </div>
-                <div class="row sell-info">
-                  <div class="col-md-12">
-                    <table class="table-in-portlet sell-info">
-                      <tbody>
-                        <tr>
-                          <td width="15%" height="50px" class="seller-choice default-info-left">도매원가</td>
-                          <td class="td-wholesale">
-                            <div class="input-group">
-                              <input
-                                class="wholesale seller-info-input"
-                                type="text"
-                                maxlength="8"
-                                placeholder="0"
-                              />
-                            </div>
-                            <span class="input-group-addon">원</span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td width="15%" height="50px" class="seller-choice default-info-left">
-                            판매가
-                            <span class="font-color-red">*</span>
-                          </td>
-                          <td class="td-wholesale">
-                            <div class="input-group">
-                              <input
-                                v-model="price"
-                                class="wholesale seller-info-input"
-                                type="text"
-                                maxlength="8"
-                                placeholder="0"
-                              />
-                            </div>
-                            <span class="input-group-addon">원</span>
-                            <span class="font-color-blue">
-                              <i class="xi-caret-up"></i>
-                              판매가는 원화기준 10원 이상이며 가격 입력 시 10원 단위로 입력해 주세요.
-                            </span>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td width="15%" height="50px" class="seller-choice default-info-left">
-                            할인정보
-                            <span class="font-color-red">*</span>
-                          </td>
-                          <td colspan="3">
-                            <div class="col-md-6">
-                              <table>
-                                <tbody>
-                                  <tr>
-                                    <td>할인율</td>
-                                    <td>할인가</td>
-                                  </tr>
-                                  <tr>
-                                    <td class="td-background">
-                                      <div class="discount-rate">
-                                        <input
-                                          v-model="discount_rate"
-                                          placeholder="0"
-                                          class="discount-input"
-                                          type="text"
-                                        />
-                                        <span class="discount-persent">%</span>
-                                      </div>
-                                    </td>
-                                    <td class="td-background">
-                                      <div>
-                                        <input
-                                          v-model="discount_price"
-                                          class="discount-input"
-                                          type="text"
-                                          placeholder="0"
-                                        />원
-                                        <button class="discount-button" type="button">할인판매가적용</button>
-                                      </div>
-                                    </td>
-                                  </tr>
-
-                                  <tr>
-                                    <td class="td-background">할인판매가</td>
-                                    <td class="td-background">
-                                      <div>
-                                        <input
-                                          v-model="discount_price"
-                                          class="discount-input"
-                                          type="text"
-                                          placeholder="0"
-                                        />
-                                        원
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td>할인기간</td>
-                                    <td class="product_info">
-                                      <div class="radio-list">
-                                        <label>
-                                          <div class="radio">
-                                            <button>
-                                              <input
-                                                type="radio"
-                                                name="informationNo2"
-                                                value="Y"
-                                                checked="checked"
-                                                v-on:click="thatisHidden = false"
-                                              />
-                                              무기한
-                                            </button>
-                                          </div>
-                                        </label>
-
-                                        <label>
-                                          <button>
-                                            <input
-                                              type="radio"
-                                              name="informationNo2"
-                                              v-on:click="thatisHidden = true"
-                                            />
-                                            기간설정
-                                          </button>
-                                        </label>
-                                      </div>
-                                      <div class="input-directly" v-if="thatisHidden">
-                                        <span>
-                                          <div>
-                                            <label for="datepicker-invalid">시작일</label>
-                                            <b-form-datepicker
-                                              v-model="discount_start"
-                                              id="datepicker-invalid"
-                                              :state="false"
-                                              class="mb-2"
-                                            ></b-form-datepicker>
-                                            <label for="datepicker-valid">종료일</label>
-                                            <b-form-datepicker
-                                              v-model="discount_end"
-                                              id="datepicker-valid"
-                                              :state="true"
-                                            ></b-form-datepicker>
-                                          </div>
-                                        </span>
-                                        <br />
-                                        <span class="font-color-red">
-                                          * 할인기간을 설정시 기간만료되면 자동으로 정상가로 변경 됩니다.
-                                          <br />
-                                        </span>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                              <span class="font-color-blue">
-                                <i class="xi-caret-up"></i> 할인판매가 = 판매가 * 할인율
-                                <br />
-                                <i class="xi-caret-up"></i> 할인 판매가 적용 버튼을 클릭 하시면 판매가 정보가 자동 계산되어집니다.
-                                <br />
-                                <i class="xi-caret-up"></i> 할인 판매가는 원화기준 10원 단위로 자동 절사됩니다.
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-
-                        <tr class="tr-wholesale default-info-left">
-                          <td width="15%" class="seller-choice default-info-left">
-                            최소판매수량
-                            <span class="font-color-red">*</span>
-                          </td>
-                          <td>
-                            <div class="radio-list">
-                              <label>
-                                <div class="radio">
-                                  <span class="checked">
-                                    <input v-model="min_sales_unit" value="1" type="radio" />
-                                  </span>
-                                </div>1개 이상
-                              </label>
-                              <label>
-                                <div class="radio">
-                                  <span>
-                                    <input class type="radio" disabled />
-                                  </span>
-                                </div>
-                              </label>
-                              <input type="text" class="minimum-amount" /> 개 이상
-                              <span class="font-color-blue">(20개를 초과하여 설정하실 수 없습니다)</span>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr class="tr-wholesale default-info-left">
-                          <td width="15%" height="50px" class="seller-choice default-info-left">
-                            최대판매수량
-                            <span class="font-color-red">*</span>
-                          </td>
-                          <td>
-                            <div class="radio-list">
-                              <label>
-                                <div class="radio">
-                                  <span class="checked">
-                                    <input v-model="max_sales_unit" value="20" type="radio" />
-                                  </span>
-                                </div>20개
-                              </label>
-                              <label>
-                                <div class="radio">
-                                  <span>
-                                    <input class type="radio" disabled />
-                                  </span>
-                                </div>
-                              </label>
-                              <input type="text" class="minimum-amount" /> 개 이상
-                              <span class="font-color-blue">(20개를 초과하여 설정하실 수 없습니다)</span>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr class="tr-wholesale default-info-left">
-                          <td width="15%" height="50px" class="seller-choice default-info-left">
-                            상품 태그 관리
-                            <span class="font-color-red">*</span>
-                          </td>
-                          <td>
-                            <b-form-tags
-                              input-id="tags-separators"
-                              v-model="tag"
-                              separator=" ,;"
-                              placeholder="입력해 주세요"
-                              class="mb-2"
-                            ></b-form-tags>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>-->
 
     <!-- 등록 취소 버튼 -->
     <v-col class="text-center">
@@ -739,12 +524,17 @@
 
 <script>
 import axios from "axios";
+import { VueEditor } from "vue2-editor";
 import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 
 export default {
+  components: {
+    VueEditor
+  },
   data() {
     return {
       infoDatas: [],
+      content: "",
 
       sellersModal: false,
       sellersInputModal: false,
@@ -758,7 +548,6 @@ export default {
       colorModal: 0,
       colors: [],
       selectedColor: [],
-      colorInfo: <div>hi</div>,
 
       invenColorsCount: [{ state: false }],
       invenSizesCount: [{ state: false }],
@@ -768,6 +557,9 @@ export default {
       optionSizes: [],
       allOptions: { color: [], size: [] },
       makingOptionsData: [],
+      invenState: null,
+      test: 0,
+
       productDatas: {
         seller_key_id: "",
         is_onsale: 1,
@@ -782,20 +574,9 @@ export default {
         },
         name: "",
         simple_description: "",
-        color_filter_id: 0
-        // details: "뛰어다닐 수 있어요",
-        // options: [
-        //   {
-        //     size: "L",
-        //     color: "White",
-        //     quantity: 30
-        //   },
-        //   {
-        //     size: "L",
-        //     color: "White",
-        //     quantity: 30
-        //   }
-        // ],
+        color_filter_id: 0,
+        details: "",
+        options: this.makingOptionsData
         // wholesale_price: 30000,
         // price: 68000,
         // discount_rate: 10,
@@ -817,21 +598,22 @@ export default {
         .post(
           `${YE_URL}/product`,
           {
-            seller_key_id: 17,
-            is_onsale: 0,
-            is_displayed: 0,
-            color_filter_id: 5,
-            first_category_id: 15,
-            second_category_id: 1,
-            is_detail_reference: 0,
+            seller_key_id: this.productDatas.seller_key_id,
+            is_onsale: this.productDatas.is_onsale,
+            is_displayed: this.productDatas.is_displayed,
+            color_filter_id: this.productDatas.color_filter_id,
+            first_category_id: this.productDatas.first_category_id,
+            second_category_id: Number(this.productDatas.second_category_id),
+            is_detail_reference: this.productDatas.is_detail_reference,
             manufacture: {
-              manufacturer: "브랜디",
-              manufacture_date: "2010-01-01",
-              origin: "한국"
+              manufacturer: this.productDatas.manufacture.manufacturer,
+              manufacture_date: this.productDatas.manufacture.manufacture_date,
+              origin: this.productDatas.manufacture.origin
             },
-            name: "예쁜",
-            simple_description: "따듯해요",
+            name: this.productDatas.name,
+            simple_description: this.productDatas.simple_description,
             details: "겨울",
+            color_filter_id: this.productDatas.color_filter_id,
             options: [
               {
                 size: "XL",
@@ -861,6 +643,9 @@ export default {
         )
         .then(response => {
           console.log(response);
+        })
+        .catch(error => {
+          console.log(error.response.data.message);
         });
     },
     sellersModalHandle: function() {
@@ -869,19 +654,56 @@ export default {
         : (this.sellersInputModal = false);
     },
     makingOptions: function() {
+      this.makingOptionsData = [];
       for (let i = 0; i <= this.allOptions.color.length - 1; i++) {
         for (let j = 0; j <= this.allOptions.size.length - 1; j++) {
           this.makingOptionsData.push({
             color: this.allOptions.color[i],
-            size: this.allOptions.size[j]
+            size: this.allOptions.size[j],
+            quantity: null
           });
         }
       }
     },
-    selectOptionColor: function(name, option) {
-      option === "color"
-        ? this.allOptions.color.push(name)
-        : this.allOptions.size.push(name);
+    selectOptionColor: function(name, option, index) {
+      if (option === "color" && this.allOptions.color.length === 0) {
+        this.allOptions.color.push(name);
+      } else if (option === "color" && this.allOptions.color[index]) {
+        const colorCheck = this.allOptions.color.filter(colorInfo => {
+          return colorInfo === name;
+        });
+        colorCheck.length != 0
+          ? alert(`이미 선택된 옵션입니다.`)
+          : (this.allOptions.color[index] = name);
+      } else if (option === "color" && this.allOptions.color.length != 0) {
+        const colorCheck = this.allOptions.color.filter(colorInfo => {
+          return colorInfo === name;
+        });
+        colorCheck.length != 0
+          ? alert(`이미 선택된 옵션입니다.`)
+          : this.allOptions.color.push(name);
+      }
+
+      if (option === "size" && this.allOptions.size.length === 0) {
+        this.allOptions.size.push(name);
+      } else if (option === "size" && this.allOptions.size[index]) {
+        const sizeCheck = this.allOptions.size.filter(sizeInfo => {
+          return sizeInfo === name;
+        });
+        sizeCheck.length != 0
+          ? alert(`이미 선택된 옵션입니다.`)
+          : (this.allOptions.size[index] = name);
+      } else if (option === "size" && this.allOptions.size.length != 0) {
+        const sizeCheck = this.allOptions.size.filter(sizeInfo => {
+          return sizeInfo === name;
+        });
+        sizeCheck.length != 0
+          ? alert(`이미 선택된 옵션입니다.`)
+          : this.allOptions.size.push(name);
+      }
+      // option === "color"
+      //   ? this.allOptions.color.push(name)
+      //   : this.allOptions.size.push(name);
     },
     colorModalHandle: function(index) {
       this.invenColorsCount[index].state = !this.invenColorsCount[index].state;
@@ -891,21 +713,21 @@ export default {
     },
 
     getOptionColors: function() {
-      axios
-        .get(`${SJ_URL}/product-options`, {
-          headers: {
-            Authorization: localStorage.access_token
-          }
-        })
-        .then(response => {
-          this.optionColors = response.data.option_color;
-          this.optionSizes = response.data.option_size;
-        });
-      // axios.get(`${URL}/test.json`).then(response => {
-      //   console.log("here is test Data >>>>", response);
-      //   this.optionSizes = response.data.size;
-      //   this.optionColors = response.data.color;
-      // });
+      // axios
+      //   .get(`${YE_URL}/product-options`, {
+      //     headers: {
+      //       Authorization: localStorage.access_token
+      //     }
+      //   })
+      //   .then(response => {
+      //     this.optionColors = response.data.option_color;
+      //     this.optionSizes = response.data.option_size;
+      //   });
+      axios.get(`${URL}/test.json`).then(response => {
+        console.log("here is test Data >>>>", response);
+        this.optionSizes = response.data.size;
+        this.optionColors = response.data.color;
+      });
     },
     minusSizeOption: function() {
       this.invenSizesCount.splice(this.invenSizesCount.length - 1, 1);
@@ -1009,6 +831,16 @@ export default {
 <style lang="scss" scoped>
 .prWrap {
   padding-top: 35px;
+
+  .editorBox {
+    display: block !important;
+  }
+  .quillWrapper {
+    background-color: white;
+  }
+  td {
+    padding: 20px !important;
+  }
   .wrap {
     position: absolute;
     top: -100px;
@@ -1267,17 +1099,19 @@ export default {
   }
   .optionSelected {
     display: inline-block;
+
     color: #fff;
     background-color: #5bc0de;
     border-color: #46b8da;
-    font-size: 14px;
+    font-weight: 900;
+    font-size: 15px;
     cursor: pointer;
     &:hover {
       background-color: #46b8da;
     }
-    border-radius: 5px;
-    padding: 5px 8px;
-    margin-left: 10px;
+    border-radius: 3px;
+    padding: 8px 12px;
+    margin-left: 20px;
     margin-bottom: 10px;
   }
 
@@ -1346,31 +1180,7 @@ export default {
     border: 1px solid transparent;
     border-radius: 4px;
   }
-  .optionModal {
-    p {
-      text-align: center;
-    }
-    input {
-      width: 100%;
-    }
-    .optionList {
-      height: 100px;
-      background-color: white;
-      overflow: scroll;
-    }
-    p {
-      &:hover {
-        background-color: #eee;
-      }
-    }
-    .textDiv {
-      border: 1px solid lightgray;
-      height: 100%;
-      padding: 10px;
-      text-align: left;
-      font-size: 13px;
-    }
-  }
+
   input:focus {
     outline: 1px solid gray;
   }
@@ -1393,33 +1203,140 @@ export default {
 
   .optionTable {
     border: 1px solid lightgray;
-    th {
-      border-left: 1px solid lightgray;
-      border-bottom: 1px solid lightgray;
+    .tdBox {
+      .v-data-table {
+        border: 1px solid lightgray;
+        border-radius: 3px;
+      }
+      .headTh:nth-child(2) {
+        border: 1px solid lightgray !important;
+        border-top-width: 0 !important;
+        border-bottom-width: 0 !important;
+      }
+      .thColor {
+        background-color: white;
+        td {
+          border: 1px solid lightgray !important;
+          border-bottom-width: 0 !important;
+        }
+        .icon {
+          display: inline-block;
+          width: 25px;
+          padding: 5px;
+          text-align: center;
+          margin-right: 20px;
+          border: 1px solid lightgray;
+          border-radius: 3px;
+        }
+        i {
+          color: black;
+          font-weight: 900;
+          font-size: 13px;
+          cursor: pointer;
+          &:hover {
+            color: gray;
+          }
+        }
+      }
+      .thLine {
+        border: 1px solid lightgray !important;
+        border-left-width: 0 !important;
+        border-right-width: 0 !important;
+      }
+      th {
+        border: 0 !important;
+      }
+      td {
+        border: 0 !important;
+      }
     }
-    td {
-      // border-bottom: 1px solid lightgray;
+    .optionModal {
+      .textBox {
+        text-align: center;
+        width: 80%;
+        margin: 0 !important;
+        cursor: pointer;
+      }
+      input {
+        width: 100%;
+      }
+      .optionList {
+        margin: 0;
+        display: inline-block;
+        width: 100%;
+        height: 100px;
+        background-color: white;
+        overflow: scroll;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 400;
+        .listText {
+          margin-top: 10px;
+          cursor: pointer;
+          &:hover {
+            background-color: #eee;
+          }
+        }
+      }
+      .textBox {
+        text-align: center;
+        width: unset;
+        font-size: 14px;
+        margin-bottom: 10px !important;
+      }
+      .textDiv {
+        border: 1px solid lightgray;
+        padding: 10px;
+        text-align: left;
+        font-size: 13px;
+      }
+    }
+
+    .reusltTableWrap {
+      .v-data-table {
+        margin: 20px 0;
+        border: 1px solid lightgray !important;
+      }
+      .xi-info {
+        margin-left: 20px;
+
+        background-color: white;
+      }
+    }
+    .resultTable {
+      .resutlTableTh {
+        border: 0 !important;
+      }
+      th {
+        background-color: white;
+      }
+      .headTh {
+        background-color: #eee;
+      }
+      .invenControl {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        input {
+          width: unset;
+          margin-right: 5px;
+        }
+        label {
+          margin: 0 30px 0 10px;
+        }
+      }
+    }
+
+    .headTh {
+      font-size: 14px;
+      font-weight: 600;
+      color: black;
     }
     div:first-child {
       width: 100%;
     }
     .headColor {
       background-color: #eee;
-    }
-    .thColor {
-      background-color: white;
-      .icon {
-        display: inline;
-        margin-right: 20px;
-      }
-      i {
-        color: black;
-        font-size: 25px;
-        cursor: pointer;
-        &:hover {
-          color: gray;
-        }
-      }
     }
   }
   * {
