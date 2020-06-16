@@ -68,10 +68,6 @@ def create_user_endpoints(app, user_service):
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
-        except Exception as e:
-            db_connection.rollback()
-            return {'message' : str(e)}, 500
-
         finally:
             if db_connection:
                 db_connection.close()
@@ -105,10 +101,6 @@ def create_user_endpoints(app, user_service):
                 sign_in_response = user_service.check_user(get_user, db_connection)
 
                 return sign_in_response
-
-        except  Exception as e:
-            db_connection.rollback()
-            return {'message' : str(e)}, 500
 
         finally:
             if db_connection:
@@ -144,19 +136,17 @@ def create_user_endpoints(app, user_service):
             db_connection = get_connection()
             if db_connection:
 
-                filters = None
                 if request.args:
                     filters = request.args
                     validate(filters, seller_list_query_schema)
+                else:
+                    filters = None
 
                 sellers_response = user_service.get_seller_list(filters, db_connection)
                 return sellers_response
 
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
-
-        except  Exception as e:
-            return {'message': str(e)}, 500
 
         finally:
             if db_connection:
@@ -239,13 +229,6 @@ def create_user_endpoints(app, user_service):
 
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
-
-        except Exception as e:
-
-            if db_connection:
-                db_connection.rollback()
-
-            return {'message' : str(e)}, 500
 
         finally:
 
@@ -337,13 +320,6 @@ def create_user_endpoints(app, user_service):
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
 
-        except Exception as e:
-
-            if db_connection:
-                db_connection.rollback()
-
-            return {'message' : str(e)}, 500
-
         finally:
             
             if db_connection:
@@ -384,10 +360,7 @@ def create_user_endpoints(app, user_service):
                     return {'message' : 'UNAUTHORIZED'}, 401   
 
                 seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
-                return seller_infos 
-
-        except Exception as e:
-            return {'message' : str(e)}, 500
+                return seller_infos
 
         finally:
             if db_connection:
@@ -423,9 +396,6 @@ def create_user_endpoints(app, user_service):
                 seller_infos = user_service.get_seller_details(g.user, db_connection)
                 return seller_infos
 
-        except Exception as e:
-            return {'message' : str(e)}, 500
-
         finally:
             if db_connection:
                 db_connection.close()
@@ -455,10 +425,6 @@ def create_user_endpoints(app, user_service):
 
         except  ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
-
-        except Exception as e:
-            db_connection.rollback()
-            return {'message' : str(e)}, 500
 
         finally:
             if db_connection:

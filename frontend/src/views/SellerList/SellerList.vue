@@ -237,6 +237,17 @@
         </div>
       </div>
     </div>
+    <div id="app">
+  <v-app id="inspire">
+    <div class="text-center">
+      <v-pagination
+        v-model="page"
+        :length="pagesData"
+        @input="search"
+      ></v-pagination>
+    </div>
+  </v-app>
+</div>
   </div>
 </template>
  
@@ -279,6 +290,9 @@ export default {
       this.searchDatas[index].id.length === 0
         ? (this.searchDatas[index].state = false)
         : (this.searchDatas[index].state = true);
+    },
+    getPage: function(page) {
+      page;
     },
     getListDatas: function() {
       axios
@@ -353,7 +367,11 @@ export default {
           this.getListDatas();
         });
     },
-    search: function() {
+    search: function(page) {
+      let queryString = [];
+      if (page === undefined) {
+        page = 1
+      }
       //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
       // console.log("url data >>>> ", this.$route.query.page);
@@ -364,12 +382,13 @@ export default {
         item.id.length > 0 ? queryString.push(`${item.name}=${item.id}&`) : "";
       });
       axios
-        .get(`${SJ_URL}/sellers?${this.queryString.join("")}`, {
-          headers: {
+        .get(`${YE_URL}/sellers?pages=${page}&${queryString.join("")}`, {
+          headers: {  
             Authorization: localStorage.access_token
           }
         })
         .then(response => {
+          this.queryString = [];
           this.infoDatas = response.data.sellers;
           this.usersData = response.data.number_of_sellers;
           this.pagesData = response.data.number_of_pages;
