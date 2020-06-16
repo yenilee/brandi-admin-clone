@@ -280,7 +280,7 @@ class ProductService:
             #products        : 상품 리스트            
             return {
                 'product_count'   : count,
-                'number_of_pages' : int(len(products)/10)+1,
+                'number_of_pages' : int(count / 10) + 1,
                 'products'        : products}, 200
 
         except KeyError:           

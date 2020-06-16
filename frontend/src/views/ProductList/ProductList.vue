@@ -240,30 +240,29 @@ data() {
   },
   methods: {
     pagination:function(page){
-
+      //판매여부, 진열여부, 할인여부
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
-
-      this.inputBtn.filter(item => {
+      //셀러명
+      this.inputBtn.filter(item => {    
         item.state.length > 0
           ? this.query.push(`${item.name}=${item.state}&`)
           : "";
       });
-
+      //상품명, 상품코드, 상품번호
       this.selectBtn.filter(item => {
         item.state.length > 0
           ? this.query.push(`${item.name}=${item.state}&`)
           : "";
       });
-
+      //셀러속성
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
-      
-    console.log(this.query)
+          
     axios
-    .get(`${SJ_URL}/products?${this.query}page=${page}`, {
+    .get(`${SJ_URL}/products?${this.query.join("")}page=${page}`, {
       headers: {
         Authorization: localStorage.access_token
       }
@@ -271,10 +270,10 @@ data() {
     .then(response => {
       this.infoDatas = response.data;
     })
-    .catch(error => {
-      console.log(error.response.data.message);
-    })
+
+    //쿼리스트링 초기화
     this.query = [];
+    
     },
     reset: function() { 
 
@@ -292,8 +291,7 @@ data() {
         this.twoBtn[i]['state'] = 3;
       }       
     },    
-    search: function() {     
-
+    search: function() {         
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
@@ -313,7 +311,8 @@ data() {
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
-
+      // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링 추가
+      this.query.push('page=1&');
       axios
         .get(`${SJ_URL}/products?${this.query.join("")}`, {
           headers: {
@@ -323,9 +322,11 @@ data() {
         .then(response => {
           this.infoDatas = response.data;
           this.number = response.data.number_of_pages;
-        });
-        
-      console.log(this.query);
+        });     
+
+      //pagination 버튼 1로 이동
+      this.page = 1;
+      //쿼리스트링 초기화     
       this.query = [];
 
     },
