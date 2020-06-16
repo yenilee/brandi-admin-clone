@@ -252,6 +252,7 @@ def create_product_endpoints(app, product_service):
                 db_connection.close()
 
     @app.route('/products', methods=['GET'])
+    @connection_error
     @authorize
     def get_product_list():
         """
@@ -333,5 +334,3 @@ def create_product_endpoints(app, product_service):
         finally:
             if db_connection:
                 db_connection.close()
-
-

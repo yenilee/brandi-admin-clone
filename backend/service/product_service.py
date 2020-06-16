@@ -275,11 +275,13 @@ class ProductService:
             products = self.product_dao.get_productlist(seller_info, filters, db_connection)
             count    = self.product_dao.get_product_count(seller_info, filters, db_connection)
 
-            #product_count : 검색된 상품의 개수 
-            #products      : 상품 리스트            
+            #product_count   : 검색된 상품의 개수
+            #number_of_pages : 페이지 개수 (한 페이지당 10개의 상품) 
+            #products        : 상품 리스트            
             return {
-                'product_count' : count,
-                'products'      : products}, 200
+                'product_count'   : count,
+                'number_of_pages' : int(count / 10) + 1,
+                'products'        : products}, 200
 
         except KeyError:           
             return {'message': 'KEY_ERROR'}, 400

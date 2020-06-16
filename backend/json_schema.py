@@ -567,7 +567,8 @@ product_list_queryset_schema = {
             "examples": [
                 1
             ],
-            "pattern" : "[0-1]"
+            "pattern" : "[0-1]",
+            "maxLength": 1            
         },
         "is_displayed": {
             "$id": "#/properties/is_displayed",
@@ -578,7 +579,8 @@ product_list_queryset_schema = {
             "examples": [
                 0
             ],
-            "pattern" : "[0-1]"
+            "pattern" : "[0-1]",
+            "maxLength": 1
         },
         "is_discount": {
             "$id": "#/properties/is_discount",
@@ -587,7 +589,8 @@ product_list_queryset_schema = {
             "examples": [
                 0
             ],
-            "pattern" : "[0-1]"
+            "pattern" : "[0-1]",
+            "maxLength": 1
         },
         "seller_attribute_id": {
             "$id": "#/properties/seller_attribute_id",
@@ -596,7 +599,8 @@ product_list_queryset_schema = {
             "examples": [
                 2
             ],
-            "pattern" : "[0-7]"
+            "pattern" : "[0-7]",
+            "maxLength": 1
         },
         "product_number": {
             "$id": "#/properties/product_number",
@@ -606,6 +610,16 @@ product_list_queryset_schema = {
                 1
             ],
             "pattern" : "[0-9]"
+        },
+        "page": {
+            "$id": "#/properties/page",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-9]",
+            "maxLength": 1
         }
     }
 }

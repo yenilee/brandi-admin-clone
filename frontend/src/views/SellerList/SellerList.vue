@@ -111,7 +111,7 @@
                     <td>
                       <select
                         class="sellerStatus"
-                        @click="() => lengthCheck(7)"
+                        @input="() => lengthCheck(7)"
                         v-model="searchDatas[7].id"
                       >
                         <option value>선택</option>
@@ -142,7 +142,7 @@
                     <td>
                       <select
                         class="sellerStatus"
-                        @click="() => lengthCheck(8)"
+                        @input="() => lengthCheck(8)"
                         v-model="searchDatas[8].id"
                       >
                         <option value>선택</option>
@@ -262,6 +262,7 @@ export default {
   data() {
     return {
       headers: sellerListHeaders,
+      queryString: null,
       infoDatas: [],
       usersData: null,
       pagesData: null,
@@ -273,8 +274,8 @@ export default {
         { name: "supervisor_infos.name", id: "", state: false },
         { name: "supervisor_infos.phone_number", id: "", state: false },
         { name: "supervisor_infos.email", id: "", state: false },
-        { name: "sellers.seller_status_id", id: "", state: false },
-        { name: "sellers.seller_attribute_id", id: "", state: false },
+        { name: "sellers.seller_status_id", id: "", state: true },
+        { name: "sellers.seller_attribute_id", id: "", state: true }
       ],
       dates: ["2020-06-03", "2020-06-24"]
     };
@@ -286,7 +287,7 @@ export default {
 
   methods: {
     lengthCheck: function(index) {
-      this.searchDatas[index].id.length == 0
+      this.searchDatas[index].id.length === 0
         ? (this.searchDatas[index].state = false)
         : (this.searchDatas[index].state = true);
     },
@@ -295,7 +296,7 @@ export default {
     },
     getListDatas: function() {
       axios
-        .get(`${YE_URL}/sellers`, {
+        .get(`${SJ_URL}/sellers`, {
           // .get(`${URL}/sellerList.json`, {
           headers: {
             Authorization: localStorage.access_token
@@ -341,7 +342,7 @@ export default {
     actionBtnChange: function(action, id) {
       axios
         .put(
-          `${YE_URL}/action`,
+          `${SJ_URL}/action`,
           {
             user: id,
             action_type: action
@@ -378,9 +379,7 @@ export default {
       // axios.get(`${YE_URL}/sellers`);
       // alert(this.searchDatas.id);
       this.searchDatas.filter(item => {
-        item.state && item.id.length != 0
-          ? queryString.push(`${item.name}=${item.id}&`)
-          : "";
+        item.id.length > 0 ? queryString.push(`${item.name}=${item.id}&`) : "";
       });
       axios
         .get(`${YE_URL}/sellers?pages=${page}&${queryString.join("")}`, {
@@ -393,14 +392,14 @@ export default {
           this.infoDatas = response.data.sellers;
           this.usersData = response.data.number_of_sellers;
           this.pagesData = response.data.number_of_pages;
-          console.log(response);
-          console.log(queryString);
-
+          console.log("res", response);
+          console.log("query", queryString);
         });
     },
     reset: function() {
       this.searchDatas.map(item => {
         item.id = "";
+        this.query = [];
       });
       this.search();
     }

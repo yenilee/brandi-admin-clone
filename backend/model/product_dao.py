@@ -417,17 +417,20 @@ class ProductDao:
          # 셀러 속성
         if 'seller_attribute_id' in filters:
             # 셀러 속성 ID를 모두 가져온다
-            seller_attributes = filters.getlist('seller_attribute_id', type = int)
+            seller_attributes = tuple(filters.getlist('seller_attribute_id', type = int))
             # 한개의 셀러 속성 필터링 구문 추가 
             if len(seller_attributes) is 1:
                 filter_statement = filter_statement + " AND sellers.seller_attribute_id=" + str(seller_attributes[0])
             # 여러개의 셀러 속성 필터링 구문 추가 
             else:                 
-                filter_statement  = filter_statement + " AND sellers.seller_attribute_id IN " + str(tuple(seller_attributes))
+                filter_statement  = filter_statement + " AND sellers.seller_attribute_id IN " + str(seller_attributes)
 
         # 상품 등록일 내림차순
-        filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC;' 
+        filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC LIMIT 10'
 
+        if 'page' in filters:
+            filter_statement = filter_statement + ' OFFSET ' + str((10 * int(filters['page']) - 10))
+ 
         # 리스트 조회 쿼리에서 반환된 row의 개수를 담는다
         cursor.execute(products_list_sql + filter_statement)        
 
