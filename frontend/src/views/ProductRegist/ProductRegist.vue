@@ -88,7 +88,10 @@
             <!-- 셀러 상태 테이블 -->
 
             <tr class="sellerSelect">
-              <th>셀러 선택</th>
+              <th>
+                셀러 선택
+                <i class="xi-pen" />
+              </th>
               <td>
                 <input
                   type="text"
@@ -162,7 +165,10 @@
             <!-- 카테고리 -->
 
             <tr>
-              <th>카테고리</th>
+              <th>
+                카테고리
+                <i class="xi-pen" />
+              </th>
               <td class="categoryBox">
                 <tr>
                   <th>1차 카테고리</th>
@@ -199,7 +205,10 @@
             <!-- 상품 정보 고시 -->
 
             <tr>
-              <th>상품 정보 고시</th>
+              <th>
+                상품 정보 고시
+                <i class="xi-pen" />
+              </th>
               <td class="onSaleBox">
                 <div>
                   <input
@@ -244,7 +253,10 @@
             <!-- 상품명 -->
 
             <tr>
-              <th>상품명</th>
+              <th>
+                상품명
+                <i class="xi-pen" />
+              </th>
               <td>
                 <div class="box">
                   <input type="text" v-model="productDatas.name" />
@@ -266,7 +278,10 @@
 
             <!-- 상세 상품 설명 -->
             <tr>
-              <th>상세 상품 설명</th>
+              <th>
+                상세 상품 정보
+                <i class="xi-pen" />
+              </th>
               <td class="editorBox">
                 <vue-editor v-model="productDatas.details"></vue-editor>
               </td>
@@ -274,7 +289,10 @@
             <!-- 색상필터(썸네일 이미지) -->
 
             <tr>
-              <th>색상필터(썸네일 이미지)</th>
+              <th>
+                색상필터(썸네일 이미지)
+                <i class="xi-pen" />
+              </th>
               <td class="onSaleBox">
                 <div style="width: 100%">
                   <input
@@ -319,7 +337,10 @@
         <v-simple-table>
           <template v-slot:default>
             <tr>
-              <th>옵션설정</th>
+              <th>
+                옵션설정
+                <i class="xi-pen" />
+              </th>
               <td>
                 <input style="width: 10px; margin-right: 10px" type="radio" id="option" checked />
                 <label for="option">기본옵션</label>
@@ -518,7 +539,10 @@
             </tr>
 
             <tr class="originPriceTable">
-              <th>판매가</th>
+              <th>
+                판매가
+                <i class="xi-pen" />
+              </th>
               <td>
                 <input v-model="productDatas.price" type="text" />
                 <div class="wonBox">원</div>
@@ -577,19 +601,24 @@
             <tr class="originPriceTable">
               <th>최소 판매 수량</th>
               <td>
-                <input v-model="productDatas.price" type="text" />
-                <div class="wonBox">원</div>
+                <input :value="0" class="radioBtn" name="maxQuantity" type="radio" />
+                <label class="radioLabel">1개 이상</label>
+                <input class="radioBtn" name="maxQuantity" type="radio" />
+                <input v-model="productDatas.maximum_quantity" class="radioInput" type="text" />
+                <label class="radioLabel">개 이상</label>
+                <span>(20개를 초과하여 설정하실 수 없습니다)</span>
               </td>
-              <div>
-                <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
-              </div>
             </tr>
 
             <tr class="originPriceTable">
               <th>최대 판매 수량</th>
               <td>
-                <input v-model="productDatas.price" type="text" />
-                <div class="wonBox">원</div>
+                <input :value="0" class="radioBtn" name="minQuantity" type="radio" />
+                <label class="radioLabel">1개 이상</label>
+                <input class="radioBtn" name="minQuantity" type="radio" />
+                <input v-model="productDatas.minimum_quantity" class="radioInput" type="text" />
+                <label class="radioLabel">개 이상</label>
+                <span>(20개를 초과하여 설정하실 수 없습니다)</span>
               </td>
               <div>
                 <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
@@ -603,7 +632,6 @@
     <!-- 판매정보 시작 -->
 
     <!-- 등록 취소 버튼 -->
-    <div @click="test01">전송버튼</div>
     <v-col class="text-center">
       <div class="my-2">
         <v-btn class="enroll-button">등록</v-btn>
@@ -675,11 +703,11 @@ export default {
         options: this.makingOptionsData,
         wholesale_price: "",
         price: "",
-        discount_rate: ""
+        discount_rate: "",
         // discount_start: "2020-06-01 08:30:00",
         // discount_end: "2020-06-03 23:59:59",
-        // maximum_quantity: 1000,
-        // minimum_quantity: 40,
+        maximum_quantity: "",
+        minimum_quantity: ""
         // tags: ["태그88", "태그97", "태그94"]
       }
     };
@@ -1470,6 +1498,19 @@ export default {
       width: 15% !important;
       border-top-right-radius: 0px !important;
       border-bottom-right-radius: 0px !important;
+    }
+    .radioBtn {
+      width: unset !important;
+      margin-right: 20px;
+    }
+    .radioLabel {
+      margin-right: 20px;
+    }
+    .radioInput {
+      margin-right: 20px;
+    }
+    span {
+      color: #1e90ff;
     }
     .wonBox {
       width: 40px;
