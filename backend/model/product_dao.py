@@ -430,9 +430,7 @@ class ProductDao:
 
         if 'page' in filters:
             filter_statement = filter_statement + ' OFFSET ' + str((10 * int(filters['page']) - 10))
-
-        print(filter_statement)
-
+ 
         # 리스트 조회 쿼리에서 반환된 row의 개수를 담는다
         cursor.execute(products_list_sql + filter_statement)        
 
