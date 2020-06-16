@@ -159,7 +159,7 @@
                   <td>{{info.product_keys_id}}</td>
                   <td>{{info.seller_attributes_name}}</td>
                   <td>{{info.user}}</td>
-                  <td>{{info.price}}</td>
+                  <td>{{new Intl.NumberFormat().format(info.price)}}</td>
                   <td>
                     {{info.discount_price}}
                     <div class="discount">{{info.discount_rate ? `(${info.discount_rate}%)` : ""}}</div>
@@ -228,10 +228,32 @@ export default {
     this.getListDatas();
   },
   methods: {
-    reset: function() {},
-    search: function() {
-      let queryString = [];
+    reset: function() {
+      //셀러명 select 버튼 초기화
+      this.inputBtn[0]["state"] = "";
+      this.selectBtn[0]["state"] = "";
+      this.attCount = 0;
+      //셀러 속성 초기화
+      this.attBtn[0]["state"] = 1;
+      for (let i = 1; i < this.attBtn.length; i++) {
+        this.attBtn[i]["state"] = 0;
+      }
+      // 판매여부, 할인여부, 진열여부 초기화
+      for (let i = 0; i < this.twoBtn.length; i++) {
+        this.twoBtn[i]["state"] = 3;
+      }
+      axios
+        .get(`${YE_URL}/products?`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.infoDatas = response.data;
+        });
+    },
 
+    search: function() {
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
@@ -261,7 +283,7 @@ export default {
         .then(response => {
           this.infoDatas = response.data;
         });
-      console.log(this.query);
+      this.query = [];
     },
     getListDatas: function() {
       axios
@@ -515,7 +537,6 @@ export default {
     td {
       text-align: left;
       height: 39px !important;
-      padding: 12px 8px 8px 8px;
       border: 1px solid #ddd;
       border-left-width: 0 !important;
       border-bottom-width: 0 !important;
@@ -525,6 +546,9 @@ export default {
       color: black !important;
       font-size: 13px !important;
       background-color: #eee;
+    }
+    th {
+      width: 100%;
     }
   }
 }
