@@ -196,8 +196,7 @@
 import axios from "axios";
 import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 export default {
-
-  data() {
+data() {
     return {
       number: "",
       page: 1,
