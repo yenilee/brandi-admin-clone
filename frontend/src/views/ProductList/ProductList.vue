@@ -159,9 +159,9 @@
                   <td>{{info.product_keys_id}}</td>
                   <td>{{info.seller_attributes_name}}</td>
                   <td>{{info.user}}</td>
-                  <td>{{info.price}}</td>
+                  <td>{{new Intl.NumberFormat().format(info.price)}}</td>
                   <td>
-                    {{info.discount_price}}
+                    {{new Intl.NumberFormat().format(info.discount_price)}}
                     <div class="discount">{{info.discount_rate ? `(${info.discount_rate}%)` : ""}}</div>
                   </td>
                   <td>{{info.is_onsale ? "판매" : "미판매"}}</td>
@@ -174,15 +174,34 @@
         </v-simple-table>
       </template>
     </div>
-  </div>
+    <div class='pagination'>
+      <template>
+          <div>
+            <v-app id="inspire">
+              <div class="text-center">
+                <v-pagination
+                  v-model="page"
+                  :length="infoDatas.number_of_pages" 
+                  @input="pagination"                                                    
+                ></v-pagination>
+              </div>
+            </v-app>
+          </div>      
+        </template>
+      </div>
+  </div>  
 </template>
 
 <script>
 import axios from "axios";
 import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 export default {
+
   data() {
     return {
+      number: "",
+      page: 1,
+      
       infoDatas: {},
 
       searchDatas: [
@@ -213,24 +232,68 @@ export default {
         { name: "seller_attribute_id", state: 0 }
       ],
 
-      attAll: { state: true },
-      attShop: { state: false },
-      attMarket: { state: false },
-      attLoad: { state: false },
-      attDesigner: { state: false },
-      attGeneral: { state: false },
-      attBeauty: { state: false },
-
-      query: []
+      query: [],
+      currentPage: 1
     };
   },
   mounted: function() {
     this.getListDatas();
   },
   methods: {
-    reset: function() {},
-    search: function() {
-      let queryString = [];
+    pagination:function(page){
+
+      this.twoBtn.filter(item => {
+        item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
+      });
+
+      this.inputBtn.filter(item => {
+        item.state.length > 0
+          ? this.query.push(`${item.name}=${item.state}&`)
+          : "";
+      });
+
+      this.selectBtn.filter(item => {
+        item.state.length > 0
+          ? this.query.push(`${item.name}=${item.state}&`)
+          : "";
+      });
+
+      this.attBtn.filter(item => {
+        item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
+      });
+      
+    console.log(this.query)
+    axios
+    .get(`${SJ_URL}/products?${this.query}page=${page}`, {
+      headers: {
+        Authorization: localStorage.access_token
+      }
+    })
+    .then(response => {
+      this.infoDatas = response.data;
+    })
+    .catch(error => {
+      console.log(error.response.data.message);
+    })
+    this.query = [];
+    },
+    reset: function() { 
+
+      //셀러명 select 버튼 초기화
+      this.inputBtn[0]['state'] = "";
+      this.selectBtn[0]['state'] = "";
+      this.attCount = 0;
+      //셀러 속성 초기화
+      this.attBtn[0]['state'] = 1;
+      for (let i=1;i<this.attBtn.length;i++) {
+        this.attBtn[i]['state'] = 0;
+      }
+      // 판매여부, 할인여부, 진열여부 초기화
+      for (let i=0;i<this.twoBtn.length;i++) {
+        this.twoBtn[i]['state'] = 3;
+      }       
+    },    
+    search: function() {     
 
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
@@ -253,19 +316,23 @@ export default {
       });
 
       axios
-        .get(`${YE_URL}/products?${this.query.join("")}`, {
+        .get(`${SJ_URL}/products?${this.query.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
         })
         .then(response => {
           this.infoDatas = response.data;
+          this.number = response.data.number_of_pages;
         });
+        
       console.log(this.query);
+      this.query = [];
+
     },
     getListDatas: function() {
       axios
-        .get(`${YE_URL}/products`, {
+        .get(`${SJ_URL}/products`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -318,7 +385,7 @@ export default {
       if (this.attCount > 0) {
         this.attBtn[0].state = 0;
       }
-    }
+    }    
   }
 };
 </script>
@@ -525,6 +592,15 @@ export default {
       color: black !important;
       font-size: 13px !important;
       background-color: #eee;
+    }
+
+    .pagination {
+      font-size: 20px;
+
+    }
+    .page_item {
+      font-size: 20px;
+
     }
   }
 }
