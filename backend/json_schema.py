@@ -1,9 +1,114 @@
+#셀러 회원가입 스키마
+seller_sign_up_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "examples": [
+        {
+            "user": "test3",
+            "seller_attribute_id": 3,
+            "password": "1q2w3e4r!",
+            "phone_number": "010-1111-2222",
+            "name": "테스트03",
+            "eng_name": "brandi",
+            "service_number": "010-1234-1234",
+            "site_url": "http://www.naver.com"
+        }
+    ],
+    "required": [
+        "user",
+        "seller_attribute_id",
+        "password",
+        "phone_number",
+        "name",
+        "eng_name",
+        "service_number",
+        "site_url"
+    ],
+    "additionalProperties": True,
+    "properties": {
+        "user": {
+            "$id": "#/properties/user",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "test3"
+            ],
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{4,20}$"
+        },
+        "seller_attribute_id": {
+            "$id": "#/properties/seller_attribute_id",
+            "type": "integer",
+            "default": 0,
+            "examples": [
+                3
+            ],
+            "maximum": 7,
+            "minimum": 1
+        },
+        "password": {
+            "$id": "#/properties/password",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "1q2w3e4r!"
+            ],
+            "pattern": "(?=.*[A-Za-z])(?=.*\\d)(?=.*[$@$!%*#?&])[A-Za-z\\d$@$!%*#?&]{7,20}$"
+        },
+        "phone_number": {
+            "$id": "#/properties/phone_number",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "010-1111-2222"
+            ],
+            "pattern": "\\d{3}-\\d{3,4}-\\d{4}$"
+        },
+        "name": {
+            "$id": "#/properties/name",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "테스트03"
+            ],
+            "pattern": "^[ㄱ-ㅣ가-힣-0-9A-Za-z]([0-9ㄱ-ㅣ가-힣A-Za-z]){0,20}$"
+        },
+        "eng_name": {
+            "$id": "#/properties/eng_name",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "brandi"
+            ],
+            "pattern": "^[a-z]*$"
+        },
+        "service_number": {
+            "$id": "#/properties/service_number",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "010-1234-1234"
+            ],
+            "pattern": "(02.{0}|^01.{1}|[0-9]{4})-([0-9]+)-([0-9]{4})"
+        },
+        "site_url": {
+            "$id": "#/properties/site_url",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "http://www.naver.com"
+            ],
+            "pattern": "(http|https):\\/\\/(\\w+:{0,1}\\w*@)?(\\S+)(:[0-9]+)?(\\/|\\/([\\w#!:.?+=&%@!\\-\\/].[^\\s]*$))?"
+        }
+    }
+}
+
+#셀러 등록 수정 parameter validation
 seller_register_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
     "type": "object",
-    "title": "The root schema",
-    "description": "The root schema comprises the entire JSON document.",
     "default": {},
     "examples": [
         {
@@ -79,8 +184,6 @@ seller_register_schema = {
         "profile": {
             "$id": "#/properties/profile",
             "type": "string",
-            "title": "The profile schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "url"
@@ -89,8 +192,6 @@ seller_register_schema = {
         "background_image": {
             "$id": "#/properties/background_image",
             "type": "string",
-            "title": "The background_image schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "url"
@@ -99,8 +200,6 @@ seller_register_schema = {
         "simple_introduction": {
             "$id": "#/properties/simple_introduction",
             "type": "string",
-            "title": "The simple_introduction schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "안녕 난 진아야 안녕"
@@ -110,8 +209,6 @@ seller_register_schema = {
         "detail_introduction": {
             "$id": "#/properties/detail_introduction",
             "type": ["string", "null"],
-            "title": "The detail_introduction schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "셀러 상세 소개"
@@ -120,8 +217,6 @@ seller_register_schema = {
         "site_url": {
             "$id": "#/properties/site_url",
             "type": "string",
-            "title": "The site_url schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "http://www.naver.com"
@@ -131,8 +226,6 @@ seller_register_schema = {
         "supervisors": {
             "$id": "#/properties/supervisors",
             "type": ["array", "null"],
-            "title": "The supervisors schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": [],
             "examples": [
                 [
@@ -156,8 +249,6 @@ seller_register_schema = {
                     {
                         "$id": "#/properties/supervisors/items/anyOf/0",
                         "type": "object",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
                         "default": {},
                         "examples": [
                             {
@@ -167,15 +258,13 @@ seller_register_schema = {
                                 "order": "1"
                             }
                         ],
-                        "required": [   
+                        "required": [
                         ],
                         "additionalProperties": True,
                         "properties": {
                             "supervisor_name": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/supervisor_name",
-                                "type": ["string", "null"],                       
-                                "title": "The supervisor_name schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type": ["string", "null"],                 
                                 "default": "",
                                 "examples": [
                                     "담당자1"
@@ -183,9 +272,7 @@ seller_register_schema = {
                             },
                             "supervisor_phone_number": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/supervisor_phone_number",
-                                "type": ["string", "null"],
-                                "title": "The supervisor_phone_number schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type": ["string", "null"],                       
                                 "default": "",
                                 "examples": [
                                     "담당자1 핸드폰번호"
@@ -194,9 +281,7 @@ seller_register_schema = {
                             },
                             "supervisor_email": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/supervisor_email",
-                                "type":["string", "null"],
-                                "title": "The supervisor_email schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type":["string", "null"],                          
                                 "default": "",
                                 "examples": [
                                     "담당자1 이메일"
@@ -204,9 +289,7 @@ seller_register_schema = {
                             },
                             "order": {
                                 "$id": "#/properties/supervisors/items/anyOf/0/properties/order",
-                                "type": "integer",
-                                "title": "The order schema",
-                                "description": "An explanation about the purpose of this instance.",
+                                "type": "integer",                       
                                 "default": "",
                                 "examples": [
                                     "1"
@@ -220,9 +303,7 @@ seller_register_schema = {
         },
         "service_number": {
             "$id": "#/properties/service_number",
-            "type": "string",
-            "title": "The service_number schema",
-            "description": "An explanation about the purpose of this instance.",
+            "type": "string",      
             "default": "",
             "examples": [
                 "010-5338-7244"
@@ -232,8 +313,6 @@ seller_register_schema = {
         "zip_code": {
             "$id": "#/properties/zip_code",
             "type": "string",
-            "title": "The zip_code schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "우편번호"
@@ -242,8 +321,6 @@ seller_register_schema = {
         "address": {
             "$id": "#/properties/address",
             "type": "string",
-            "title": "The address schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "주소 (택배 수령지)"
@@ -252,8 +329,6 @@ seller_register_schema = {
         "detail_address": {
             "$id": "#/properties/detail_address",
             "type": "string",
-            "title": "The detail_address schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "상세주소 (택배 수령지)"
@@ -262,8 +337,6 @@ seller_register_schema = {
         "buisness_hours": {
             "$id": "#/properties/buisness_hours",
             "type": "array",
-            "title": "The buisness_hours schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": [],
             "examples": [
                 [
@@ -285,8 +358,6 @@ seller_register_schema = {
                     {
                         "$id": "#/properties/buisness_hours/items/anyOf/0",
                         "type": "object",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
                         "default": {},
                         "examples": [
                             {
@@ -305,8 +376,6 @@ seller_register_schema = {
                             "start_time": {
                                 "$id": "#/properties/buisness_hours/items/anyOf/0/properties/start_time",
                                 "type": ["string", "null"],
-                                "title": "The start_time schema",
-                                "description": "An explanation about the purpose of this instance.",
                                 "default": "",
                                 "examples": [
                                     "9:00:00"
@@ -315,8 +384,6 @@ seller_register_schema = {
                             "end_time": {
                                 "$id": "#/properties/buisness_hours/items/anyOf/0/properties/end_time",
                                 "type": ["string", "null"],
-                                "title": "The end_time schema",
-                                "description": "An explanation about the purpose of this instance.",
                                 "default": "",
                                 "examples": [
                                     "6:00:00"
@@ -325,8 +392,6 @@ seller_register_schema = {
                             "is_weekend": {
                                 "$id": "#/properties/buisness_hours/items/anyOf/0/properties/is_weekend",
                                 "type": "integer",
-                                "title": "The is_weekend schema",
-                                "description": "An explanation about the purpose of this instance.",
                                 "default": "",
                                 "examples": [
                                     "0"
@@ -341,8 +406,6 @@ seller_register_schema = {
         "bank": {
             "$id": "#/properties/bank",
             "type": "string",
-            "title": "The bank schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "정산은행"
@@ -351,8 +414,6 @@ seller_register_schema = {
         "account_owner": {
             "$id": "#/properties/account_owner",
             "type": "string",
-            "title": "The account_owner schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "계좌주"
@@ -361,8 +422,6 @@ seller_register_schema = {
         "bank_account": {
             "$id": "#/properties/bank_account",
             "type": "string",
-            "title": "The bank_account schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "계좌번호"
@@ -372,8 +431,6 @@ seller_register_schema = {
         "shipping_information": {
             "$id": "#/properties/shipping_information",
             "type": "string",
-            "title": "The shipping_information schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "배송정보"
@@ -382,8 +439,6 @@ seller_register_schema = {
         "refund_information": {
             "$id": "#/properties/refund_information",
             "type": "string",
-            "title": "The refund_information schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "교환 / 환불 정보"
@@ -392,8 +447,6 @@ seller_register_schema = {
         "model_height": {
             "$id": "#/properties/model_height",
             "type": "integer",
-            "title": "The model_height schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 177
@@ -402,8 +455,6 @@ seller_register_schema = {
         "model_size_top": {
             "$id": "#/properties/model_size_top",
             "type": "integer",
-            "title": "The model_size_top schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 50
@@ -412,8 +463,6 @@ seller_register_schema = {
         "model_size_bottom": {
             "$id": "#/properties/model_size_bottom",
             "type": "integer",
-            "title": "The model_size_bottom schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 30
@@ -422,8 +471,6 @@ seller_register_schema = {
         "model_size_foot": {
             "$id": "#/properties/model_size_foot",
             "type": "integer",
-            "title": "The model_size_foot schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
             "examples": [
                 255
@@ -432,8 +479,6 @@ seller_register_schema = {
         "feed_message": {
             "$id": "#/properties/feed_message",
             "type": ["string", "null"],
-            "title": "The feed_message schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
             "examples": [
                 "안녕하세요 OOO에요! 봄에 어울리는 신상이 입고 되었습니다."
@@ -442,282 +487,11 @@ seller_register_schema = {
     }
 }
 
-product_register_schema = {
-    "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "http://example.com/example.json",
-    "type": "object",
-    "title": "The root schema",
-    "description": "The root schema comprises the entire JSON document.",
-    "default": {},
-    "examples": [
-        {
-            "color_filter_id": 2,
-            "first_category_id": 1,
-            "second_category_id": 25,
-            "is_displayed": 1,
-            "is_onsale": 1,
-            "name": "멋진 옷",
-            "is_detail_reference": 1,
-            "simple_description": "good",
-            "details": "사세요",
-            "maximum_quantity": 10,
-            "price": 8000,
-            "wholesale_price": 8000,
-            "discount_rate": 0,
-            "discount_start": "2018-05-31",
-            "discount_end": "2019-04-10",
-            "manufacturer": "브랜디",
-            "manufacture_date": "1991-04-01 12:00:59",
-            "origin": "한국",
-            "tags": [
-                "큐트",
-                "러블리"
-            ]
-        }
-    ],
-    "required": [
-        "first_category_id",
-        "second_category_id",
-        "is_displayed",
-        "is_onsale",
-        "name",
-        "is_detail_reference",
-        "details",
-        "price",
-        "discount_rate",
-        "tags"
-    ],
-    "additionalProperties": True,
-    "properties": {
-        "color_filter_id": {
-            "$id": "#/properties/color_filter_id",
-            "type": "integer",
-            "title": "The color_filter_id schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                2
-            ]
-        },
-        "first_category_id": {
-            "$id": "#/properties/first_category_id",
-            "type": "integer",
-            "title": "The first_category_id schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                1
-            ]
-        },
-        "second_category_id": {
-            "$id": "#/properties/second_category_id",
-            "type": "integer",
-            "title": "The second_category_id schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                25
-            ]
-        },
-        "is_displayed": {
-            "$id": "#/properties/is_displayed",
-            "type": "integer",
-            "title": "The is_displayed schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                1
-            ]
-        },
-        "is_onsale": {
-            "$id": "#/properties/is_onsale",
-            "type": "integer",
-            "title": "The is_onsale schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                1
-            ]
-        },
-        "name": {
-            "$id": "#/properties/name",
-            "type": "string",
-            "title": "The name schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "멋진 옷"
-            ]
-        },
-        "is_detail_reference": {
-            "$id": "#/properties/is_detail_reference",
-            "type": "integer",
-            "title": "The is_detail_reference schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                1
-            ]
-        },
-        "simple_description": {
-            "$id": "#/properties/simple_description",
-            "type": "string",
-            "title": "The simple_description schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "good"
-            ]
-        },
-        "details": {
-            "$id": "#/properties/details",
-            "type": "string",
-            "title": "The details schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "사세요"
-            ]
-        },
-        "maximum_quantity": {
-            "$id": "#/properties/maximum_quantity",
-            "type": ["integer", "null"],
-            "title": "The maximum_quantity schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                10
-            ]
-        },
-        "minimum_quantity": {
-            "$id": "#/properties/minimum_quantity",
-            "type": ["integer", "null"],
-            "title": "The minimum_quantity schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                10
-            ]
-        },
-        "price": {
-            "$id": "#/properties/price",
-            "type": ["integer", "null"],
-            "title": "The price schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                8000
-            ]
-        },
-        "wholesale_price": {
-            "$id": "#/properties/wholesale_price",
-            "type": ["integer", "null"],
-            "title": "The wholesale_price schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                8000
-            ]
-        },
-        "discount_rate": {
-            "$id": "#/properties/discount_rate",
-            "type": "integer",
-            "title": "The discount_rate schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": 0,
-            "examples": [
-                0
-            ]
-        },
-        "discount_start": {
-            "$id": "#/properties/discount_start",
-            "type": ["string", "null"],
-            "title": "The discount_start schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "2018-05-31"
-            ]
-        },
-        "discount_end": {
-            "$id": "#/properties/discount_end",
-            "type": ["string", "null"],
-            "title": "The discount_end schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "2019-04-10"
-            ]
-        },
-        "manufacturer": {
-            "$id": "#/properties/manufacturer",
-            "type": ["string", "null"],
-            "title": "The manufacturer schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "브랜디"
-            ]
-        },
-        "manufacture_date": {
-            "$id": "#/properties/manufacture_date",
-            "type": ["string", "null"],
-            "title": "The manufacture_date schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "1991-04-01 12:00:59"
-            ]
-        },
-        "origin": {
-            "$id": "#/properties/origin",
-            "type": ["string", "null"],
-            "title": "The origin schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": "",
-            "examples": [
-                "한국"
-            ]
-        },
-        "tags": {
-            "$id": "#/properties/tags",
-            "type": "array",
-            "title": "The tags schema",
-            "description": "An explanation about the purpose of this instance.",
-            "default": [],
-            "examples": [
-                [
-                    "큐트",
-                    "러블리"
-                ]
-            ],
-            "additionalItems": True,
-            "items": {
-                "anyOf": [
-                    {
-                        "$id": "#/properties/tags/items/anyOf/0",
-                        "type": "string",
-                        "title": "The first anyOf schema",
-                        "description": "An explanation about the purpose of this instance.",
-                        "default": "",
-                        "examples": [
-                            "큐트",
-                            "러블리"
-                        ]
-                    }
-                ],
-                "$id": "#/properties/tags/items"
-            }
-        }
-    }
-}
-
+#셀러 상태 변경 시 액션 버튼 request validation
 seller_action_schema = {
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "http://example.com/example.json",
     "type": "object",
-    "title": "The root schema",
-    "description": "The root schema comprises the entire JSON document.",
     "default": {},
     "examples": [
         {
@@ -734,22 +508,482 @@ seller_action_schema = {
         "user": {
             "$id": "#/properties/user",
             "type": "integer",
-            "title": "The user schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": 0,
-            "examples": [
-                9
-            ]
         },
         "action_type": {
             "$id": "#/properties/action_type",
             "type": "string",
-            "title": "The action_type schema",
-            "description": "An explanation about the purpose of this instance.",
             "default": "",
-            "examples": [
-                "입점 승인"
+            "anyOf": [
+                {"action_type" : "입점 승인"},
+                {"action_type" : "입점 거절"},
             ]
         }
+    },
+}
+
+#상품 리스트 필터링 parameter validation
+product_list_queryset_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "examples": [
+        {
+            "user": "test",
+            "product_code": "brandi13",
+            "is_onsale": 1,
+            "is_displayed": 0,
+            "is_discount": 0,
+            "seller_attribute_id": 2,
+            "product_number": 1
+        }
+    ],
+    "required": [],
+    "additionalProperties": True,
+    "properties": {
+        "user": {
+            "$id": "#/properties/user",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "test"
+            ],
+            "pattern": "[A-Za-z0-9]"
+        },
+        "product_code": {
+            "$id": "#/properties/product_code",
+            "type": "string",
+            "default": "",
+            "examples": [
+                "brandi13"
+            ],
+            "pattern" : "[A-Za-z0-9]"
+        },
+        "is_onsale": {
+            "$id": "#/properties/is_onsale",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-1]",
+            "maxLength": 1            
+        },
+        "is_displayed": {
+            "$id": "#/properties/is_displayed",
+            "type": "string",
+            "title": "The is_displayed schema",
+            "description": "An explanation about the purpose of this instance.",
+            "default": 0,
+            "examples": [
+                0
+            ],
+            "pattern" : "[0-1]",
+            "maxLength": 1
+        },
+        "is_discount": {
+            "$id": "#/properties/is_discount",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                0
+            ],
+            "pattern" : "[0-1]",
+            "maxLength": 1
+        },
+        "seller_attribute_id": {
+            "$id": "#/properties/seller_attribute_id",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                2
+            ],
+            "pattern" : "[0-7]",
+            "maxLength": 1
+        },
+        "product_number": {
+            "$id": "#/properties/product_number",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-9]"
+        },
+        "page": {
+            "$id": "#/properties/page",
+            "type": "string",
+            "default": 0,
+            "examples": [
+                1
+            ],
+            "pattern" : "[0-9]",
+            "maxLength": 1
+        }
     }
+}
+
+product_register_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "seller_key_id": 18,
+            "is_onsale": 1,
+            "is_displayed": 1,
+            "color_filter_id": 1,
+            "first_category_id": 15,
+            "second_category_id": 1,
+            "is_detail_reference": 0,
+            "manufacture": {
+                "manufacturer": "예은",
+                "manufacture_date": "2020-05-15",
+                "origin": "중국"
+            },
+            "name": "청바지",
+            "simple_description": "편해요",
+            "details": "뛰어다닐 수 있어요",
+            "options": [
+                {
+                    "size": "XL",
+                    "color": "Gray",
+                    "quantity": 88
+                }, {
+                    "size": "L",
+                    "color": "Gray",
+                    "quantity": 88
+                }
+            ],
+            "wholesale_price": 30000,
+            "price": 68000,
+            "discount_rate": 10,
+            "discount_start": "2020-06-01 08:30:00",
+            "discount_end": "2020-06-03 23:59:59",
+            "maximum_quantity": 1000,
+            "minimum_quantity": 40,
+            "tags": [
+                "태그88",
+                "태그97",
+                "태그94"
+            ]
+        }
+    ],
+    "required": [
+        "is_onsale",
+        "is_displayed",
+        "first_category_id",
+        "second_category_id",
+        "is_detail_reference",
+        "name",
+        "simple_description",
+        "details",
+        "options",
+        "price",
+        "discount_rate",
+        "tags"
+    ],
+    "additionalProperties": True,
+    "properties": {
+        "seller_key_id": {
+            "$id": "#/properties/seller_key_id",
+            "type": "integer",
+            "default": 0
+        },
+        "is_onsale": {
+            "$id": "#/properties/is_onsale",
+            "type": "integer",
+            "default": 0
+        },
+        "is_displayed": {
+            "$id": "#/properties/is_displayed",
+            "type": "integer",
+            "default": 0
+        },
+        "color_filter_id": {
+            "$id": "#/properties/color_filter_id",
+            "type": ["integer", "null"],
+            "default": "null",
+        },
+        "first_category_id": {
+            "$id": "#/properties/first_category_id",
+            "type": "integer",
+            "default": 0
+        },
+        "second_category_id": {
+            "$id": "#/properties/second_category_id",
+            "type": "integer",
+            "default": 0,
+        },
+        "is_detail_reference": {
+            "$id": "#/properties/is_detail_reference",
+            "type": "integer",
+            "default": 0
+        },
+        "manufacture": {
+            "$id": "#/properties/manufacture",
+            "type": ["object", "null"],
+            "default": {},
+            "examples": [
+                {
+                    "manufacturer": "예은",
+                    "manufacture_date": "2020-05-15",
+                    "origin": "중국"
+                }
+            ],
+            "required": [
+                "manufacturer",
+                "manufacture_date",
+                "origin"
+            ],
+            "additionalProperties": True,
+            "properties": {
+                "manufacturer": {
+                    "$id": "#/properties/manufacture/properties/manufacturer",
+                    "type": "string",
+                    "default": ""
+                },
+                "manufacture_date": {
+                    "$id": "#/properties/manufacture/properties/manufacture_date",
+                    "type": "string",
+                    "default": ""
+                },
+                "origin": {
+                    "$id": "#/properties/manufacture/properties/origin",
+                    "type": "string",
+                    "default": "",
+                }
+            }
+        },
+        "name": {
+            "$id": "#/properties/name",
+            "type": "string",
+            "default": ""
+        },
+        "simple_description": {
+            "$id": "#/properties/simple_description",
+            "type": "string",
+            "default": ""
+        },
+        "details": {
+            "$id": "#/properties/details",
+            "type": "string",
+            "default": ""
+        },
+        "options": {
+            "$id": "#/properties/options",
+            "type": "array",
+            "default": [],
+            "examples": [
+                [
+                    {
+                        "size": "XL",
+                        "color": "Gray",
+                        "quantity": 88
+                    },
+                    {
+                    "size": "L",
+                    "color": "Gray",
+                    "quantity": 88
+                }
+                ]
+            ],
+            "additionalItems": True,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/options/items/anyOf/0",
+                        "type": "object",
+                        "default": {},
+                        "examples": [
+                            {
+                                "size": 5,
+                                "color": 4,
+                                "quantity": 88
+                            }
+                        ],
+                        "required": [
+                            "size",
+                            "color"
+                            "",
+                            "quantity"
+                        ],
+                        "additionalProperties": True,
+                        "properties": {
+                            "size": {
+                                "$id": "#/properties/options/items/anyOf/0/properties/size",
+                                "type": "string",
+                                "default": 0
+                            },
+                            "color": {
+                                "$id": "#/properties/options/items/anyOf/0/properties/color",
+                                "type": "string",
+                                "default": 0
+                            },
+                            "quantity": {
+                                "$id": "#/properties/options/items/anyOf/0/properties/quantity",
+                                "type": "integer",
+                                "default": 0
+                            }
+                        }
+                    }
+                ],
+                "$id": "#/properties/options/items"
+            }
+        },
+        "wholesale_price": {
+            "$id": "#/properties/wholesale_price",
+            "type": ["integer", "null"],
+            "default": 0,
+        },
+        "price": {
+            "$id": "#/properties/price",
+            "type": "integer",
+            "default": 0,
+        },
+        "discount_rate": {
+            "$id": "#/properties/discount_rate",
+            "type": ["integer"],
+            "default": 0,
+            "minimum" : 0,
+            "maximum": 100
+        },
+        "discount_start": {
+            "$id": "#/properties/discount_start",
+            "type": ["string", "null"],
+            "default": "",
+        },
+        "discount_end": {
+            "$id": "#/properties/discount_end",
+            "type": ["string", "null"],
+            "default": "",
+        },
+        "maximum_quantity": {
+            "$id": "#/properties/maximum_quantity",
+            "type": ["integer", "null"],
+            "default": 1,
+            "minimum" : 20,
+            "maximum": 20
+        },
+        "minimum_quantity": {
+            "$id": "#/properties/minimum_quantity",
+            "type": ["integer", "null"],
+            "default": 20,
+            "minimum" : 1,
+            "maximum": 20
+        },
+        "tags": {
+            "$id": "#/properties/tags",
+            "type": "array",
+            "default": [],
+            "uniqueItems" : True,
+            "errorMessage": "Please add a short description",
+            "miniItems" : 1,
+            "additionalItems": True,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/tags/items/anyOf/0",
+                        "type": "string",
+                        "default": "",
+                    }
+                ],
+                "$id": "#/properties/tags/items"
+            }
+        }
+    }
+}
+
+seller_list_query_schema = {
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "title": "The root schema",
+    "description": "The root schema comprises the entire JSON document.",
+    "default": {},
+    "examples": [
+        {
+            "sellers.id": 1,
+            "seller_keys.user": "master",
+            "sellers.eng_name": "seller",
+            "sellers.name": "셀러",
+            "supervisor_infos.name": "매니저",
+            "supervisor_infos.phone_number": "010-4232-1234",
+            "supervisor_infos.email": "seller@gg.com",
+            "seller_status.name": "입점",
+            "seller_attributes.name": "뷰티",
+            "seller_status.id": 1,
+            "seller_attributes.id": 7
+        }
+    ],
+    "required": [],
+    "additionalProperties": True,
+    "properties": {
+        "sellersid": {
+            "$id": "#/properties/sellersid",
+            "type": "integer",
+            "default": 0
+        },
+        "seller_keys.user": {
+            "$id": "#/properties/seller_keys.user",
+            "type": "string",
+            "default": ""
+        },
+        "sellers.eng_name": {
+            "$id": "#/properties/sellers.eng_name",
+            "type": "string",
+            "default": ""
+        },
+        "sellers.name": {
+            "$id": "#/properties/sellers.name",
+            "type": "string",
+            "default": ""
+        },
+        "supervisor_infos.name": {
+            "$id": "#/properties/supervisor_infos.name",
+            "type": "string",
+            "default": ""
+        },
+        "supervisor_infos.phone_number": {
+            "$id": "#/properties/supervisor_infos.phone_number",
+            "type": "string",
+            "default": ""
+        },
+        "supervisor_infos.email": {
+            "$id": "#/properties/supervisor_infos.email",
+            "type": "string",
+            "default": ""
+        },
+        "seller_status.name": {
+            "$id": "#/properties/seller_status.name",
+            "type": "string",
+            "default": ""
+        },
+        "seller_attributes.name": {
+            "$id": "#/properties/seller_attributes.name",
+            "type": "string",
+            "default": ""
+        },
+        "seller_status.id": {
+            "$id": "#/properties/seller_status.id",
+            "type": "integer",
+            "default": 0
+        },
+        "seller_attributes.id": {
+            "$id": "#/properties/seller_attributes.id",
+            "type": "integer",
+            "default": 0
+        }
+    }
+}
+
+action_button_validation = {
+    1 : ['입점 승인', '입점 거절'],
+    2 : ['휴점 신청', '퇴점 신청 처리'],
+    3 : ['휴점 해제', '퇴점 신청 처리'],
+    4 : ['휴점 신청', '퇴점 확정 처리', '퇴점 철회 처리']
 }

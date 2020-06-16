@@ -161,7 +161,7 @@
                   <td>{{info.user}}</td>
                   <td>{{new Intl.NumberFormat().format(info.price)}}</td>
                   <td>
-                    {{info.discount_price}}
+                    {{new Intl.NumberFormat().format(info.discount_price)}}
                     <div class="discount">{{info.discount_rate ? `(${info.discount_rate}%)` : ""}}</div>
                   </td>
                   <td>{{info.is_onsale ? "판매" : "미판매"}}</td>
@@ -174,6 +174,17 @@
         </v-simple-table>
       </template>
     </div>
+    <div class="pagination">
+      <template>
+        <div>
+          <v-app id="inspire">
+            <div class="text-center">
+              <v-pagination v-model="page" :length="infoDatas.number_of_pages" @input="pagination"></v-pagination>
+            </div>
+          </v-app>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -183,6 +194,9 @@ import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 export default {
   data() {
     return {
+      number: "",
+      page: 1,
+
       infoDatas: {},
 
       searchDatas: [
@@ -213,21 +227,49 @@ export default {
         { name: "seller_attribute_id", state: 0 }
       ],
 
-      attAll: { state: true },
-      attShop: { state: false },
-      attMarket: { state: false },
-      attLoad: { state: false },
-      attDesigner: { state: false },
-      attGeneral: { state: false },
-      attBeauty: { state: false },
-
-      query: []
+      query: [],
+      currentPage: 1
     };
   },
   mounted: function() {
     this.getListDatas();
   },
   methods: {
+    pagination: function(page) {
+      //판매여부, 진열여부, 할인여부
+      this.twoBtn.filter(item => {
+        item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
+      });
+      //셀러명
+      this.inputBtn.filter(item => {
+        item.state.length > 0
+          ? this.query.push(`${item.name}=${item.state}&`)
+          : "";
+      });
+      //상품명, 상품코드, 상품번호
+      this.selectBtn.filter(item => {
+        item.state.length > 0
+          ? this.query.push(`${item.name}=${item.state}&`)
+          : "";
+      });
+      //셀러속성
+      this.attBtn.filter(item => {
+        item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
+      });
+
+      axios
+        .get(`${SJ_URL}/products?${this.query.join("")}page=${page}`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.infoDatas = response.data;
+        });
+
+      //쿼리스트링 초기화
+      this.query = [];
+    },
     reset: function() {
       //셀러명 select 버튼 초기화
       this.inputBtn[0]["state"] = "";
@@ -242,17 +284,7 @@ export default {
       for (let i = 0; i < this.twoBtn.length; i++) {
         this.twoBtn[i]["state"] = 3;
       }
-      axios
-        .get(`${YE_URL}/products?`, {
-          headers: {
-            Authorization: localStorage.access_token
-          }
-        })
-        .then(response => {
-          this.infoDatas = response.data;
-        });
     },
-
     search: function() {
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
@@ -273,21 +305,27 @@ export default {
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
-
+      // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링 추가
+      this.query.push("page=1&");
       axios
-        .get(`${YE_URL}/products?${this.query.join("")}`, {
+        .get(`${SJ_URL}/products?${this.query.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
         })
         .then(response => {
           this.infoDatas = response.data;
+          this.number = response.data.number_of_pages;
         });
+
+      //pagination 버튼 1로 이동
+      this.page = 1;
+      //쿼리스트링 초기화
       this.query = [];
     },
     getListDatas: function() {
       axios
-        .get(`${YE_URL}/products`, {
+        .get(`${SJ_URL}/products`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -549,6 +587,14 @@ export default {
     }
     th {
       width: 100%;
+
+    .pagination {
+      font-size: 20px;
+
+    }
+    .page_item {
+      font-size: 20px;
+
     }
   }
 }

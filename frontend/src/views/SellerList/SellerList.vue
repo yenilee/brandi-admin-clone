@@ -251,6 +251,7 @@ export default {
   data() {
     return {
       headers: sellerListHeaders,
+      queryString: null,
       infoDatas: [],
       usersData: null,
       pagesData: null,
@@ -281,7 +282,7 @@ export default {
     },
     getListDatas: function() {
       axios
-        .get(`${YE_URL}/sellers`, {
+        .get(`${SJ_URL}/sellers`, {
           // .get(`${URL}/sellerList.json`, {
           headers: {
             Authorization: localStorage.access_token
@@ -327,7 +328,7 @@ export default {
     actionBtnChange: function(action, id) {
       axios
         .put(
-          `${YE_URL}/action`,
+          `${SJ_URL}/action`,
           {
             user: id,
             action_type: action
@@ -353,7 +354,6 @@ export default {
         });
     },
     search: function() {
-      let queryString = [];
       //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
       // console.log("url data >>>> ", this.$route.query.page);
@@ -364,7 +364,7 @@ export default {
         item.id.length > 0 ? queryString.push(`${item.name}=${item.id}&`) : "";
       });
       axios
-        .get(`${YE_URL}/sellers?${queryString.join("")}`, {
+        .get(`${SJ_URL}/sellers?${this.queryString.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -380,6 +380,7 @@ export default {
     reset: function() {
       this.searchDatas.map(item => {
         item.id = "";
+        this.query = [];
       });
       this.search();
     }

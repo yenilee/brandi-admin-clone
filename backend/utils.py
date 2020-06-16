@@ -1,7 +1,9 @@
 import jwt
+import pymysql
 
 from functools import wraps
 from flask     import request, Response, g
+
 from config    import SECRET_KEY, ALGORITHM
 
 def authorize(f):
@@ -25,3 +27,25 @@ def authorize(f):
             
         return f(*args, **kwargs)
     return decorated_function
+
+def connection_error(f):
+    @wraps(f)
+    def func_wrapper(*args, **kwargs):
+        try:
+           return f(*args, **kwargs)
+
+        except pymysql.err.InternalError:
+            return {'message': 'DATABASE_SERVER_ERROR'}, 500
+
+        except pymysql.err.OperationalError:
+            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
+
+        except pymysql.err.ProgrammingError:
+            return {'message': 'DATABASE_PROGRAMMING_ERROR'}, 500
+
+        except pymysql.err.NotSupportedError:
+            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
+
+        except pymysql.err.IntegrityError:
+            return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
+    return func_wrapper

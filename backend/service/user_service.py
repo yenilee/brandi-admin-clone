@@ -12,43 +12,8 @@ class UserService:
         self.user_dao = user_dao
         self.config   = config
 
-    def check_sign_up_validations(self, new_user):
-            # 회원가입 request parameter 유효성 검사
-
-            #셀러 ID
-            if not re.match(r'^[A-Za-z0-9][A-Za-z0-9_-]{4,20}$', new_user['user']):
-                return {'message' : 'ID_VALIDATION_ERROR'}, 400
-
-            #비밀번호
-            if not re.match(r'(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{7,20}$', new_user['password']):
-                return {'message' : 'PASSWORD_VALIDATION_ERROR'}, 400
-
-            #핸드폰번호
-            if not re.match(r'\d{3}-\d{3,4}-\d{4}$', new_user['phone_number']):
-                return {'message' : 'PHONE_NUMBER_VALIDATION_ERROR'}, 400
-
-            #한글 이름
-            if not re.match(r'^[ㄱ-ㅣ가-힣-0-9A-Za-z]([0-9ㄱ-ㅣ가-힣A-Za-z]){0,20}$', new_user['name']):
-                return {'message' : 'SELLER_NAME_VALIDATION_ERROR'}, 400
-
-            #영문 이름
-            if not re.match(r'^[a-z]*$', new_user['eng_name']):
-                return {'message' : 'SELLER_ENGLISH_NAME_VALIDATION_ERROR'}, 400
-
-            #고객센터 전화번호
-            if not re.match(r'(02.{0}|^01.{1}|[0-9]{4})-([0-9]+)-([0-9]{4})', new_user['service_number']):
-                return {'message' : 'SERVICE_NUMBER_VALIDATION_ERROR'}, 400
-
-            #사이트 URL
-            if not re.match(r'(http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/].[^\s]*$))?', new_user['site_url']):
-                return {'message' : 'SITE_URL_VALIDATION_ERROR'}, 400
-
     def sign_up_seller(self, new_user, db_connection):
         try:
-            # 회원가입 Validation 검사
-            if self.check_sign_up_validations(new_user):
-                return self.check_sign_up_validations(new_user)
-
             # 셀러 ID 중복체크 
             seller_id = self.user_dao.count_seller_id(new_user, db_connection)
             
@@ -62,15 +27,15 @@ class UserService:
             new_user['password'] = bcrypt.hashpw(new_user['password'].encode('utf-8'),bcrypt.gensalt()).decode('utf-8')
             last_row_id = self.user_dao.sign_up_seller(new_user, db_connection)
             new_user['last_row_id'] = last_row_id
-            # 저장된 셀러 ID를 가져와서 초기 관리자, 영업시간 정보를 저장
+            # 저장된 셀러 ID를 가져와서 관리자, 영업시간 정보를 초기화
             self.user_dao.insert_initial_supervisor(new_user, db_connection)
             self.user_dao.insert_initial_buisness_hours(new_user, db_connection)
 
             return "", 200
 
-        except KeyError as e:
+        except KeyError:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR' + str(e)}, 400
+            return {'message' : 'KEY_ERROR'}, 400
 
         except TypeError:
             db_connection.rollback()
@@ -134,9 +99,9 @@ class UserService:
             self.user_dao.update_seller(seller_infos, db_connection)
             return "", 200
 
-        except KeyError as e:
+        except KeyError:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR' + str(e)}, 400
+            return {'message' : 'KEY_ERROR'}, 400
 
         except TypeError:
             db_connection.rollback()
@@ -146,12 +111,12 @@ class UserService:
         try:
             # user - 셀러권한 : 자기 자신의 고유 ID, 마스터권한 : url parameter로 받은 셀러 고유 ID
 
-            # 사용자 정보
-            user_info        = self.user_dao.get_seller_details(user, db_connection)
+            # 사용자 정보 가져오기
+            user_info = self.user_dao.get_seller_details(user, db_connection) 
             
             # 셀러가 존재하지 않을 경우 
             if user_info == 0:
-                return {'message' : 'NO_SELLER_SELECTED'}, 500
+                return {'message' : 'NO_SELLER_SELECTED'}, 400
 
             # 담당자 정보 가져오기
             supervisor_info  = self.user_dao.get_supervisors(user, db_connection)
@@ -208,7 +173,15 @@ class UserService:
     def update_status(self, user, action_type, db_connection):
         try:
             # 예전 기록 중 셀러의 최신 수정 데이터를 갖고 있는 ID를 불러오기
-            previous_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)[0]
+            previous_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)
+
+            if previous_seller_id == 0:
+                return {'message' : 'NO SELLER SELECTED'}, 400
+
+            # request에 담긴 action을 기반으로 다음 status 불러오기
+            next_status_id = self.user_dao.get_next_status(action_type, db_connection)
+            if next_status_id == 0:
+                return {'message':'ACTION BUTTON DOES NOT EXIST'}
 
             # 위에서 가져온 ID의 데이터 종료일을 현재로 바꿔줌
             self.user_dao.update_history(previous_seller_id, db_connection)
@@ -225,9 +198,6 @@ class UserService:
             self.user_dao.update_supervisor(user_id, db_connection)
             self.user_dao.update_buisness_hour(user_id, db_connection)
 
-            # request에 담긴 action을 기반으로 다음 status 불러오기
-            next_status_id = self.user_dao.get_next_status(action_type, db_connection)
-
             # 퇴점 신청 처리일 경우 is_deleted를 1로 바꿔서 soft delete 실행
             if next_status_id == 6 or next_status_id == 7:
                 self.user_dao.soft_delete_seller(recent_seller_id, db_connection)
@@ -241,10 +211,10 @@ class UserService:
 
             return "", 200
 
-        except KeyError:
+        except KeyError as e:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR'}, 400
+            return {'message' : 'KEY_ERROR' +str(e)}, 400
 
-        except TypeError:
+        except TypeError as e:
             db_connection.rollback()
-            return {'message' : 'TYPE_ERROR'}, 400
+            return {'message' : 'TYPE_ERROR' + str(e)}, 400

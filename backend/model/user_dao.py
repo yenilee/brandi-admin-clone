@@ -14,7 +14,9 @@ class UserDao:
             %(user)s
             )
         """
-        cursor.execute(seller_key_insert_sql, new_user)
+        affected_row = cursor.execute(seller_key_insert_sql, new_user)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def sign_up_seller(self, new_user, db_connection):
         # 회원가입 시 필요한 셀러 정보 저장 
@@ -51,7 +53,10 @@ class UserDao:
                         );
                         """
 
-        cursor.execute(seller_insert_sql, new_user)
+        affected_row = cursor.execute(seller_insert_sql, new_user)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
+
         return cursor.lastrowid
 
     def count_seller_id(self, new_user, db_connection):
@@ -60,7 +65,8 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
 
         check_user_sql = """
-        SELECT COUNT(user) AS count
+        SELECT
+            COUNT(user) AS count
         FROM seller_keys
         WHERE user = %(user)s
         """
@@ -152,7 +158,7 @@ class UserDao:
         INNER JOIN seller_keys AS user ON sellers.seller_key_id = user.id
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        # cursor.execute 결과를 확인해 SELECT에 걸린 상품이 하나도 없으면 0을 리턴
+        # cursor.execute 결과를 확인해 SELECT에 걸린 셀러가 하나도 없으면 0을 리턴
         if cursor.execute(seller_infos_get_sql, user) == 0:
             return 0
 
@@ -163,10 +169,10 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         supervisor_infos_get_sql = """
         SELECT 
-        name as supervisor_name,
-        phone_number as supervisor_phone_number,
-        email as supervisor_email,
-        `order`
+            name as supervisor_name,
+            phone_number as supervisor_phone_number,
+            email as supervisor_email,
+            `order`
         FROM supervisor_infos
         WHERE seller_id = (SELECT id FROM sellers WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59');
         """
@@ -178,12 +184,12 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         buisness_hours_get_sql = """
         SELECT
-        id,
-        seller_id,
-        TIME_FORMAT(start_time, '%%H:%%i:%%s') AS start_time,
-        TIME_FORMAT(end_time, '%%H:%%i:%%s') AS end_time,
-        is_weekend,
-        is_deleted
+            id,
+            seller_id,
+            TIME_FORMAT(start_time, '%%H:%%i:%%s') AS start_time,
+            TIME_FORMAT(end_time, '%%H:%%i:%%s') AS end_time,
+            is_weekend,
+            is_deleted
         FROM buisness_hours
         WHERE seller_id = (SELECT id FROM sellers WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59');
         """
@@ -195,52 +201,54 @@ class UserDao:
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
         seller_histories_get_sql = """
         SELECT
-        DATE_FORMAT(MAX(start_date), '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
-        status.name,
-        MAX(editor) AS editor
+            DATE_FORMAT(MAX(start_date), '%%Y-%%m-%%d %%H:%%i:%%s') AS created_at,
+            status.name,
+            sellers.editor AS editor
         FROM
         sellers
         INNER JOIN seller_status AS status ON sellers.seller_status_id = status.id
         WHERE seller_key_id = %s
-        GROUP BY status.name
+        GROUP BY status.name, sellers.editor
         ORDER BY created_at
         """
         cursor.execute(seller_histories_get_sql, user)
         return cursor.fetchall()
 
     def update_seller(self, seller_infos, db_connection):
-        #  셀러 나머지 정보 (한줄 소개, 간략 소개, 배경 이미지, 계좌 정보, 배송, 환불 정보, 변경 실행자 등) 업데이트
+        #  가장 최신의 셀러 나머지 정보 
+        # (한줄 소개, 간략 소개, 배경 이미지, 계좌 정보, 배송, 환불 정보, 변경 실행자 등) 업데이트
         cursor = db_connection.cursor()
         seller_register_sql = """
         UPDATE sellers
         SET
-            profile = %(profile)s,
-            background_image = %(background_image)s,
-            simple_introduction = %(simple_introduction)s,
-            detail_introduction = %(detail_introduction)s,
-            site_url = %(site_url)s,
-            service_number = %(service_number)s,
-            zip_code = %(zip_code)s,
-            address = %(address)s,
-            detail_address = %(detail_address)s,
-            bank = %(bank)s,
-            account_owner =  %(account_owner)s,
-            bank_account = %(bank_account)s,
+            profile              = %(profile)s,
+            background_image     = %(background_image)s,
+            simple_introduction  = %(simple_introduction)s,
+            detail_introduction  = %(detail_introduction)s,
+            site_url             = %(site_url)s,
+            service_number       = %(service_number)s,
+            zip_code             = %(zip_code)s,
+            address              = %(address)s,
+            detail_address       = %(detail_address)s,
+            bank                 = %(bank)s,
+            account_owner        = %(account_owner)s,
+            bank_account         = %(bank_account)s,
             shipping_information = %(shipping_information)s,
-            refund_information = %(refund_information)s,
-            model_height = %(model_height)s,
-            model_size_top = %(model_size_top)s,
-            model_size_bottom = %(model_size_bottom)s,
-            model_size_foot = %(model_size_foot)s,
-            feed_message = %(feed_message)s,
-            editor = (SELECT user from seller_keys WHERE id = %(editor)s)
-
+            refund_information   = %(refund_information)s,
+            model_height         = %(model_height)s,
+            model_size_top       = %(model_size_top)s,
+            model_size_bottom    = %(model_size_bottom)s,
+            model_size_foot      = %(model_size_foot)s,
+            feed_message         = %(feed_message)s,
+            editor               = (SELECT user from seller_keys WHERE id = %(editor)s)     
         WHERE seller_key_id = %(user)s AND end_date = '2037-12-31 23:59:59'
         """
-        cursor.execute(seller_register_sql, seller_infos)
+        affected_row = cursor.execute(seller_register_sql, seller_infos)
+        if affected_row == -1:
+            raise Exception("CANNOT UPDATE DATA")
 
     def insert_supervisor(self, supervisor, db_connection):
-        # 담당자 정보 삽입
+        # 가장 최신 셀러 ID에 담당자 정보 삽입
         cursor = db_connection.cursor()
         supervisor_register_sql = """
         INSERT INTO supervisor_infos (
@@ -257,7 +265,9 @@ class UserDao:
             %(order)s
         )
         """
-        cursor.execute(supervisor_register_sql, supervisor)
+        affected_row = cursor.execute(supervisor_register_sql, supervisor)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def insert_buisness_hour(self, buisness_hour, db_connection):
         # 영업시간 정보 삽입
@@ -275,7 +285,9 @@ class UserDao:
             %(is_weekend)s
         )
         """
-        cursor.execute(supervisor_register_sql, buisness_hour)
+        affected_row = cursor.execute(supervisor_register_sql, buisness_hour)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def insert_initial_supervisor(self, new_user, db_connection):
         # 초기 회원가입 시 담당자 정보에 셀러 핸드폰번호 초기화
@@ -301,7 +313,9 @@ class UserDao:
             3
         )
         """
-        cursor.execute(supervisor_register_sql, new_user)
+        affected_row = cursor.execute(supervisor_register_sql, new_user)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def insert_initial_buisness_hours(self, new_user, db_connection):
         # 초기 회원가입 시 담당자 정보에 셀러 영업시간 초기화
@@ -325,7 +339,9 @@ class UserDao:
             1
         )
         """
-        cursor.execute(supervisor_register_sql, new_user)
+        affected_row = cursor.execute(supervisor_register_sql, new_user)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def update_supervisor(self, user_id, db_connection):
         # 셀러의 이전 ID 값의 담당자 정보를 새롭게 업데이트 해준다 
@@ -348,7 +364,9 @@ class UserDao:
         supervisor_infos
         WHERE seller_id = %(previous_id)s
         """
-        cursor.execute(insert_first_supervisor_sql, user_id)
+        affected_row = cursor.execute(insert_first_supervisor_sql, user_id)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")
 
     def update_buisness_hour(self, user_id, db_connection):
         # 셀러의 이전 ID 값의 고객센터 영업시간 정보를 새롭게 업데이트 해준다 
@@ -369,7 +387,9 @@ class UserDao:
         buisness_hours
         WHERE seller_id = %(previous_id)s
         """
-        cursor.execute(insert_first_buisness_hour_sql, user_id)  
+        affected_row = cursor.execute(insert_first_buisness_hour_sql, user_id)
+        if affected_row == -1:
+            raise Exception("CANNOT INSERT DATA")  
 
     def update_history(self, previous_id, db_connection):
         # 이전의 셀러 레코드의 유효종료일을 현재 시점으로 업데이트
@@ -389,8 +409,10 @@ class UserDao:
         FROM sellers
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(get_recent_seller_id_sql, user)
-        return cursor.fetchone()
+        affected_row = cursor.execute(get_recent_seller_id_sql, user)
+        if affected_row == 0:
+            return 0
+        return cursor.fetchone()[0]
 
     def get_seller_list(self, filters, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
@@ -401,9 +423,10 @@ class UserDao:
         # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
         if filters is not None:
             for k, v in filters.items():
-                if k == 'sellers.id':
+                if k == 'sellers.id' or k == 'seller_keys.id':
                     statement += f" AND {k} = {v}"
-                statement += f" AND {k} LIKE '%{v}%'"
+                else:
+                    statement += f" AND {k} LIKE '%{v}%'"
 
         sellers_list_sql = """
         SELECT DISTINCT
@@ -448,7 +471,10 @@ class UserDao:
         FROM seller_actions
         WHERE action_type = %(action_type)s
         """
-        cursor.execute(change_status_sql, action_type_name)
+        affected_row = cursor.execute(change_status_sql, action_type_name)
+        if affected_row == 0:
+            return 0
+
         next_status_id = cursor.fetchone()[0]
         return next_status_id
 

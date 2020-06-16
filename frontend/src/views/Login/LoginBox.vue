@@ -73,7 +73,7 @@ export default {
 
       if (this.passwordState && this.loginState) {
         axios
-          .post(`${YE_URL}/sign-in`, {
+          .post(`${SJ_URL}/sign-in`, {
             method: "POST",
             user: this.loginValue,
             password: this.passwordValue
