@@ -588,13 +588,12 @@ export default {
     th {
       width: 100%;
 
-    .pagination {
-      font-size: 20px;
-
-    }
-    .page_item {
-      font-size: 20px;
-
+      .pagination {
+        font-size: 20px;
+      }
+      .page_item {
+        font-size: 20px;
+      }
     }
   }
 }
