@@ -88,7 +88,10 @@
             <!-- 셀러 상태 테이블 -->
 
             <tr class="sellerSelect">
-              <th>셀러 선택</th>
+              <th>
+                셀러 선택
+                <i class="xi-pen" />
+              </th>
               <td>
                 <input
                   type="text"
@@ -162,7 +165,10 @@
             <!-- 카테고리 -->
 
             <tr>
-              <th>카테고리</th>
+              <th>
+                카테고리
+                <i class="xi-pen" />
+              </th>
               <td class="categoryBox">
                 <tr>
                   <th>1차 카테고리</th>
@@ -199,7 +205,10 @@
             <!-- 상품 정보 고시 -->
 
             <tr>
-              <th>상품 정보 고시</th>
+              <th>
+                상품 정보 고시
+                <i class="xi-pen" />
+              </th>
               <td class="onSaleBox">
                 <div>
                   <input
@@ -244,7 +253,10 @@
             <!-- 상품명 -->
 
             <tr>
-              <th>상품명</th>
+              <th>
+                상품명
+                <i class="xi-pen" />
+              </th>
               <td>
                 <div class="box">
                   <input type="text" v-model="productDatas.name" />
@@ -266,7 +278,10 @@
 
             <!-- 상세 상품 설명 -->
             <tr>
-              <th>상세 상품 설명</th>
+              <th>
+                상세 상품 정보
+                <i class="xi-pen" />
+              </th>
               <td class="editorBox">
                 <vue-editor v-model="productDatas.details"></vue-editor>
               </td>
@@ -274,7 +289,10 @@
             <!-- 색상필터(썸네일 이미지) -->
 
             <tr>
-              <th>색상필터(썸네일 이미지)</th>
+              <th>
+                색상필터(썸네일 이미지)
+                <i class="xi-pen" />
+              </th>
               <td class="onSaleBox">
                 <div style="width: 100%">
                   <input
@@ -319,7 +337,10 @@
         <v-simple-table>
           <template v-slot:default>
             <tr>
-              <th>옵션설정</th>
+              <th>
+                옵션설정
+                <i class="xi-pen" />
+              </th>
               <td>
                 <input style="width: 10px; margin-right: 10px" type="radio" id="option" checked />
                 <label for="option">기본옵션</label>
@@ -482,7 +503,11 @@
                                 <input v-model="makingOptionsData[index].quantity" type="text" />개
                               </label>
                             </th>
-                            <th>dsfl</th>
+                            <th class="optionMinusBox">
+                              <div class="optionMinus" @click="minusMakingOptions(index)">
+                                <i class="xi-minus"></i>
+                              </div>
+                            </th>
                           </tr>
                         </template>
                       </v-simple-table>
@@ -503,7 +528,104 @@
         <i class="xi-user">판매 정보</i>
       </div>
       <div class="cmpTable">
-        <div @click="test01">전송버튼</div>
+        <v-simple-table>
+          <template>
+            <tr class="originPriceTable">
+              <th>도매원가</th>
+              <td>
+                <input v-model="productDatas.wholesale_price" type="text" />
+                <div class="wonBox">원</div>
+              </td>
+            </tr>
+
+            <tr class="originPriceTable">
+              <th>
+                판매가
+                <i class="xi-pen" />
+              </th>
+              <td>
+                <input v-model="productDatas.price" type="text" />
+                <div class="wonBox">원</div>
+              </td>
+              <div>
+                <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
+              </div>
+            </tr>
+
+            <tr class="originPriceTable">
+              <th>할인 정보</th>
+
+              <td class="discountTable">
+                <v-simple-table>
+                  <template>
+                    <tr>
+                      <th>할인율</th>
+                      <th>할인가</th>
+                    </tr>
+                    <tr>
+                      <th>
+                        <input
+                          class="discountInput"
+                          v-model="productDatas.discount_rate"
+                          type="text"
+                        />
+                        <div class="wonBox">%</div>
+                      </th>
+                      <th>
+                        <div>{{discountPrice > 0 ? discountPrice : ""}}</div>
+                        <div class="discountBtn" @click="discountClick">할인 판매가 적용</div>
+                      </th>
+                    </tr>
+                    <tr>
+                      <th>할인판매가</th>
+                      <th>{{changedPrice > 0 ? changedPrice : ""}}</th>
+                    </tr>
+                    <tr>
+                      <th>할인기간</th>
+                      <th>라디오</th>
+                    </tr>
+                  </template>
+                </v-simple-table>
+              </td>
+              <div>
+                <i class="xi-info">할인판매가 = 판매가 * 할인율</i>
+              </div>
+              <div>
+                <i class="xi-info">할인 판매가 적용 버튼을 클릭 하시면 판매가 정보가 자동 계산되어집니다.</i>
+              </div>
+              <div>
+                <i class="xi-info">할인 판매가는 원화기준 10원 단위로 자동 절사됩니다.</i>
+              </div>
+            </tr>
+
+            <tr class="originPriceTable">
+              <th>최소 판매 수량</th>
+              <td>
+                <input :value="0" class="radioBtn" name="maxQuantity" type="radio" />
+                <label class="radioLabel">1개 이상</label>
+                <input class="radioBtn" name="maxQuantity" type="radio" />
+                <input v-model="productDatas.maximum_quantity" class="radioInput" type="text" />
+                <label class="radioLabel">개 이상</label>
+                <span>(20개를 초과하여 설정하실 수 없습니다)</span>
+              </td>
+            </tr>
+
+            <tr class="originPriceTable">
+              <th>최대 판매 수량</th>
+              <td>
+                <input :value="0" class="radioBtn" name="minQuantity" type="radio" />
+                <label class="radioLabel">1개 이상</label>
+                <input class="radioBtn" name="minQuantity" type="radio" />
+                <input v-model="productDatas.minimum_quantity" class="radioInput" type="text" />
+                <label class="radioLabel">개 이상</label>
+                <span>(20개를 초과하여 설정하실 수 없습니다)</span>
+              </td>
+              <div>
+                <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
+              </div>
+            </tr>
+          </template>
+        </v-simple-table>
       </div>
     </div>
 
@@ -519,7 +641,6 @@
       </div>
     </v-col>
   </div>
-
 </template>
 
 <script>
@@ -560,6 +681,9 @@ export default {
       invenState: null,
       test: 0,
 
+      discountPrice: "",
+      changedPrice: "",
+
       productDatas: {
         seller_key_id: "",
         is_onsale: 1,
@@ -576,14 +700,14 @@ export default {
         simple_description: "",
         color_filter_id: 0,
         details: "",
-        options: this.makingOptionsData
-        // wholesale_price: 30000,
-        // price: 68000,
-        // discount_rate: 10,
+        options: this.makingOptionsData,
+        wholesale_price: "",
+        price: "",
+        discount_rate: "",
         // discount_start: "2020-06-01 08:30:00",
         // discount_end: "2020-06-03 23:59:59",
-        // maximum_quantity: 1000,
-        // minimum_quantity: 40,
+        maximum_quantity: "",
+        minimum_quantity: ""
         // tags: ["태그88", "태그97", "태그94"]
       }
     };
@@ -647,6 +771,14 @@ export default {
         .catch(error => {
           console.log(error.response.data.message);
         });
+    },
+    discountClick: function() {
+      this.discountPrice =
+        this.productDatas.price / this.productDatas.discount_rate;
+      this.changedPrice = this.productDatas.price - this.discountPrice;
+    },
+    minusMakingOptions: function(index) {
+      this.makingOptionsData.splice(this.makingOptionsData[index], 1);
     },
     sellersModalHandle: function() {
       this.sellersInputModal
@@ -1271,7 +1403,8 @@ export default {
         font-size: 14px;
         font-weight: 400;
         .listText {
-          margin-top: 10px;
+          margin-top: 8px;
+          height: 20px;
           cursor: pointer;
           &:hover {
             background-color: #eee;
@@ -1325,6 +1458,25 @@ export default {
           margin: 0 30px 0 10px;
         }
       }
+      .optionMinusBox {
+        text-align: center;
+        width: 20%;
+
+        .optionMinus {
+          margin-left: 43%;
+          text-align: center;
+          justify-self: center;
+          width: 30px;
+          height: 30px;
+          font-size: 30px;
+          font-weight: 900;
+          color: #fff;
+          background-color: #d9534f;
+          border-color: #d43f3a;
+          border-radius: 3px;
+          cursor: pointer;
+        }
+      }
     }
 
     .headTh {
@@ -1339,324 +1491,70 @@ export default {
       background-color: #eee;
     }
   }
+
+  .originPriceTable {
+    border: 1px solid red;
+    input {
+      width: 15% !important;
+      border-top-right-radius: 0px !important;
+      border-bottom-right-radius: 0px !important;
+    }
+    .radioBtn {
+      width: unset !important;
+      margin-right: 20px;
+    }
+    .radioLabel {
+      margin-right: 20px;
+    }
+    .radioInput {
+      margin-right: 20px;
+    }
+    span {
+      color: #1e90ff;
+    }
+    .wonBox {
+      width: 40px;
+      height: 34px;
+      background-color: #e5e5e5;
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+
+      text-align: center;
+      padding: 8px;
+    }
+    .xi-info {
+      padding-left: 20px;
+    }
+  }
+  .discountTable {
+    text-align: left;
+    .discountInput {
+      width: 40% !important;
+    }
+    .v-data-table {
+      width: 50%;
+      border-left: 1px solid lightgray;
+      border-bottom: 1px solid lightgray;
+    }
+    .wonBox {
+      display: inline;
+      vertical-align: middle;
+    }
+    .discountBtn {
+      font-size: 14px;
+      padding: 6px 12px;
+      display: inline-block;
+      border-radius: 3px;
+      margin-top: 5px;
+      color: #fff;
+      background-color: #428bca;
+      border-color: #357ebd;
+      cursor: pointer;
+    }
+  }
+
   * {
     // border: 1px solid red;
-  }
-  .ProductRegist {
-    tr th {
-      // border : 1px solid #ddd;
-      text-align: center;
-    }
-    td {
-      padding: 10px;
-      border: 0.3px solid #ddd;
-      background-color: white;
-    }
-    .td-border {
-      // border:  0.3px solid #ddd;
-    }
-    .page_content {
-      width: 100%;
-      height: 100%;
-      background-color: white;
-      margin-top: 20px;
-      .page_title {
-        background-color: #eee;
-        padding: 10px 10px 2px 10px;
-        font-size: 20px;
-        small {
-          font-size: 14px;
-          letter-spacing: 0px;
-          font-weight: 300;
-          color: #888;
-        }
-      }
-      .page_bar {
-        border: 0;
-        padding: 0px;
-        background-color: #eee;
-        margin-bottom: 25px;
-        padding-left: 10px;
-        padding-right: 20px;
-      }
-      .page_ul {
-        display: flex;
-        justify-content: flex-start;
-        padding: 8px;
-        margin: 0;
-        list-style: none;
-      }
-      .portlet {
-        .portlet-title {
-          background-color: #eee;
-          border-radius: 4px 4px 0 0;
-          padding: 10px 10px 2px 10px;
-          height: 50px;
-        }
-        .caption {
-          color: #333;
-          display: flex;
-          justify-content: flex-start;
-          font-size: 16px;
-          line-height: 16px;
-          font-weight: 400;
-          margin: 0;
-          padding: 0;
-          margin-top: 1px;
-        }
-      }
-      .modal-color {
-        background-color: white;
-        color: red;
-      }
-      .modal-form {
-        display: flex;
-        justify-content: center;
-        background-color: white;
-      }
-
-      label {
-        display: flex;
-        margin: 10px;
-      }
-      .seller-search {
-        display: flex;
-
-        .seller-search-input {
-          background-color: white;
-          width: 150px;
-          margin: auto;
-        }
-        .seller-search2 {
-          cursor: not-allowed;
-          background-color: #eeeeee;
-          width: 250px;
-          border: none;
-        }
-      }
-
-      .row {
-        margin-right: -15px;
-        margin-left: -15px;
-
-        .table-in-portlet {
-          width: 100%;
-        }
-        .align-middle {
-          background-color: #f9f9f9;
-          .font-color-red {
-            color: red !important;
-          }
-          input[type="button"] {
-            -webkit-appearance: button;
-            cursor: pointer;
-          }
-        }
-        .radio-list {
-          display: flex;
-          align-items: center;
-        }
-        .font-color-blue {
-          font-size: 13px;
-          color: #1e90ff !important;
-          margin-top: 5px;
-        }
-        .font-color-red {
-          color: red !important;
-        }
-        .table-category {
-          zoom: 1;
-          position: static;
-          width: 500px;
-          background-color: #f9f9f9;
-        }
-        .radio {
-          display: flex;
-        }
-        .input-directly {
-          height: 300px;
-        }
-        .manufacture-day {
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
-        }
-
-        .company-name {
-          margin-top: 10px;
-          background-color: white;
-          border: 1px solid #888;
-          width: 400px;
-          background-color: white;
-          border: 1px solid #888;
-        }
-        .origin {
-          width: 400px;
-        }
-        .form-selectd {
-          border: 1px solid #888;
-          background-color: white;
-          width: 300px;
-        }
-        .form-control {
-          border: 1px solid #888;
-        }
-        .color-filter {
-          // border: 1px solid #ddd;
-          width: 200px;
-        }
-        .one-line {
-          width: 100%;
-          background-color: white;
-          border: 1px solid #888;
-        }
-        #preview {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        #preview img {
-          max-width: 100%;
-          max-height: 500px;
-        }
-        .picker-box {
-          margin-right: 30px;
-        }
-      }
-      .li-tag {
-        margin-top: 15px;
-      }
-      .age-filter {
-        background-color: white;
-        width: 200px;
-        height: 12px;
-        border-radius: 15px;
-      }
-      .ckeditor {
-        display: block;
-        // border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 0 3px;
-        background: #eee;
-      }
-      .vertical-align-middle {
-        height: unset;
-        background-color: #eee !important;
-      }
-      .bd-top {
-        font-size: 14px;
-        font-weight: 600;
-        background-color: #eee !important;
-      }
-      .style-filter-label {
-        display: flex;
-        justify-content: flex-start;
-      }
-      .default-info-left {
-        background-color: #eee;
-        text-align: center;
-      }
-      .td-wholesale {
-        display: flex;
-      }
-      .tr-wholesale {
-        border: 1px solid rgb(221, 221, 221);
-      }
-      .input-group {
-        width: 240px !important;
-        background-color: white;
-        border-radius: 10px;
-        margin-left: 10px;
-      }
-      .wholesale {
-        position: relative;
-        z-index: 2;
-        float: left;
-        width: 100%;
-        margin-left: 10px;
-      }
-      .input-group-addon {
-        margin-left: 10px;
-        border-color: #e5e5e5;
-        min-width: 39px;
-        margin-top: 10px;
-      }
-      .seller-info-input {
-        border: 1px solid #eee;
-      }
-      .td-background {
-        background-color: white;
-      }
-      .discount-label {
-        width: 120px;
-      }
-      .discount-div {
-        background-color: #f9f9f9;
-      }
-      .discount-persent {
-        background-color: #e5e5e5;
-      }
-      .discount-button {
-        color: #fff;
-        background-color: #3071a9;
-        border-color: #285e8e;
-        border-radius: 10px;
-        width: 124px;
-        height: 34px;
-        margin: 15px;
-      }
-      .discount-input {
-        width: 100px;
-        margin-left: 10px;
-        border: 1px solid #ddd;
-      }
-      .discount-rate {
-        display: flex;
-      }
-      .minimum-amount {
-        cursor: not-allowed;
-        background-color: #eeeeee;
-        width: 100px;
-        height: 34px;
-      }
-      .stock-div {
-        display: flex;
-      }
-      .stock-amount {
-        margin-left: 20px;
-      }
-      .text-center {
-        display: flex;
-        justify-content: center;
-      }
-
-      .inspire {
-        height: 50px;
-      }
-      .modal-input {
-        border: 1px solid red;
-      }
-      .enroll-button {
-        background-color: #5cb85c !important;
-        color: white;
-      }
-      .cancle-button {
-        margin-left: 5px;
-        background-color: #d9534f !important;
-        color: white;
-      }
-      .apply-button {
-        background-color: #5bc0de !important;
-        color: white;
-        margin-bottom: 10px;
-      }
-      .product-option-info {
-        text-align: center;
-      }
-      .style-filter-span {
-        margin-left: 20px;
-      }
-    }
   }
 }
 </style>
