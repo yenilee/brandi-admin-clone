@@ -416,17 +416,24 @@ class UserDao:
 
     def get_seller_list(self, filters, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
-
-        # 밑에서 추가할 SQL statement를 정의
         statement = ""
+        equal_search = ['sellers.id', 'sellers.seller_status_id', 'sellers.seller_attribute_id']
+        like_search = ['seller_keys.user', 'sellers.eng_name', 'sellers.name', 'supervisor_infos.name',
+                       'supervisor_infos.phone_number', 'supervisor_infos.email']
 
-        # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
+        offset_statement = ""
         if filters is not None:
             for k, v in filters.items():
-                if k == 'sellers.id' or k == 'seller_keys.id':
+                if k in equal_search:
                     statement += f" AND {k} = {v}"
-                else:
+                if k in like_search:
                     statement += f" AND {k} LIKE '%{v}%'"
+                if k == 'pages':
+                    if v is not '1':
+                        v = (int(v) - 1) * 10 + 1
+                    else:
+                        v = 1
+                    offset_statement = f" LIMIT 10 OFFSET {v}"
 
         sellers_list_sql = """
         SELECT DISTINCT
@@ -457,10 +464,12 @@ class UserDao:
         WHERE end_date = '2037-12-31 23:59:59' 
         AND sellers.seller_status_id <> 6 
         AND sellers.seller_status_id <> 7
-        AND (authority_id = 2 OR authority_id = 3) """ + statement + " ORDER BY sellers.id DESC"
+        AND (authority_id = 2 OR authority_id = 3)""" + statement + offset_statement
 
+        print(sellers_list_sql)
         if cursor.execute(sellers_list_sql) == 0:
             return 0
+
         sellers = cursor.fetchall()
         return sellers
 
@@ -488,7 +497,7 @@ class UserDao:
             seller_status_id,
             editor,
             password,
-            phone_number,
+            phone_number, 
             name,
             eng_name,
             service_number,
@@ -587,3 +596,16 @@ class UserDao:
         WHERE id = %s AND end_date = '2037-12-31 23:59:59';
         """
         cursor.execute(soft_delete_seller_sql, seller_key_id)
+
+    def get_number_of_sellers(self, db_connection):
+        cursor = db_connection.cursor()
+        get_number_of_sellers_sql = """
+        SELECT count(seller_key_id)
+        FROM sellers
+        WHERE end_date = '2037-12-31 23:59:59'
+        """
+        affected_row = cursor.execute(get_number_of_sellers_sql)
+        if affected_row == 0:
+            return 0
+
+        return cursor.fetchone()[0]

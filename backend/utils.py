@@ -35,6 +35,10 @@ def connection_error(f):
            return f(*args, **kwargs)
 
         except pymysql.err.InternalError:
+
+            if db_connection:
+                db_connection.rollback()
+
             return {'message': 'DATABASE_SERVER_ERROR'}, 500
 
         except pymysql.err.OperationalError:
@@ -48,4 +52,8 @@ def connection_error(f):
 
         except pymysql.err.IntegrityError:
             return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
+
+        except  Exception as e:
+            return {'message': str(e)}, 500
+
     return func_wrapper
