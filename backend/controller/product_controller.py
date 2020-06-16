@@ -33,9 +33,6 @@ def create_product_endpoints(app, product_service):
 
                 return {'seller_list' : sellers }, 200
 
-        except  Exception as e:
-            return {'message': str(e)}, 500
-
         finally:
             if db_connection:
                 db_connection.close()
@@ -57,9 +54,6 @@ def create_product_endpoints(app, product_service):
 
                 return {'color_filters' : register_response}, 200
 
-        except  Exception as e:
-            return {'message': str(e)}, 500
-
         finally:
             if db_connection:
                 db_connection.close()
@@ -80,9 +74,6 @@ def create_product_endpoints(app, product_service):
                 register_response = product_service.registration_page_options(db_connection)
 
                 return register_response
-
-        except  Exception as e:
-            return {'message': str(e)}, 500
 
         finally:
             if db_connection:
@@ -112,9 +103,6 @@ def create_product_endpoints(app, product_service):
                     'first_category': first_categories
                     }, 200
 
-        except  Exception as e:
-            return {'message': str(e)}, 500
-
         finally:
             if db_connection:
                 db_connection.close()
@@ -137,10 +125,8 @@ def create_product_endpoints(app, product_service):
                 register_response = product_service.get_second_category(seller_key_id, first_category_id, db_connection)
                 return register_response
 
-        except  Exception as e:
-            return {'message': str(e)}, 500
-
         finally:
+            if db_connection:
                 db_connection.close()
 
     @app.route('/product', methods=['POST'])
@@ -208,11 +194,8 @@ def create_product_endpoints(app, product_service):
                 return register_response
 
         except  ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
-
-        except Exception as e:
             db_connection.rollback()
-            return {'message': str(e)}, 500
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
 
         finally:
             if db_connection:
@@ -237,9 +220,6 @@ def create_product_endpoints(app, product_service):
 
                 return get_response
 
-        except  Exception as e:
-            return {'message': str(e)}, 500
-
         finally:
             db_connection.close()
 
@@ -263,15 +243,13 @@ def create_product_endpoints(app, product_service):
                 db_connection.commit()
                 return update_response
 
-        except ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
-
-        except Exception as e:
+        except  ValidationError as e:
             db_connection.rollback()
-            return {'message': str(e)}, 500
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
 
         finally:
-            db_connection.close()
+            if db_connection:
+                db_connection.close()
 
     @app.route('/products', methods=['GET'])
     @connection_error
@@ -323,9 +301,6 @@ def create_product_endpoints(app, product_service):
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
-        except  Exception as e:
-            return {'message': str(e)}, 500
-
         finally:
             if db_connection:
                 db_connection.close()
@@ -355,9 +330,6 @@ def create_product_endpoints(app, product_service):
 
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
-
-        except  Exception as e:
-            return {'message': str(e)}, 500
 
         finally:
             if db_connection:

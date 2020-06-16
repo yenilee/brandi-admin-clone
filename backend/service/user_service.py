@@ -154,14 +154,16 @@ class UserService:
             merge_tuples = collections.defaultdict(list)
             [ merge_tuples[k].extend(v.split(',')) for k, v in seller_actions ]
 
+            number_of_sellers = self.user_dao.get_number_of_sellers(db_connection)
+
             # 위에서 만든 값을 셀러의 상태 ID와 매칭해줌
             for seller in sellers:
                 for action in list(merge_tuples.items()):
                     if action[0]== seller['status_id']:
                         seller.update({"actions_by_status" : action[1]})
 
-            return {'number_of_sellers' : len(sellers),
-                    'number_of_pages' : int(len(sellers)/10)+1,
+            return {'number_of_sellers' : number_of_sellers,
+                    'number_of_pages' : int((number_of_sellers)/10)+1,
                     'sellers' : sellers}, 200
 
         except KeyError as e:
