@@ -482,7 +482,11 @@
                                 <input v-model="makingOptionsData[index].quantity" type="text" />개
                               </label>
                             </th>
-                            <th>dsfl</th>
+                            <th class="optionMinusBox">
+                              <div class="optionMinus" @click="minusMakingOptions(index)">
+                                <i class="xi-minus"></i>
+                              </div>
+                            </th>
                           </tr>
                         </template>
                       </v-simple-table>
@@ -519,7 +523,6 @@
       </div>
     </v-col>
   </div>
-
 </template>
 
 <script>
@@ -647,6 +650,9 @@ export default {
         .catch(error => {
           console.log(error.response.data.message);
         });
+    },
+    minusMakingOptions: function(index) {
+      this.makingOptionsData.splice(this.makingOptionsData[index], 1);
     },
     sellersModalHandle: function() {
       this.sellersInputModal
@@ -1271,7 +1277,8 @@ export default {
         font-size: 14px;
         font-weight: 400;
         .listText {
-          margin-top: 10px;
+          margin-top: 8px;
+          height: 20px;
           cursor: pointer;
           &:hover {
             background-color: #eee;
@@ -1323,6 +1330,25 @@ export default {
         }
         label {
           margin: 0 30px 0 10px;
+        }
+      }
+      .optionMinusBox {
+        text-align: center;
+        width: 20%;
+
+        .optionMinus {
+          margin-left: 43%;
+          text-align: center;
+          justify-self: center;
+          width: 30px;
+          height: 30px;
+          font-size: 30px;
+          font-weight: 900;
+          color: #fff;
+          background-color: #d9534f;
+          border-color: #d43f3a;
+          border-radius: 3px;
+          cursor: pointer;
         }
       }
     }
