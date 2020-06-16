@@ -409,8 +409,10 @@ class UserDao:
         FROM sellers
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(get_recent_seller_id_sql, user)
-        return cursor.fetchone()
+        affected_row = cursor.execute(get_recent_seller_id_sql, user)
+        if affected_row == 0:
+            return 0
+        return cursor.fetchone()[0]
 
     def get_seller_list(self, filters, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
@@ -423,7 +425,8 @@ class UserDao:
             for k, v in filters.items():
                 if k == 'sellers.id' or k == 'seller_keys.id':
                     statement += f" AND {k} = {v}"
-                statement += f" AND {k} LIKE '%{v}%'"
+                else:
+                    statement += f" AND {k} LIKE '%{v}%'"
 
         sellers_list_sql = """
         SELECT DISTINCT
@@ -468,7 +471,10 @@ class UserDao:
         FROM seller_actions
         WHERE action_type = %(action_type)s
         """
-        cursor.execute(change_status_sql, action_type_name)
+        affected_row = cursor.execute(change_status_sql, action_type_name)
+        if affected_row == 0:
+            return 0
+
         next_status_id = cursor.fetchone()[0]
         return next_status_id
 
