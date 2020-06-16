@@ -174,6 +174,21 @@
         </v-simple-table>
       </template>
     </div>
+    <div class='pagination'>
+      <template>
+          <div>
+            <v-app id="inspire">
+              <div class="text-center">
+                <v-pagination
+                  v-model="page"
+                  :length="infoDatas.number_of_pages" 
+                  @input="pagination"                                                    
+                ></v-pagination>
+              </div>
+            </v-app>
+          </div>      
+        </template>
+      </div>
   </div>
 </template>
 
