@@ -39,13 +39,15 @@ def create_user_endpoints(app, user_service):
             success                : code : 200
             key error              : {message : KEY_ERROR}, code : 400
 
-            셀러 ID 중복            : {message : USER_ALREADY_EXISTS}, code : 400
-            셀러 ID 형식 위반       : {message : ID_VALIDATION_ERROR}, code :400
-            비밀번호 형식 위반       : {message : PASSWORD_VALIDATION_ERROR}, code : 400
-            핸드폰번호 형식 위반     : {message : PHONE_NUMBER_VALIDATION_ERROR}, code : 400
-            셀러 이름 형식 위반      : {message : SELLER_NAME_VALIDATION_ERROR}, code : 400
-            셀러 영문 이름 형식 위반 : {message : SELLER_ENGLISH_NAME_VALIDATION_ERROR}, code :400
-            사이트 URL 형식 위반     : {message : SITE_URL_VALIDATION_ERROR}, code :400
+            셀러 ID 중복 : {message : PARAMETER_VALIDATION_ERROR deque(['user'])}, code : 400
+            셀러 속성 ID 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['seller_attribute_id'])"}, code : 400
+            셀러 ID 형식 위반 : {message : ID_VALIDATION_ERROR}, code :400
+            비밀번호 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['password'])}, code : 400
+            핸드폰번호 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['phone_number'])}, code : 400
+            셀러 이름 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['name'])}, code : 400
+            셀러 영문 이름 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['eng_name'])}, code :400
+            고객센터 전화번호 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['service_number'])}
+            사이트 URL 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['site_url'])}, code :400
 
         """
 
