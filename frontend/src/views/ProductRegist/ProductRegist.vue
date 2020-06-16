@@ -401,12 +401,7 @@
         </template>
       </div>
     </div>
-    <div class="cmpWrap">
-      <div class="cmpTitle">
-        <i class="xi-user">판매 정보</i>
-      </div>
-      <div class="cmpTable"></div>
-    </div>
+
   </div>
 </template>
 
@@ -514,7 +509,7 @@ export default {
 
     getOptionColors: function() {
       axios
-        .get(`${YE_URL}/product-options`, {
+        .get(`${SJ_URL}/product-options`, {
           headers: {
             Authorization: localStorage.access_token
           }

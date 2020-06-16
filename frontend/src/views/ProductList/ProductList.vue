@@ -159,9 +159,9 @@
                   <td>{{info.product_keys_id}}</td>
                   <td>{{info.seller_attributes_name}}</td>
                   <td>{{info.user}}</td>
-                  <td>{{info.price}}</td>
+                  <td>{{new Intl.NumberFormat().format(info.price)}}</td>
                   <td>
-                    {{info.discount_price}}
+                    {{new Intl.NumberFormat().format(info.discount_price)}}
                     <div class="discount">{{info.discount_rate ? `(${info.discount_rate}%)` : ""}}</div>
                   </td>
                   <td>{{info.is_onsale ? "판매" : "미판매"}}</td>
@@ -189,7 +189,7 @@
           </div>      
         </template>
       </div>
-  </div>
+  </div>  
 </template>
 
 <script>
@@ -384,7 +384,7 @@ data() {
       if (this.attCount > 0) {
         this.attBtn[0].state = 0;
       }
-    }
+    }    
   }
 };
 </script>
@@ -591,6 +591,15 @@ data() {
       color: black !important;
       font-size: 13px !important;
       background-color: #eee;
+    }
+
+    .pagination {
+      font-size: 20px;
+
+    }
+    .page_item {
+      font-size: 20px;
+
     }
   }
 }

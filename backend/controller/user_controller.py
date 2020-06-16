@@ -17,6 +17,7 @@ def create_user_endpoints(app, user_service):
     user_service = user_service
 
     @app.route('/sign-up', methods = ['POST'])
+    @connection_error
     def sign_up():
 
         """
@@ -64,26 +65,6 @@ def create_user_endpoints(app, user_service):
 
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
-
-        except pymysql.err.InternalError:
-
-            if db_connection:
-                db_connection.rollback()
-
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            db_connection.rollback()
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except Exception as e:
             db_connection.rollback()
@@ -153,7 +134,7 @@ def create_user_endpoints(app, user_service):
         마스터 권한 아닐 시 : {'message' : 'UNAUTHORIZED'}, code : 400
         """
 
-        if g.auth is not 1:
+        if g.auth is not AUTH['MASTER']:
             return {'message' : 'UNAUTHORIZED'}, 401
 
         db_connection = None
@@ -180,6 +161,7 @@ def create_user_endpoints(app, user_service):
                 db_connection.close()
 
     @app.route('/seller', methods=['PUT'])
+    @connection_error
     @authorize
     def update_seller():
         """
@@ -253,23 +235,8 @@ def create_user_endpoints(app, user_service):
                 db_connection.commit()
                 return update_response
 
-        except ValidationError:
+        except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
-
-        except pymysql.err.InternalError:
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
 
         except Exception as e:
 
@@ -284,6 +251,7 @@ def create_user_endpoints(app, user_service):
                 db_connection.close()
 
     @app.route('/seller/<int:seller_key_id>', methods=['PUT'])
+    @connection_error
     @authorize
     def update_seller_master(seller_key_id):
         """
@@ -367,21 +335,6 @@ def create_user_endpoints(app, user_service):
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
 
-        except pymysql.err.InternalError:
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
-
         except Exception as e:
 
             if db_connection:
@@ -395,6 +348,7 @@ def create_user_endpoints(app, user_service):
                 db_connection.close()
 
     @app.route('/seller_details/<int:seller_key_id>', methods = ['GET'])
+    @connection_error
     @authorize
     def get_seller_details_master(seller_key_id):
         """
@@ -430,21 +384,6 @@ def create_user_endpoints(app, user_service):
                 seller_infos = user_service.get_seller_details(seller_key_id, db_connection)
                 return seller_infos 
 
-        except pymysql.err.InternalError:
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
-
         except Exception as e:
             return {'message' : str(e)}, 500
 
@@ -453,6 +392,7 @@ def create_user_endpoints(app, user_service):
                 db_connection.close()
 
     @app.route('/seller_details', methods = ['GET'])
+    @connection_error
     @authorize
     def get_seller_details():
         """
@@ -481,21 +421,6 @@ def create_user_endpoints(app, user_service):
                 seller_infos = user_service.get_seller_details(g.user, db_connection)
                 return seller_infos
 
-        except pymysql.err.InternalError:
-            return {'message' : 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message' : 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError:
-            return {'message' : 'DATABASE_PROGRAMMING_ERROR'}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message' : 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message' : 'DATABASE_INTERGRITY_ERROR'}, 500
-
         except Exception as e:
             return {'message' : str(e)}, 500
 
@@ -516,7 +441,7 @@ def create_user_endpoints(app, user_service):
                 action_type = request.json
                 validate(action_type, seller_action_schema)
 
-                if g.auth is not 1:
+                if g.auth is not AUTH['MASTER']:
                     return {'message' : 'UNAUTHORIZED'}, 400
 
                 user = action_type['user']

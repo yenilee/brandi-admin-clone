@@ -10,6 +10,7 @@
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
     "vue": "^2.6.11",
+    "vue-plain-pagination": "^0.3.0",
     "vue-router": "^3.1.6",
     "vuejs-daum-postcode": "^1.0.4",
     "vuetify": "^2.2.11",

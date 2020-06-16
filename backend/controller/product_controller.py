@@ -208,7 +208,7 @@ def create_product_endpoints(app, product_service):
                 return register_response
 
         except  ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
 
         except Exception as e:
             db_connection.rollback()
@@ -263,8 +263,8 @@ def create_product_endpoints(app, product_service):
                 db_connection.commit()
                 return update_response
 
-        except  ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
+        except ValidationError as e:
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
 
         except Exception as e:
             db_connection.rollback()
@@ -274,6 +274,7 @@ def create_product_endpoints(app, product_service):
             db_connection.close()
 
     @app.route('/products', methods=['GET'])
+    @connection_error
     @authorize
     def get_product_list():
         """
@@ -322,21 +323,6 @@ def create_product_endpoints(app, product_service):
         except ValidationError as e:
             return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
-        except pymysql.err.InternalError:
-            return {'message': 'DATABASE_SERVER_ERROR'}, 500
-
-        except pymysql.err.OperationalError:
-            return {'message': 'DATABASE_ACCESS_DENIED'}, 500
-
-        except pymysql.err.ProgrammingError as e:
-            return {'message': 'DATABASE_PROGRAMMING_ERROR' + str(e)}, 500
-
-        except pymysql.err.NotSupportedError:
-            return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
-
-        except pymysql.err.IntegrityError:
-            return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
-
         except  Exception as e:
             return {'message': str(e)}, 500
 
@@ -376,5 +362,3 @@ def create_product_endpoints(app, product_service):
         finally:
             if db_connection:
                 db_connection.close()
-
-
