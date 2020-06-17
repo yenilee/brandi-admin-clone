@@ -172,7 +172,7 @@ def create_product_endpoints(app, product_service):
         Returns:
 
         success    : code : 200
-        key error  : {"message" : "KEY_ERROR"}, code : 400
+        key error  : {message : KEY_ERROR}, code : 400
         """
 
         db_connection = None
@@ -256,7 +256,7 @@ def create_product_endpoints(app, product_service):
     @authorize
     def get_product_list():
         """
-        상품 리스트 API (마스터) [GET]
+        상품 리스트 API [GET]
 
         Args:
 
@@ -276,9 +276,9 @@ def create_product_endpoints(app, product_service):
         Returns:
 
         success      : code : 200
-        key error    : {"message" : "KEY_ERROR"}, code : 400
-        type error   : {"message" : "TYPE_ERROR"}, code : 400
-        unauthorized : {"message" : "UNAUTHORIZED"}, code : 401
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
+        unauthorized : {message : UNAUTHORIZED}, code : 401
         """
 
         db_connection = None
@@ -304,16 +304,6 @@ def create_product_endpoints(app, product_service):
         finally:
             if db_connection:
                 db_connection.close()
-
-    @app.route('/resize', methods=['POST'])
-    def resize_image():
-        db_connection = None
-
-        db_connection = get_connection()
-        if db_connection:
-            image_url = '/home/sungjunjin/바탕화면/brandi.jpg'
-            register_response = product_service.resize_image(image_url, db_connection)
-            return image_url
 
     @app.route('/product-history/<int:product_key_id>', methods = ['GET'])
     @connection_error
