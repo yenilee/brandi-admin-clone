@@ -13,6 +13,21 @@
     <div class="filterBox">
       <div class="filterDiv">
         <div>조회 기간</div>
+
+        <!-- <b-row>
+          <b-col md="auto">
+            <b-calendar v-model="value" @context="onContext" locale="en-US"></b-calendar>
+          </b-col>
+          <b-col>
+            <p>
+              Value:
+              <b>'{{ value }}'</b>
+            </p>
+            <p class="mb-0">Context:</p>
+            <pre class="small">{{ context }}</pre>
+          </b-col>
+        </b-row>-->
+
         <input type="text" />
       </div>
       <div class="filterDiv">
@@ -154,7 +169,7 @@
                 <tr v-for="info in infoDatas.products" :key="info.id">
                   <td>{{info.created_at}}</td>
                   <td></td>
-                  <td>{{info.name}}</td>
+                  <td @click="() => idClick(info.product_keys_id)">{{info.name}}</td>
                   <td>{{info.product_code}}</td>
                   <td>{{info.product_keys_id}}</td>
                   <td>{{info.seller_attributes_name}}</td>
@@ -190,6 +205,9 @@
 
 <script>
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import { URL, YE, YE_URL } from "../../config/urlConfig";
 export default {
   data() {
@@ -235,6 +253,9 @@ export default {
     this.getListDatas();
   },
   methods: {
+    idClick: function(id) {
+      this.$router.push({ name: "productregist", params: { id: id } });
+    },
     pagination: function(page) {
       //판매여부, 진열여부, 할인여부
       this.twoBtn.filter(item => {
@@ -595,6 +616,7 @@ export default {
 
       .pagination {
         font-size: 20px;
+        text-align: center;
       }
       .page_item {
         font-size: 20px;

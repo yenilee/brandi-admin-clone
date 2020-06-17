@@ -238,16 +238,12 @@
       </div>
     </div>
     <div id="app">
-  <v-app id="inspire">
-    <div class="text-center">
-      <v-pagination
-        v-model="page"
-        :length="pagesData"
-        @input="search"
-      ></v-pagination>
+      <v-app id="inspire">
+        <div class="text-center">
+          <v-pagination v-model="page" :length="pagesData" @input="search"></v-pagination>
+        </div>
+      </v-app>
     </div>
-  </v-app>
-</div>
   </div>
 </template>
  
@@ -296,7 +292,7 @@ export default {
     },
     getListDatas: function() {
       axios
-        .get(`${SJ_URL}/sellers`, {
+        .get(`${YE_URL}/sellers`, {
           // .get(`${URL}/sellerList.json`, {
           headers: {
             Authorization: localStorage.access_token
@@ -342,7 +338,7 @@ export default {
     actionBtnChange: function(action, id) {
       axios
         .put(
-          `${SJ_URL}/action`,
+          `${YE_URL}/action`,
           {
             user: id,
             action_type: action
@@ -370,7 +366,7 @@ export default {
     search: function(page) {
       let queryString = [];
       if (page === undefined) {
-        page = 1
+        page = 1;
       }
       //이 곳에서 serachDatas의 내용을 post에 실어 백엔드에 보내준다.
       //그 다음에 바로 해당 내용들을 get해서 리스트에 뿌려주어야 한다.
@@ -383,7 +379,7 @@ export default {
       });
       axios
         .get(`${YE_URL}/sellers?pages=${page}&${queryString.join("")}`, {
-          headers: {  
+          headers: {
             Authorization: localStorage.access_token
           }
         })

@@ -580,10 +580,10 @@
                       <th>할인판매가</th>
                       <th>{{changedPrice > 0 ? changedPrice : ""}}</th>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                       <th>할인기간</th>
                       <th>라디오</th>
-                    </tr>
+                    </tr>-->
                   </template>
                 </v-simple-table>
               </td>
@@ -624,6 +624,21 @@
                 <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
               </div>
             </tr>
+            <tr>
+              <th>상품 태그 관리</th>
+              <td>
+                <div class="box">
+                  <b-form-tags
+                    input-id="tags-separators"
+                    v-model="productDatas.tags"
+                    separator=" ,;"
+                    placeholder="입력해 주세요"
+                    class="mb-2"
+                    tag-variant="primary"
+                  ></b-form-tags>
+                </div>
+              </td>
+            </tr>
           </template>
         </v-simple-table>
       </div>
@@ -634,7 +649,7 @@
     <!-- 등록 취소 버튼 -->
     <v-col class="text-center">
       <div class="my-2">
-        <v-btn class="enroll-button">등록</v-btn>
+        <v-btn class="enroll-button" @click="test01()">등록</v-btn>
       </div>
       <div class="my-2">
         <v-btn class="cancle-button">취소</v-btn>
@@ -646,6 +661,9 @@
 <script>
 import axios from "axios";
 import { VueEditor } from "vue2-editor";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 
 export default {
@@ -654,6 +672,8 @@ export default {
   },
   data() {
     return {
+      value: "",
+      context: null,
       infoDatas: [],
       content: "",
 
@@ -707,13 +727,13 @@ export default {
         // discount_start: "2020-06-01 08:30:00",
         // discount_end: "2020-06-03 23:59:59",
         maximum_quantity: "",
-        minimum_quantity: ""
-        // tags: ["태그88", "태그97", "태그94"]
+        minimum_quantity: "",
+        tags: []
       }
     };
   },
   mounted: function() {
-    // this.getListDatas();
+    this.getListDatas();
     this.getOptionColors();
   },
   methods: {
@@ -736,28 +756,17 @@ export default {
             },
             name: this.productDatas.name,
             simple_description: this.productDatas.simple_description,
-            details: "겨울",
+            details: this.productDatas.details,
             color_filter_id: this.productDatas.color_filter_id,
-            options: [
-              {
-                size: "XL",
-                color: "White",
-                quantity: 30
-              },
-              {
-                size: "L",
-                color: "White",
-                quantity: 30
-              }
-            ],
-            wholesale_price: 5000,
-            price: 20000,
-            discount_rate: 50,
+            options: this.makingOptionsData,
+            wholesale_price: Number(this.productDatas.wholesale_price),
+            price: Number(this.productDatas.price),
+            discount_rate: Number(this.productDatas.discount_rate),
             discount_start: "2020-06-16 00:00:00",
-            discount_end: "2020-06-16 23:59:59",
-            maximum_quantity: 20,
-            minimum_quantity: 2,
-            tags: ["코트", "따듯한 코트"]
+            discount_end: "2020-06-18 23:59:59",
+            maximum_quantity: Number(this.productDatas.maximum_quantity),
+            minimum_quantity: Number(this.productDatas.minimum_quantity),
+            tags: this.productDatas.tags
           },
           {
             headers: {
@@ -772,9 +781,12 @@ export default {
           console.log(error.response.data.message);
         });
     },
+    onContext(ctx) {
+      this.context = ctx;
+    },
     discountClick: function() {
       this.discountPrice =
-        this.productDatas.price / this.productDatas.discount_rate;
+        this.productDatas.price * (this.productDatas.discount_rate / 100);
       this.changedPrice = this.productDatas.price - this.discountPrice;
     },
     minusMakingOptions: function(index) {
@@ -792,7 +804,7 @@ export default {
           this.makingOptionsData.push({
             color: this.allOptions.color[i],
             size: this.allOptions.size[j],
-            quantity: null
+            quantity: 0
           });
         }
       }
@@ -845,21 +857,21 @@ export default {
     },
 
     getOptionColors: function() {
-      // axios
-      //   .get(`${YE_URL}/product-options`, {
-      //     headers: {
-      //       Authorization: localStorage.access_token
-      //     }
-      //   })
-      //   .then(response => {
-      //     this.optionColors = response.data.option_color;
-      //     this.optionSizes = response.data.option_size;
-      //   });
-      axios.get(`${URL}/test.json`).then(response => {
-        console.log("here is test Data >>>>", response);
-        this.optionSizes = response.data.size;
-        this.optionColors = response.data.color;
-      });
+      axios
+        .get(`${YE_URL}/product-options`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.optionColors = response.data.option_color;
+          this.optionSizes = response.data.option_size;
+        });
+      // axios.get(`${URL}/test.json`).then(response => {
+      //   console.log("here is test Data >>>>", response);
+      //   this.optionSizes = response.data.size;
+      //   this.optionColors = response.data.color;
+      // });
     },
     minusSizeOption: function() {
       this.invenSizesCount.splice(this.invenSizesCount.length - 1, 1);
@@ -947,13 +959,14 @@ export default {
     //상품 수정페이지로 진입시, 기존의 상품 정보들을 받아옵니다.
     getListDatas: function() {
       axios
-        .get(`${YE_URL}/product/2`, {
+        .get(`${YE_URL}/product/${this.$route.params.id}`, {
           headers: {
             Authorization: localStorage.access_token
           }
         })
         .then(response => {
-          this.infoDatas = response.data.product_detail;
+          console.log(response.data.product_detail);
+          this.productDatas = response.data.product_detail;
         });
     }
   }
@@ -978,7 +991,7 @@ export default {
     top: -100px;
     left: 0;
     width: 100vw;
-    height: 200vh;
+    height: 430vh;
     opacity: 50%;
     background-color: gray;
     z-index: 5;
@@ -1493,7 +1506,6 @@ export default {
   }
 
   .originPriceTable {
-    border: 1px solid red;
     input {
       width: 15% !important;
       border-top-right-radius: 0px !important;

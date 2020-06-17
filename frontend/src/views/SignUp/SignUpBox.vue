@@ -145,7 +145,7 @@
 
 <script>
 import axios from "axios";
-import { SJ_URL } from "../../config/urlConfig";
+import { SJ_URL, YE_URL } from "../../config/urlConfig";
 import {
   idReg,
   pwReg,
@@ -187,7 +187,7 @@ export default {
     signUpClick: function() {
       if (confirm("입력하신 정보로 셀러신청을 하시겠습니까?") == true) {
         axios
-          .post(`${SJ_URL}/sign-up`, {
+          .post(`${YE_URL}/sign-up`, {
             method: "POST",
             user: this.user.value,
             seller_attribute_id: this.seller_attribute_id.value,
