@@ -22,6 +22,7 @@ def create_user_endpoints(app, user_service):
 
         """
         회원가입 API [POST]
+        작성자 : 진성준
 
         Args:
             [Body]
@@ -157,7 +158,7 @@ def create_user_endpoints(app, user_service):
     def update_seller():
         """
         셀러 수정 (셀러 권한) API [PUT]
-
+        작성자 : 진성준
         Args:
 
             [Header]
@@ -240,6 +241,7 @@ def create_user_endpoints(app, user_service):
     def update_seller_master(seller_key_id):
         """
         셀러 수정 (마스터 권한) API [PUT]
+        작성자 : 진성준
 
         Args:
 
@@ -315,6 +317,7 @@ def create_user_endpoints(app, user_service):
             if db_connection:
                 update_response = user_service.update_seller(seller_key_id, seller_infos, db_connection)
                 db_connection.commit()
+
                 return update_response
 
         except ValidationError as e:
@@ -331,6 +334,7 @@ def create_user_endpoints(app, user_service):
     def get_seller_details_master(seller_key_id):
         """
         셀러 상세 정보 (마스터권한) [GET]
+        작성자 : 진성준
 
         Args:
             [Header]
@@ -353,8 +357,8 @@ def create_user_endpoints(app, user_service):
         db_connection = None
         try:
             db_connection = get_connection()
-            if db_connection: 
-                
+            
+            if db_connection:                 
                 #권한이 마스터가 아니면 UNAUTHORIZED return 
                 if g.auth is not AUTH['MASTER']:
                     return {'message' : 'UNAUTHORIZED'}, 401   
@@ -372,7 +376,8 @@ def create_user_endpoints(app, user_service):
     def get_seller_details():
         """
         셀러 상세 정보 (셀러권한) [GET]
-
+        작성자 : 진성준
+        
         Args:
             [Header]
                 Authorization : 로그인 토큰

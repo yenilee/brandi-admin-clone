@@ -618,8 +618,7 @@ product_list_queryset_schema = {
             "examples": [
                 1
             ],
-            "pattern" : "[0-9]",
-            "maxLength": 1
+            "pattern" : "[0-9]",          
         }
     }
 }

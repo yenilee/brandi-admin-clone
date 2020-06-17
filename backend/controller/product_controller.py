@@ -257,7 +257,8 @@ def create_product_endpoints(app, product_service):
     def get_product_list():
         """
         상품 리스트 API [GET]
-
+        작성자 :진성준
+        
         Args:
 
         [Header]
