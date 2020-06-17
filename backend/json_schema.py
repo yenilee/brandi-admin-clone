@@ -826,7 +826,7 @@ product_register_schema = {
                             },
                             "quantity": {
                                 "$id": "#/properties/options/items/anyOf/0/properties/quantity",
-                                "type": "integer",
+                                "type": ["integer","string"],
                                 "default": 0
                             }
                         }
@@ -866,7 +866,7 @@ product_register_schema = {
             "$id": "#/properties/maximum_quantity",
             "type": ["integer", "null"],
             "default": 1,
-            "minimum" : 20,
+            "minimum" : 1,
             "maximum": 20
         },
         "minimum_quantity": {

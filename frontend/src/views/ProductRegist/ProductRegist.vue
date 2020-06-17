@@ -892,7 +892,7 @@ export default {
 
     getOptionColors: function() {
       axios
-        .get(`${SJ_URL}/product-options`, {
+        .get(`${YE_URL}/product-options`, {
           headers: {
             Authorization: localStorage.access_token
           }

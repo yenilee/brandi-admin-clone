@@ -50,8 +50,8 @@ def connection_error(f):
         except pymysql.err.NotSupportedError:
             return {'message': 'DATABASE_NOT_SUPPORTED_ERROR'}, 500
 
-        except pymysql.err.IntegrityError:
-            return {'message': 'DATABASE_INTERGRITY_ERROR'}, 500
+        except pymysql.err.IntegrityError as e:
+            return {'message': 'DATABASE_INTERGRITY_ERROR' + str(e)}, 500
 
         except  Exception as e:
             return {'message': str(e)}, 500

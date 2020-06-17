@@ -258,7 +258,7 @@ export default {
       });
 
       axios
-        .get(`${SJ_URL}/products?${this.query.join("")}page=${page}`, {
+        .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -308,7 +308,7 @@ export default {
       // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링 추가
       this.query.push("page=1&");
       axios
-        .get(`${SJ_URL}/products?${this.query.join("")}`, {
+        .get(`${YE_URL}/products?${this.query.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -325,7 +325,7 @@ export default {
     },
     getListDatas: function() {
       axios
-        .get(`${SJ_URL}/products`, {
+        .get(`${YE_URL}/products`, {
           headers: {
             Authorization: localStorage.access_token
           }
