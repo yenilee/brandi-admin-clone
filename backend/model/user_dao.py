@@ -416,24 +416,28 @@ class UserDao:
 
     def get_seller_list(self, filters, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+
         statement = ""
         equal_search = ['sellers.id', 'sellers.seller_status_id', 'sellers.seller_attribute_id']
         like_search = ['seller_keys.user', 'sellers.eng_name', 'sellers.name', 'supervisor_infos.name',
                        'supervisor_infos.phone_number', 'supervisor_infos.email']
 
-        offset_statement = ""
+        offset_statement = " OFFSET 1"
+
         if filters is not None:
             for k, v in filters.items():
                 if k in equal_search:
                     statement += f" AND {k} = {v}"
+                    offset_statement = ""
+
                 if k in like_search:
                     statement += f" AND {k} LIKE '%{v}%'"
+                    offset_statement = ""
+
                 if k == 'pages':
                     if v is not '1':
                         v = (int(v) - 1) * 10 + 1
-                    else:
-                        v = 1
-                    offset_statement = f" LIMIT 10 OFFSET {v}"
+                        offset_statement = f" OFFSET {v}"
 
         sellers_list_sql = """
         SELECT DISTINCT
@@ -464,7 +468,7 @@ class UserDao:
         WHERE end_date = '2037-12-31 23:59:59' 
         AND sellers.seller_status_id <> 6 
         AND sellers.seller_status_id <> 7
-        AND (authority_id = 2 OR authority_id = 3)""" + statement + offset_statement
+        AND (authority_id = 2 OR authority_id = 3)""" + statement + " ORDER BY sellers.id DESC LIMIT 10" + offset_statement
 
         print(sellers_list_sql)
         if cursor.execute(sellers_list_sql) == 0:
@@ -598,6 +602,7 @@ class UserDao:
         cursor.execute(soft_delete_seller_sql, seller_key_id)
 
     def get_number_of_sellers(self, db_connection):
+
         cursor = db_connection.cursor()
         get_number_of_sellers_sql = """
         SELECT count(seller_key_id)
@@ -609,3 +614,4 @@ class UserDao:
             return 0
 
         return cursor.fetchone()[0]
+ 

@@ -1,3 +1,5 @@
+import math
+
 from const import AUTH
 
 class ProductService:
@@ -5,11 +7,6 @@ class ProductService:
     def __init__(self, product_dao, config):
         self.product_dao = product_dao
         self.config   = config
-        # self.s3 = boto3.client(
-        #     "s3",
-        #     aws_access_key_id     = S3['S3_ACCESS_KEY'],
-        #     aws_secret_access_key = S3['S3_SECRET_KEY']
-        # )
 
     def get_sellers_for_master(self, auth, filters, db_connection):
         try:
@@ -185,7 +182,7 @@ class ProductService:
             recent_product['options'] = self.product_dao.get_recent_options(recent_product_id, db_connection)
 
             if recent_product['is_detail_reference'] == 0:
-                recent_product['notices'] = self.product_dao.get_recent_manufacture(recent_product_id, db_connection)
+                recent_product['manufacture'] = self.product_dao.get_recent_manufacture(recent_product_id, db_connection)
 
             tags = self.product_dao.get_tag(recent_product_id, db_connection)
             tag_list = []
@@ -219,11 +216,11 @@ class ProductService:
 
             # 상세 상품 정보에 기입하지 않고 직접 등록할 경우 제조 관련 정보를 field(3개) insert
             # 추가 하기 전 동일한 정보가 있다면 id를 받아오고, 없을 경우 새롭게 추가한다
-            notices_id = self.product_dao.select_notices_id(product['manufacture'], db_connection)
+            notices_id = self.product_dao.select_notices_id(product['notices'], db_connection)
             product['notices_id'] = notices_id
 
             if notices_id is 0:
-                product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
+                product['notices_id'] = self.product_dao.insert_manufacturer(product['notices'], db_connection)
 
             # request로 받아온 상품 정보를 업데이트 한다
             self.product_dao.update_product(product, db_connection)
@@ -280,35 +277,11 @@ class ProductService:
             #products        : 상품 리스트            
             return {
                 'product_count'   : count,
-                'number_of_pages' : int(count / 10) + 1,
+                'number_of_pages' : math.ceil(count / 10),
                 'products'        : products}, 200
 
         except KeyError:           
             return {'message': 'KEY_ERROR'}, 400
 
-        except TypeError as e:            
-
-            return {'message': 'TYPE ERROR' + str(e)}, 400
-
-    def resize_image(self, image_url, db_connection):
-
-        IMAGE_SMALL = (150, 150)
-        IMAGE_MEDIUM = (320, 320)
-        IMAGE_LARGE = (640, 640)
-
-        image = Image.open(image_url)
-
-        image_large = image.resize(IMAGE_LARGE)
-        image_medium = image.resize(IMAGE_MEDIUM)
-        image_small = image.resize(IMAGE_SMALL)
-
-        filename = 'test'
-        # image_large.show()
-        # image_medium.show()
-        # image_small.show()
-
-        self.s3.upload_file(
-            image_url,
-            self.config['S3']['S3_BUCKET'],
-            "image_large"
-        )
+        except TypeError:
+            return {'message': 'TYPE ERROR'}, 400

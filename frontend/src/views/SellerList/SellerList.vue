@@ -261,6 +261,8 @@ import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 export default {
   data() {
     return {
+      page : 1,
+      currentPage : 1,
       headers: sellerListHeaders,
       queryString: null,
       infoDatas: [],
@@ -276,7 +278,7 @@ export default {
         { name: "supervisor_infos.email", id: "", state: false },
         { name: "sellers.seller_status_id", id: "", state: true },
         { name: "sellers.seller_attribute_id", id: "", state: true }
-      ],
+        ],
       dates: ["2020-06-03", "2020-06-24"]
     };
   },
@@ -291,12 +293,9 @@ export default {
         ? (this.searchDatas[index].state = false)
         : (this.searchDatas[index].state = true);
     },
-    getPage: function(page) {
-      page;
-    },
     getListDatas: function() {
       axios
-        .get(`${SJ_URL}/sellers`, {
+        .get(`${YE_URL}/sellers`, {
           // .get(`${URL}/sellerList.json`, {
           headers: {
             Authorization: localStorage.access_token
@@ -342,7 +341,7 @@ export default {
     actionBtnChange: function(action, id) {
       axios
         .put(
-          `${SJ_URL}/action`,
+          `${YE_URL}/action`,
           {
             user: id,
             action_type: action
@@ -399,7 +398,7 @@ export default {
     reset: function() {
       this.searchDatas.map(item => {
         item.id = "";
-        this.query = [];
+        this.queryString= [];
       });
       this.search();
     }

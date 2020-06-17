@@ -845,21 +845,21 @@ export default {
     },
 
     getOptionColors: function() {
-      // axios
-      //   .get(`${YE_URL}/product-options`, {
-      //     headers: {
-      //       Authorization: localStorage.access_token
-      //     }
-      //   })
-      //   .then(response => {
-      //     this.optionColors = response.data.option_color;
-      //     this.optionSizes = response.data.option_size;
-      //   });
-      axios.get(`${URL}/test.json`).then(response => {
-        console.log("here is test Data >>>>", response);
-        this.optionSizes = response.data.size;
-        this.optionColors = response.data.color;
-      });
+      axios
+        .get(`${YE_URL}/product-options`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.optionColors = response.data.option_color;
+          this.optionSizes = response.data.option_size;
+        });
+      // axios.get(`${URL}/test.json`).then(response => {
+      //   console.log("here is test Data >>>>", response);
+      //   this.optionSizes = response.data.size;
+      //   this.optionColors = response.data.color;
+      // });
     },
     minusSizeOption: function() {
       this.invenSizesCount.splice(this.invenSizesCount.length - 1, 1);

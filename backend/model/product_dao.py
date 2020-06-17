@@ -428,6 +428,7 @@ class ProductDao:
         # 상품 등록일 내림차순
         filter_statement = filter_statement + ' ORDER BY product_keys.created_at DESC LIMIT 10'
 
+        # (LIMIT * PAGE) - LIMIT
         if 'page' in filters:
             filter_statement = filter_statement + ' OFFSET ' + str((10 * int(filters['page']) - 10))
  
