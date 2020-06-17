@@ -214,7 +214,7 @@ export default {
     return {
       number: "",
       page: 1,
-
+      currentPage: 1,
       infoDatas: {},
 
       searchDatas: [
@@ -245,8 +245,7 @@ export default {
         { name: "seller_attribute_id", state: 0 }
       ],
 
-      query: [],
-      currentPage: 1
+      query: []
     };
   },
   mounted: function() {
@@ -277,6 +276,19 @@ export default {
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
+
+      axios
+        .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.infoDatas = response.data;
+        });
+
+      //쿼리스트링 초기화
+      this.query = [];
 
       axios
         .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
@@ -326,7 +338,7 @@ export default {
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
-      // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링 추가
+      // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링
       this.query.push("page=1&");
       axios
         .get(`${YE_URL}/products?${this.query.join("")}`, {
@@ -579,6 +591,12 @@ export default {
   }
 
   .tableBox {
+    tr {
+      th {
+        width: 10%;
+      }
+    }
+
     .tableIn {
       width: calc(100vw - 335px);
       overflow: auto;
@@ -613,13 +631,19 @@ export default {
     }
     th {
       width: 100%;
-
       .pagination {
         font-size: 20px;
-        text-align: center;
       }
       .page_item {
         font-size: 20px;
+
+        .pagination {
+          font-size: 20px;
+          text-align: center;
+        }
+        .page_item {
+          font-size: 20px;
+        }
       }
     }
   }

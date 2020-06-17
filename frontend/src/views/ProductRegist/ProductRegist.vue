@@ -295,25 +295,16 @@
               </th>
               <td class="onSaleBox">
                 <div style="width: 100%">
-                  <input
-                    v-model="colorModal"
-                    :value="0"
-                    type="radio"
-                    id="unuse"
-                    name="colorFilter"
-                    checked
-                  />
-                  <label for="unuse">사용안함</label>
-                  <input
-                    @click="getColors()"
-                    v-model="colorModal"
-                    :value="1"
-                    type="radio"
-                    id="using"
-                    name="colorFilter"
-                  />
+                  <input @click="deleteColor()" type="radio" name="colorFilter" checked />
+                  <label @click="deleteColor()" for="unuse">사용안함</label>
+                  <input @click="getColors()" type="radio" class="colorFitler" name="colorFilter" />
                   <label @click="getColors()" for="using">사용</label>
-                  <input class="colorInput" type="text" disabled :value="selectedColor[2]" />
+                  <input
+                    class="colorInput"
+                    type="text"
+                    disabled
+                    :value="productDatas.color_filter_id ? selectedColor[2] : ''"
+                  />
                   <div>
                     <i
                       class="xi-info"
@@ -649,7 +640,7 @@
     <!-- 등록 취소 버튼 -->
     <v-col class="text-center">
       <div class="my-2">
-        <v-btn class="enroll-button" @click="test01()">등록</v-btn>
+        <v-btn class="enroll-button" @click="sumbitClick()">등록</v-btn>
       </div>
       <div class="my-2">
         <v-btn class="cancle-button">취소</v-btn>
@@ -737,7 +728,7 @@ export default {
     this.getOptionColors();
   },
   methods: {
-    test01: function() {
+    sumbitClick: function() {
       axios
         .post(
           `${YE_URL}/product`,
@@ -890,7 +881,13 @@ export default {
       this.productDatas.color_filter_id = id;
       this.selectedColor.push(id, img, name);
     },
+    deleteColor: function() {
+      this.colorModal = 0;
+      this.productDatas.color_filter_id = 0;
+      this.selectedColor = [];
+    },
     getColors: function() {
+      this.colorModal = 1;
       axios
         .get(`${YE_URL}/product-color-filter`, {
           headers: {
@@ -1111,7 +1108,7 @@ export default {
     top: 20%;
     left: 40%;
     width: 500px;
-    height: 500px;
+    height: 600px;
     background-color: white;
     padding: 40px;
     z-index: 10;
@@ -1271,6 +1268,7 @@ export default {
       width: 10px;
       margin-right: 10px;
     }
+
     label {
       margin-right: 10px;
     }
@@ -1280,6 +1278,32 @@ export default {
     }
     .colorInput {
       width: 30%;
+      cursor: not-allowed;
+    }
+  }
+  .text-center {
+    .my-2 {
+      display: inline-block;
+      padding: 10px 10px;
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      .enroll-button {
+        color: #ffffff;
+        width: 50px;
+        height: 35px;
+        background-color: #31b1d5;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+      .cancle-button {
+        color: #ffffff;
+        width: 50px;
+        height: 35px;
+        background-color: #c9302c;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
     }
   }
 
@@ -1549,8 +1573,10 @@ export default {
       border-bottom: 1px solid lightgray;
     }
     .wonBox {
-      display: inline;
+      display: inline-block;
       vertical-align: middle;
+      width: 30px;
+      height: 35px;
     }
     .discountBtn {
       font-size: 14px;
