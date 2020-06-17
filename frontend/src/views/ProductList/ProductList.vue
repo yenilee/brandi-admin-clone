@@ -13,6 +13,21 @@
     <div class="filterBox">
       <div class="filterDiv">
         <div>조회 기간</div>
+
+        <!-- <b-row>
+          <b-col md="auto">
+            <b-calendar v-model="value" @context="onContext" locale="en-US"></b-calendar>
+          </b-col>
+          <b-col>
+            <p>
+              Value:
+              <b>'{{ value }}'</b>
+            </p>
+            <p class="mb-0">Context:</p>
+            <pre class="small">{{ context }}</pre>
+          </b-col>
+        </b-row>-->
+
         <input type="text" />
       </div>
       <div class="filterDiv">
@@ -154,7 +169,7 @@
                 <tr v-for="info in infoDatas.products" :key="info.id">
                   <td>{{info.created_at}}</td>
                   <td></td>
-                  <td>{{info.name}}</td>
+                  <td @click="() => idClick(info.product_keys_id)">{{info.name}}</td>
                   <td>{{info.product_code}}</td>
                   <td>{{info.product_keys_id}}</td>
                   <td>{{info.seller_attributes_name}}</td>
@@ -174,29 +189,28 @@
         </v-simple-table>
       </template>
     </div>
-    <div class='pagination'>
+    <div class="pagination">
       <template>
-          <div>
-            <v-app id="inspire">
-              <div class="text-center">
-                <v-pagination
-                  v-model="page"
-                  :length="infoDatas.number_of_pages" 
-                  @input="pagination"                                                                    
-                ></v-pagination>
-              </div>
-            </v-app>
-          </div>      
-        </template>
-      </div>
-  </div>  
+        <div>
+          <v-app id="inspire">
+            <div class="text-center">
+              <v-pagination v-model="page" :length="infoDatas.number_of_pages" @input="pagination"></v-pagination>
+            </div>
+          </v-app>
+        </div>
+      </template>
+    </div>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import { URL, YE, YE_URL } from "../../config/urlConfig";
 export default {
-data() {
+  data() {
     return {
       number: "",
       page: 1,
@@ -231,21 +245,23 @@ data() {
         { name: "seller_attribute_id", state: 0 }
       ],
 
-      query: [],
-      
+      query: []
     };
   },
   mounted: function() {
     this.getListDatas();
   },
   methods: {
-    pagination:function(page){
+    idClick: function(id) {
+      this.$router.push({ name: "productregist", params: { id: id } });
+    },
+    pagination: function(page) {
       //판매여부, 진열여부, 할인여부
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
       //셀러명
-      this.inputBtn.filter(item => {    
+      this.inputBtn.filter(item => {
         item.state.length > 0
           ? this.query.push(`${item.name}=${item.state}&`)
           : "";
@@ -260,19 +276,19 @@ data() {
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
-          
-    axios
-    .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
-      headers: {
-        Authorization: localStorage.access_token
-      }
-    })
-    .then(response => {
-      this.infoDatas = response.data;
-    })
-    
-    //쿼리스트링 초기화
-    this.query = [];   
+
+      axios
+        .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.infoDatas = response.data;
+        });
+
+      //쿼리스트링 초기화
+      this.query = [];
 
       axios
         .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
@@ -287,23 +303,22 @@ data() {
       //쿼리스트링 초기화
       this.query = [];
     },
-    reset: function() { 
-
+    reset: function() {
       //셀러명 select 버튼 초기화
-      this.inputBtn[0]['state'] = "";
-      this.selectBtn[0]['state'] = "";
+      this.inputBtn[0]["state"] = "";
+      this.selectBtn[0]["state"] = "";
       this.attCount = 0;
       //셀러 속성 초기화
-      this.attBtn[0]['state'] = 1;
-      for (let i=1;i<this.attBtn.length;i++) {
-        this.attBtn[i]['state'] = 0;
+      this.attBtn[0]["state"] = 1;
+      for (let i = 1; i < this.attBtn.length; i++) {
+        this.attBtn[i]["state"] = 0;
       }
       // 판매여부, 할인여부, 진열여부 초기화
-      for (let i=0;i<this.twoBtn.length;i++) {
-        this.twoBtn[i]['state'] = 3;
-      }       
-    },    
-    search: function() {         
+      for (let i = 0; i < this.twoBtn.length; i++) {
+        this.twoBtn[i]["state"] = 3;
+      }
+    },
+    search: function() {
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
@@ -324,7 +339,7 @@ data() {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
       // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링
-      this.query.push('page=1&');
+      this.query.push("page=1&");
       axios
         .get(`${YE_URL}/products?${this.query.join("")}`, {
           headers: {
@@ -334,13 +349,12 @@ data() {
         .then(response => {
           this.infoDatas = response.data;
           this.number = response.data.number_of_pages;
-        });     
+        });
 
       //pagination 버튼 1로 이동
       this.page = 1;
-      //쿼리스트링 초기화     
+      //쿼리스트링 초기화
       this.query = [];
-
     },
     getListDatas: function() {
       axios
@@ -397,7 +411,7 @@ data() {
       if (this.attCount > 0) {
         this.attBtn[0].state = 0;
       }
-    }    
+    }
   }
 };
 </script>
@@ -577,12 +591,12 @@ data() {
   }
 
   .tableBox {
-    tr{
+    tr {
       th {
         width: 10%;
       }
-      }
-    
+    }
+
     .tableIn {
       width: calc(100vw - 335px);
       overflow: auto;
@@ -615,19 +629,23 @@ data() {
       font-size: 13px !important;
       background-color: #eee;
     }
-    th{
+    th {
       width: 100%;
-    .pagination {
-      font-size: 20px;
+      .pagination {
+        font-size: 20px;
+      }
+      .page_item {
+        font-size: 20px;
 
-    }
-    .page_item {
-      font-size: 20px;
-
+        .pagination {
+          font-size: 20px;
+          text-align: center;
+        }
+        .page_item {
+          font-size: 20px;
+        }
+      }
     }
   }
-    }
-
-
 }
 </style>

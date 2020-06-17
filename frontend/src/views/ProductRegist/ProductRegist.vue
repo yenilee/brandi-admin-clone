@@ -295,25 +295,16 @@
               </th>
               <td class="onSaleBox">
                 <div style="width: 100%">
-                  <input
-                    v-model="colorModal"
-                    :value="0"
-                    type="radio"
-                    id="unuse"
-                    name="colorFilter"
-                    checked
-                  />
-                  <label for="unuse">사용안함</label>
-                  <input
-                    @click="getColors()"
-                    v-model="colorModal"
-                    :value="1"
-                    type="radio"
-                    id="using"
-                    name="colorFilter"
-                  />
+                  <input @click="deleteColor()" type="radio" name="colorFilter" checked />
+                  <label @click="deleteColor()" for="unuse">사용안함</label>
+                  <input @click="getColors()" type="radio" class="colorFitler" name="colorFilter" />
                   <label @click="getColors()" for="using">사용</label>
-                  <input class="colorInput" type="text" disabled :value="selectedColor[2]" />
+                  <input
+                    class="colorInput"
+                    type="text"
+                    disabled
+                    :value="productDatas.color_filter_id ? selectedColor[2] : ''"
+                  />
                   <div>
                     <i
                       class="xi-info"
@@ -580,10 +571,10 @@
                       <th>할인판매가</th>
                       <th>{{changedPrice > 0 ? changedPrice : ""}}</th>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                       <th>할인기간</th>
                       <th>라디오</th>
-                    </tr>
+                    </tr>-->
                   </template>
                 </v-simple-table>
               </td>
@@ -624,6 +615,21 @@
                 <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
               </div>
             </tr>
+            <tr>
+              <th>상품 태그 관리</th>
+              <td>
+                <div class="box">
+                  <b-form-tags
+                    input-id="tags-separators"
+                    v-model="productDatas.tags"
+                    separator=" ,;"
+                    placeholder="입력해 주세요"
+                    class="mb-2"
+                    tag-variant="primary"
+                  ></b-form-tags>
+                </div>
+              </td>
+            </tr>
           </template>
         </v-simple-table>
       </div>
@@ -634,7 +640,7 @@
     <!-- 등록 취소 버튼 -->
     <v-col class="text-center">
       <div class="my-2">
-        <v-btn class="enroll-button">등록</v-btn>
+        <v-btn class="enroll-button" @click="sumbitClick()">등록</v-btn>
       </div>
       <div class="my-2">
         <v-btn class="cancle-button">취소</v-btn>
@@ -646,6 +652,9 @@
 <script>
 import axios from "axios";
 import { VueEditor } from "vue2-editor";
+import "bootstrap/dist/css/bootstrap.css";
+import "bootstrap-vue/dist/bootstrap-vue.css";
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 
 export default {
@@ -654,6 +663,8 @@ export default {
   },
   data() {
     return {
+      value: "",
+      context: null,
       infoDatas: [],
       content: "",
 
@@ -707,17 +718,17 @@ export default {
         // discount_start: "2020-06-01 08:30:00",
         // discount_end: "2020-06-03 23:59:59",
         maximum_quantity: "",
-        minimum_quantity: ""
-        // tags: ["태그88", "태그97", "태그94"]
+        minimum_quantity: "",
+        tags: []
       }
     };
   },
   mounted: function() {
-    // this.getListDatas();
+    this.getListDatas();
     this.getOptionColors();
   },
   methods: {
-    test01: function() {
+    sumbitClick: function() {
       axios
         .post(
           `${YE_URL}/product`,
@@ -736,28 +747,17 @@ export default {
             },
             name: this.productDatas.name,
             simple_description: this.productDatas.simple_description,
-            details: "겨울",
+            details: this.productDatas.details,
             color_filter_id: this.productDatas.color_filter_id,
-            options: [
-              {
-                size: "XL",
-                color: "White",
-                quantity: 30
-              },
-              {
-                size: "L",
-                color: "White",
-                quantity: 30
-              }
-            ],
-            wholesale_price: 5000,
-            price: 20000,
-            discount_rate: 50,
+            options: this.makingOptionsData,
+            wholesale_price: Number(this.productDatas.wholesale_price),
+            price: Number(this.productDatas.price),
+            discount_rate: Number(this.productDatas.discount_rate),
             discount_start: "2020-06-16 00:00:00",
-            discount_end: "2020-06-16 23:59:59",
-            maximum_quantity: 20,
-            minimum_quantity: 2,
-            tags: ["코트", "따듯한 코트"]
+            discount_end: "2020-06-18 23:59:59",
+            maximum_quantity: Number(this.productDatas.maximum_quantity),
+            minimum_quantity: Number(this.productDatas.minimum_quantity),
+            tags: this.productDatas.tags
           },
           {
             headers: {
@@ -772,9 +772,12 @@ export default {
           console.log(error.response.data.message);
         });
     },
+    onContext(ctx) {
+      this.context = ctx;
+    },
     discountClick: function() {
       this.discountPrice =
-        this.productDatas.price / this.productDatas.discount_rate;
+        this.productDatas.price * (this.productDatas.discount_rate / 100);
       this.changedPrice = this.productDatas.price - this.discountPrice;
     },
     minusMakingOptions: function(index) {
@@ -792,7 +795,7 @@ export default {
           this.makingOptionsData.push({
             color: this.allOptions.color[i],
             size: this.allOptions.size[j],
-            quantity: null
+            quantity: 0
           });
         }
       }
@@ -878,7 +881,13 @@ export default {
       this.productDatas.color_filter_id = id;
       this.selectedColor.push(id, img, name);
     },
+    deleteColor: function() {
+      this.colorModal = 0;
+      this.productDatas.color_filter_id = 0;
+      this.selectedColor = [];
+    },
     getColors: function() {
+      this.colorModal = 1;
       axios
         .get(`${YE_URL}/product-color-filter`, {
           headers: {
@@ -947,13 +956,14 @@ export default {
     //상품 수정페이지로 진입시, 기존의 상품 정보들을 받아옵니다.
     getListDatas: function() {
       axios
-        .get(`${YE_URL}/product/2`, {
+        .get(`${YE_URL}/product/${this.$route.params.id}`, {
           headers: {
             Authorization: localStorage.access_token
           }
         })
         .then(response => {
-          this.infoDatas = response.data.product_detail;
+          console.log(response.data.product_detail);
+          this.productDatas = response.data.product_detail;
         });
     }
   }
@@ -978,7 +988,7 @@ export default {
     top: -100px;
     left: 0;
     width: 100vw;
-    height: 200vh;
+    height: 430vh;
     opacity: 50%;
     background-color: gray;
     z-index: 5;
@@ -1098,7 +1108,7 @@ export default {
     top: 20%;
     left: 40%;
     width: 500px;
-    height: 500px;
+    height: 600px;
     background-color: white;
     padding: 40px;
     z-index: 10;
@@ -1258,6 +1268,7 @@ export default {
       width: 10px;
       margin-right: 10px;
     }
+
     label {
       margin-right: 10px;
     }
@@ -1267,6 +1278,32 @@ export default {
     }
     .colorInput {
       width: 30%;
+      cursor: not-allowed;
+    }
+  }
+  .text-center {
+    .my-2 {
+      display: inline-block;
+      padding: 10px 10px;
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      .enroll-button {
+        color: #ffffff;
+        width: 50px;
+        height: 35px;
+        background-color: #31b1d5;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+      .cancle-button {
+        color: #ffffff;
+        width: 50px;
+        height: 35px;
+        background-color: #c9302c;
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+      }
     }
   }
 
@@ -1493,7 +1530,6 @@ export default {
   }
 
   .originPriceTable {
-    border: 1px solid red;
     input {
       width: 15% !important;
       border-top-right-radius: 0px !important;
@@ -1537,8 +1573,10 @@ export default {
       border-bottom: 1px solid lightgray;
     }
     .wonBox {
-      display: inline;
+      display: inline-block;
       vertical-align: middle;
+      width: 30px;
+      height: 35px;
     }
     .discountBtn {
       font-size: 14px;

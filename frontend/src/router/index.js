@@ -36,10 +36,12 @@ const routes = [
           {
             path: 'productlist',
             component: ProductList,
+            name: 'productlist'
           },
           {
-            path: 'productRegist',
+            path: ':id',
             component: ProductRegist,
+            name: 'productregist'
           },
         ]
       },

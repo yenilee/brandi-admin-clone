@@ -522,14 +522,14 @@ export default {
   },
   mounted: function() {
     console.log("url data >>>> ", this.$route.params.id);
-    let masterURl = `${SJ_URL}/seller_details/${this.$route.params.id}`;
-    const userURl = `${SJ_URL}/seller_details`;
+    let masterURl = `${YE_URL}/seller_details/${this.$route.params.id}`;
+    const userURl = `${YE_URL}/seller_details`;
 
     axios
       .get(
         this.$route.params.id > 0
-          ? `${SJ_URL}/seller_details/${this.$route.params.id}`
-          : `${SJ_URL}/seller_details`,
+          ? `${YE_URL}/seller_details/${this.$route.params.id}`
+          : `${YE_URL}/seller_details`,
         {
           // .get(`${URL}/sellerregist.json`, {
           headers: {
