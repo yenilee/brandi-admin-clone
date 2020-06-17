@@ -602,6 +602,7 @@ class UserDao:
         cursor.execute(soft_delete_seller_sql, seller_key_id)
 
     def get_number_of_sellers(self, db_connection):
+
         cursor = db_connection.cursor()
         get_number_of_sellers_sql = """
         SELECT count(seller_key_id)
@@ -613,3 +614,4 @@ class UserDao:
             return 0
 
         return cursor.fetchone()[0]
+ 

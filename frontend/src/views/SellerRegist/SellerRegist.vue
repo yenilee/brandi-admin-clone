@@ -325,33 +325,24 @@
             <tbody>
               <th>셀러상태 변경기록</th>
               <td
-                class="historyBox"
-                v-for="history in infoDatas.data.seller_histories"
-                :key="history.id"
+
               >
                 <tbody>
-                  <tr>
+                  <tr class="history-background">
                     <th>셀러상태 변경 적용일시</th>
-                  </tr>
-                  <tr>
-                    <td>{{history.created_at}}</td>
-                  </tr>
-                </tbody>
-                <tbody>
-                  <tr>
                     <th>셀러상태</th>
-                  </tr>
-                  <tr>
-                    <td>{{history.name}}</td>
-                  </tr>
-                </tbody>
-                <tbody>
-                  <tr>
                     <th>변경 실행자</th>
                   </tr>
-                  <tr>
-                    <td>{{history.editor}}</td>
+                  <tr
+                    class="historyBox"
+                    v-for="history in infoDatas.data.seller_histories"
+                    :key="history.id"
+                  >
+                    <th>{{history.created_at}}</th>
+                    <th>{{history.name}}</th>
+                    <th>{{history.editor}}</th>
                   </tr>
+              
                 </tbody>
               </td>
             </tbody>
@@ -742,12 +733,12 @@ export default {
   }
   .historyBox {
     width: 100%;
+    background-color: white!important;
     th,
     td {
       border: 1px solid lightgray;
     }
     th {
-      background-color: #eee;
     }
   }
 }
@@ -872,5 +863,9 @@ export default {
 }
 .xi-pen {
   color: red;
+}
+
+.history-background {  
+   background-color: #eee;
 }
 </style>;

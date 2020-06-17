@@ -174,29 +174,33 @@
         </v-simple-table>
       </template>
     </div>
-    <div class="pagination">
+    <div class='pagination'>
       <template>
-        <div>
-          <v-app id="inspire">
-            <div class="text-center">
-              <v-pagination v-model="page" :length="infoDatas.number_of_pages" @input="pagination"></v-pagination>
-            </div>
-          </v-app>
-        </div>
-      </template>
-    </div>
-  </div>
+          <div>
+            <v-app id="inspire">
+              <div class="text-center">
+                <v-pagination
+                  v-model="page"
+                  :length="infoDatas.number_of_pages" 
+                  @input="pagination"                                                                    
+                ></v-pagination>
+              </div>
+            </v-app>
+          </div>      
+        </template>
+      </div>
+  </div>  
 </template>
 
 <script>
 import axios from "axios";
-import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
+import { URL, YE, YE_URL } from "../../config/urlConfig";
 export default {
-  data() {
+data() {
     return {
       number: "",
       page: 1,
-
+      currentPage: 1,
       infoDatas: {},
 
       searchDatas: [
@@ -228,20 +232,20 @@ export default {
       ],
 
       query: [],
-      currentPage: 1
+      
     };
   },
   mounted: function() {
     this.getListDatas();
   },
   methods: {
-    pagination: function(page) {
+    pagination:function(page){
       //판매여부, 진열여부, 할인여부
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
       //셀러명
-      this.inputBtn.filter(item => {
+      this.inputBtn.filter(item => {    
         item.state.length > 0
           ? this.query.push(`${item.name}=${item.state}&`)
           : "";
@@ -256,6 +260,19 @@ export default {
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
+          
+    axios
+    .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
+      headers: {
+        Authorization: localStorage.access_token
+      }
+    })
+    .then(response => {
+      this.infoDatas = response.data;
+    })
+    
+    //쿼리스트링 초기화
+    this.query = [];   
 
       axios
         .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
@@ -270,22 +287,23 @@ export default {
       //쿼리스트링 초기화
       this.query = [];
     },
-    reset: function() {
+    reset: function() { 
+
       //셀러명 select 버튼 초기화
-      this.inputBtn[0]["state"] = "";
-      this.selectBtn[0]["state"] = "";
+      this.inputBtn[0]['state'] = "";
+      this.selectBtn[0]['state'] = "";
       this.attCount = 0;
       //셀러 속성 초기화
-      this.attBtn[0]["state"] = 1;
-      for (let i = 1; i < this.attBtn.length; i++) {
-        this.attBtn[i]["state"] = 0;
+      this.attBtn[0]['state'] = 1;
+      for (let i=1;i<this.attBtn.length;i++) {
+        this.attBtn[i]['state'] = 0;
       }
       // 판매여부, 할인여부, 진열여부 초기화
-      for (let i = 0; i < this.twoBtn.length; i++) {
-        this.twoBtn[i]["state"] = 3;
-      }
-    },
-    search: function() {
+      for (let i=0;i<this.twoBtn.length;i++) {
+        this.twoBtn[i]['state'] = 3;
+      }       
+    },    
+    search: function() {         
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
@@ -305,8 +323,8 @@ export default {
       this.attBtn.filter(item => {
         item.state ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
-      // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링 추가
-      this.query.push("page=1&");
+      // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링
+      this.query.push('page=1&');
       axios
         .get(`${YE_URL}/products?${this.query.join("")}`, {
           headers: {
@@ -316,12 +334,13 @@ export default {
         .then(response => {
           this.infoDatas = response.data;
           this.number = response.data.number_of_pages;
-        });
+        });     
 
       //pagination 버튼 1로 이동
       this.page = 1;
-      //쿼리스트링 초기화
+      //쿼리스트링 초기화     
       this.query = [];
+
     },
     getListDatas: function() {
       axios
@@ -378,7 +397,7 @@ export default {
       if (this.attCount > 0) {
         this.attBtn[0].state = 0;
       }
-    }
+    }    
   }
 };
 </script>
@@ -558,6 +577,12 @@ export default {
   }
 
   .tableBox {
+    tr{
+      th {
+        width: 10%;
+      }
+      }
+    
     .tableIn {
       width: calc(100vw - 335px);
       overflow: auto;
@@ -569,6 +594,11 @@ export default {
         color: #fff;
         border-radius: 3px;
         margin-left: 5px;
+      }
+    }
+    tr {
+      th {
+        width: 10%;
       }
     }
     th,
@@ -585,16 +615,19 @@ export default {
       font-size: 13px !important;
       background-color: #eee;
     }
-    th {
+    th{
       width: 100%;
+    .pagination {
+      font-size: 20px;
 
-      .pagination {
-        font-size: 20px;
-      }
-      .page_item {
-        font-size: 20px;
-      }
+    }
+    .page_item {
+      font-size: 20px;
+
     }
   }
+    }
+
+
 }
 </style>
