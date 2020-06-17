@@ -2,6 +2,7 @@ import bcrypt
 import jwt
 import re
 import collections
+import math
 
 from config   import SECRET_KEY, ALGORITHM
 from datetime import datetime, timedelta
@@ -156,6 +157,10 @@ class UserService:
 
             number_of_sellers = self.user_dao.get_number_of_sellers(db_connection)
 
+            if filters:
+                if len(filters) > 1:
+                    number_of_sellers = len(sellers)
+
             # 위에서 만든 값을 셀러의 상태 ID와 매칭해줌
             for seller in sellers:
                 for action in list(merge_tuples.items()):
@@ -163,7 +168,7 @@ class UserService:
                         seller.update({"actions_by_status" : action[1]})
 
             return {'number_of_sellers' : number_of_sellers,
-                    'number_of_pages' : int((number_of_sellers)/10)+1,
+                    'number_of_pages' : math.ceil(number_of_sellers/10),
                     'sellers' : sellers}, 200
 
         except KeyError as e:

@@ -274,6 +274,18 @@ data() {
     //쿼리스트링 초기화
     this.query = [];   
 
+      axios
+        .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
+          headers: {
+            Authorization: localStorage.access_token
+          }
+        })
+        .then(response => {
+          this.infoDatas = response.data;
+        });
+
+      //쿼리스트링 초기화
+      this.query = [];
     },
     reset: function() { 
 
