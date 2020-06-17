@@ -49,170 +49,172 @@
           <v-simple-table>
             <template v-slot:default>
               <div class="tableIn">
-                <thead>
-                  <tr>
-                    <th class="text-left">번호</th>
-                    <th class="text-left">셀러아이디</th>
-                    <th class="text-left">영문이름</th>
-                    <th class="text-left">한글이름</th>
-                    <th class="text-left">담당자이름</th>
-                    <th class="text-left">셀러상태</th>
-                    <th class="text-left">담당자연락처</th>
-                    <th class="text-left">담당자이메일</th>
-                    <th class="text-left">셀러속성</th>
-                    <th class="text-left">상품개수</th>
-                    <th class="text-left">URL</th>
-                    <th class="text-left">등록일시</th>
-                    <th class="text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <input
-                        @keydown="() => lengthCheck(0)"
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas[0].id"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        @keydown="() => lengthCheck(1)"
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas[1].id"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        @keydown="() => lengthCheck(2)"
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas[2].id"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        @keydown="() => lengthCheck(3)"
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas[3].id"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        @keydown="() => lengthCheck(4)"
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas[4].id"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <select
-                        class="sellerStatus"
-                        @input="() => lengthCheck(7)"
-                        v-model="searchDatas[7].id"
-                      >
-                        <option value>선택</option>
-                        <option value="1">입점대기</option>
-                        <option value="2">입점</option>
-                        <option value="5">퇴점</option>
-                        <option value="4">퇴점대기</option>
-                        <option value="3">휴점</option>
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        @keydown="() => lengthCheck(5)"
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas[5].id"
-                        type="text"
-                      />
-                    </td>
+                <loading-screen>
+                  <thead>
+                    <tr>
+                      <th class="text-left">번호</th>
+                      <th class="text-left">셀러아이디</th>
+                      <th class="text-left">영문이름</th>
+                      <th class="text-left">한글이름</th>
+                      <th class="text-left">담당자이름</th>
+                      <th class="text-left">셀러상태</th>
+                      <th class="text-left">담당자연락처</th>
+                      <th class="text-left">담당자이메일</th>
+                      <th class="text-left">셀러속성</th>
+                      <th class="text-left">상품개수</th>
+                      <th class="text-left">URL</th>
+                      <th class="text-left">등록일시</th>
+                      <th class="text-left">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <input
+                          @keydown="() => lengthCheck(0)"
+                          v-on:keyup.enter="search()"
+                          v-model="searchDatas[0].id"
+                          type="text"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          @keydown="() => lengthCheck(1)"
+                          v-on:keyup.enter="search()"
+                          v-model="searchDatas[1].id"
+                          type="text"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          @keydown="() => lengthCheck(2)"
+                          v-on:keyup.enter="search()"
+                          v-model="searchDatas[2].id"
+                          type="text"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          @keydown="() => lengthCheck(3)"
+                          v-on:keyup.enter="search()"
+                          v-model="searchDatas[3].id"
+                          type="text"
+                        />
+                      </td>
+                      <td>
+                        <input
+                          @keydown="() => lengthCheck(4)"
+                          v-on:keyup.enter="search()"
+                          v-model="searchDatas[4].id"
+                          type="text"
+                        />
+                      </td>
+                      <td>
+                        <select
+                          class="sellerStatus"
+                          @input="() => lengthCheck(7)"
+                          v-model="searchDatas[7].id"
+                        >
+                          <option value>선택</option>
+                          <option value="1">입점대기</option>
+                          <option value="2">입점</option>
+                          <option value="5">퇴점</option>
+                          <option value="4">퇴점대기</option>
+                          <option value="3">휴점</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          @keydown="() => lengthCheck(5)"
+                          v-on:keyup.enter="search()"
+                          v-model="searchDatas[5].id"
+                          type="text"
+                        />
+                      </td>
 
-                    <td>
-                      <input
-                        @keydown="() => lengthCheck(6)"
-                        v-on:keyup.enter="search()"
-                        v-model="searchDatas[6].id"
-                        type="text"
-                      />
-                    </td>
-                    <td>
-                      <select
-                        class="sellerStatus"
-                        @input="() => lengthCheck(8)"
-                        v-model="searchDatas[8].id"
-                      >
-                        <option value>선택</option>
-                        <option value="1">쇼핑몰</option>
-                        <option value="2">마켓</option>
-                        <option value="3">로드샵</option>
-                        <option value="4">디자이너브랜드</option>
-                        <option value="5">제너럴브랜드</option>
-                        <option value="6">내셔널브랜드</option>
-                        <option value="7">뷰티</option>
-                      </select>
-                    </td>
-                    <td></td>
+                      <td>
+                        <input
+                          @keydown="() => lengthCheck(6)"
+                          v-on:keyup.enter="search()"
+                          v-model="searchDatas[6].id"
+                          type="text"
+                        />
+                      </td>
+                      <td>
+                        <select
+                          class="sellerStatus"
+                          @input="() => lengthCheck(8)"
+                          v-model="searchDatas[8].id"
+                        >
+                          <option value>선택</option>
+                          <option value="1">쇼핑몰</option>
+                          <option value="2">마켓</option>
+                          <option value="3">로드샵</option>
+                          <option value="4">디자이너브랜드</option>
+                          <option value="5">제너럴브랜드</option>
+                          <option value="6">내셔널브랜드</option>
+                          <option value="7">뷰티</option>
+                        </select>
+                      </td>
+                      <td></td>
 
-                    <td></td>
-                    <td></td>
-                    <td class="actionBtns">
-                      <div class="searchBtn" @click="search()">Search</div>
-                      <div class="resetBtn" @click="reset()">Reset</div>
-                    </td>
-                  </tr>
+                      <td></td>
+                      <td></td>
+                      <td class="actionBtns">
+                        <div class="searchBtn" @click="search()">Search</div>
+                        <div class="resetBtn" @click="reset()">Reset</div>
+                      </td>
+                    </tr>
 
-                  <tr v-for="item in infoDatas" :key="item.id">
-                    <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
-                    <td>{{ item.id }}</td>
-                    <td
-                      @click="() => idClick(item.seller_key_id)"
-                      class="sellerIdText"
-                    >{{ item.seller_id}}</td>
-                    <td>{{ item.seller_eng_name }}</td>
-                    <td>{{ item.seller_kor_name }}</td>
-                    <td>{{ item.manager_name }}</td>
-                    <td>{{ item.status_name}}</td>
-                    <td>{{ item.manager_phone_number }}</td>
-                    <td>{{ item.manager_email }}</td>
-                    <td>{{ item.seller_attribute_name }}</td>
-                    <td>{{ item.number_of_product }}</td>
-                    <td>{{ item.site_url }}</td>
-                    <td>{{ item.created_at }}</td>
-                    <td>
-                      <!-- 클릭하면 상태를 post 하고, Post 처리가 된 뒤의 action 버튼들을 get 해야한다. -->
-                      <div
-                        class="statusBtnBox"
-                        v-for="action in item.actions_by_status"
-                        :key="action"
-                      >
-                        <button
-                          style="background-color: #5bc0de; border-color: #46b8da;"
-                          v-if="action === '입점 승인'"
-                          @click="() => actionClick(action,item.seller_key_id)"
-                        >{{action}}</button>
-                        <button
-                          style="background-color: #d9534f;border-color: #d43f3a;"
-                          v-if="action === '입점 거절' || action === '퇴점 신청 처리' || action === '퇴점 확정 처리'"
-                          @click="() => actionClick(action,item.seller_key_id)"
-                        >{{action}}</button>
-                        <button
-                          style="background-color: #f0ad4e; border-color: #eea236;"
-                          v-if="action === '휴점 신청'"
-                          @click="() => actionClick(action,item.seller_key_id)"
-                        >{{action}}</button>
-                        <button
-                          style="background-color: #5cb85c; border-color: #4cae4c;"
-                          v-if="action === '퇴점 철회 처리' || action === '휴점 해제'"
-                          @click="() => actionClick(action,item.seller_key_id)"
-                        >{{action}}</button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
+                    <tr v-for="item in infoDatas" :key="item.id">
+                      <!-- 아이디를 클릭하면 해당 아이디의 수정페이지로 넘어간다. -->
+                      <td>{{ item.id }}</td>
+                      <td
+                        @click="() => idClick(item.seller_key_id)"
+                        class="sellerIdText"
+                      >{{ item.seller_id}}</td>
+                      <td>{{ item.seller_eng_name }}</td>
+                      <td>{{ item.seller_kor_name }}</td>
+                      <td>{{ item.manager_name }}</td>
+                      <td>{{ item.status_name}}</td>
+                      <td>{{ item.manager_phone_number }}</td>
+                      <td>{{ item.manager_email }}</td>
+                      <td>{{ item.seller_attribute_name }}</td>
+                      <td>{{ item.number_of_product }}</td>
+                      <td>{{ item.site_url }}</td>
+                      <td>{{ item.created_at }}</td>
+                      <td>
+                        <!-- 클릭하면 상태를 post 하고, Post 처리가 된 뒤의 action 버튼들을 get 해야한다. -->
+                        <div
+                          class="statusBtnBox"
+                          v-for="action in item.actions_by_status"
+                          :key="action"
+                        >
+                          <button
+                            style="background-color: #5bc0de; border-color: #46b8da;"
+                            v-if="action === '입점 승인'"
+                            @click="() => actionClick(action,item.seller_key_id)"
+                          >{{action}}</button>
+                          <button
+                            style="background-color: #d9534f;border-color: #d43f3a;"
+                            v-if="action === '입점 거절' || action === '퇴점 신청 처리' || action === '퇴점 확정 처리'"
+                            @click="() => actionClick(action,item.seller_key_id)"
+                          >{{action}}</button>
+                          <button
+                            style="background-color: #f0ad4e; border-color: #eea236;"
+                            v-if="action === '휴점 신청'"
+                            @click="() => actionClick(action,item.seller_key_id)"
+                          >{{action}}</button>
+                          <button
+                            style="background-color: #5cb85c; border-color: #4cae4c;"
+                            v-if="action === '퇴점 철회 처리' || action === '휴점 해제'"
+                            @click="() => actionClick(action,item.seller_key_id)"
+                          >{{action}}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </loading-screen>
               </div>
             </template>
           </v-simple-table>
@@ -257,8 +259,8 @@ import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 export default {
   data() {
     return {
-      page : 1,
-      currentPage : 1,
+      page: 1,
+      currentPage: 1,
       headers: sellerListHeaders,
       queryString: null,
       infoDatas: [],
@@ -274,7 +276,7 @@ export default {
         { name: "supervisor_infos.email", id: "", state: false },
         { name: "sellers.seller_status_id", id: "", state: true },
         { name: "sellers.seller_attribute_id", id: "", state: true }
-        ],
+      ],
       dates: ["2020-06-03", "2020-06-24"]
     };
   },
@@ -394,7 +396,7 @@ export default {
     reset: function() {
       this.searchDatas.map(item => {
         item.id = "";
-        this.queryString= [];
+        this.queryString = [];
       });
       this.search();
     }
