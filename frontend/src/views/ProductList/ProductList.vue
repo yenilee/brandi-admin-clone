@@ -189,16 +189,22 @@
         </v-simple-table>
       </template>
     </div>
-    <div class="pagination">
-      <template>
-        <div>
-          <v-app id="inspire">
-            <div class="text-center">
-              <v-pagination v-model="page" :length="infoDatas.number_of_pages" @input="pagination"></v-pagination>
-            </div>
-          </v-app>
-        </div>
-      </template>
+    <div class="pgCon">
+      <div class="pagination">
+        <template>
+          <div>
+            <v-app id="inspire">
+              <div class="text-center">
+                <v-pagination
+                  v-model="page"
+                  :length="infoDatas.number_of_pages"
+                  @input="pagination"
+                ></v-pagination>
+              </div>
+            </v-app>
+          </div>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -208,10 +214,22 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
+import LoadingScreen from "vue-loading-screen";
 import { URL, YE, YE_URL } from "../../config/urlConfig";
 export default {
+  components: {
+    LoadingScreen
+  },
+  props: {
+    loadingText: {
+      type: String,
+      default: "Loading..."
+    }
+  },
   data() {
     return {
+      objects: [],
+      loading: false,
       number: "",
       page: 1,
       currentPage: 1,
@@ -248,10 +266,37 @@ export default {
       query: []
     };
   },
+  created() {
+    this.$nextTick(() => {
+      this.refresh();
+    });
+  },
   mounted: function() {
     this.getListDatas();
   },
   methods: {
+    load(promise) {
+      this.loading = true;
+      const loadingFalse = () => {
+        this.loading = false;
+      };
+      promise.then(loadingFalse, loadingFalse);
+      return promise;
+    },
+    refresh: function() {
+      const p = new Promise(success => {
+        setTimeout(success, 1000);
+      });
+
+      this.$refs.loadingScreen.load(p);
+
+      p.then(() => {
+        this.objects = [
+          { id: 1, name: "Foo" },
+          { id: 2, name: "Bar" }
+        ];
+      });
+    },
     idClick: function(id) {
       this.$router.push({ name: "productregist", params: { id: id } });
     },
@@ -631,21 +676,53 @@ export default {
     }
     th {
       width: 100%;
-      .pagination {
-        font-size: 20px;
-      }
+
       .page_item {
         font-size: 20px;
 
-        .pagination {
-          font-size: 20px;
-          text-align: center;
-        }
         .page_item {
           font-size: 20px;
         }
       }
     }
+  }
+  .pgCon {
+  }
+  .pagination {
+    font-size: 20px;
+    margin-left: 33%;
+  }
+  .component-fade-enter-active,
+  .component-fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+  .component-fade-enter,
+  .component-fade-leave-active {
+    opacity: 0;
+  }
+  .main {
+    position: relative;
+    min-height: 50px;
+  }
+  .loading {
+    position: absolute;
+    z-index: 1001;
+    top: 0;
+    left: 0;
+    background-color: rgba(230, 233, 236, 0.8);
+    cursor: wait;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading .message {
+    background-color: #f4f4f4;
+    border-radius: 4px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15);
+    border: solid 1px #bbb;
+    padding: 10px 20px;
   }
 }
 </style>
