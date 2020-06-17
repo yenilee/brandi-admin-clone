@@ -27,18 +27,19 @@ class CustomJSONEncoder(JSONEncoder):
 def create_app(test_config = None):
     app = Flask(__name__)
     app.debug = True
+    # JSON 설정
     app.config['JSON_SORT_KEYS'] = False
     app.json_encoder = CustomJSONEncoder
+    # CORS 설정
     CORS(app, resources={r'*' : {'origins': '*'}})
-
+    # Config 설정
     app.config.from_pyfile('config.py')
     # DAO 생성
     user_dao     = UserDao()
     product_dao  = ProductDao()
-
     # Service 생성
     user_service = UserService(user_dao, app.config)
-    product_service = ProductService(product_dao, app.config)
+    product_service = ProductService(product_dao, app.config)    
     # Controller 생성
     create_user_endpoints(app, user_service)
     create_product_endpoints(app, product_service)
