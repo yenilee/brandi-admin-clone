@@ -605,11 +605,10 @@
               <th>최대 판매 수량</th>
               <td>
                 <input :value="0" class="radioBtn" name="minQuantity" type="radio" />
-                <label class="radioLabel">1개 이상</label>
+                <label class="radioLabel">20개</label>
                 <input class="radioBtn" name="minQuantity" type="radio" />
                 <input v-model="productDatas.minimum_quantity" class="radioInput" type="text" />
                 <label class="radioLabel">개 이상</label>
-                <span>(20개를 초과하여 설정하실 수 없습니다)</span>
               </td>
               <div>
                 <i class="xi-info">도매처옵션명 조합은 최대 100자까지 표시됩니다.</i>
