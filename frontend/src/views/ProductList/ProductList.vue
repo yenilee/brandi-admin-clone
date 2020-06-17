@@ -194,7 +194,7 @@
 
 <script>
 import axios from "axios";
-import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
+import { URL, YE, YE_URL } from "../../config/urlConfig";
 export default {
 data() {
     return {
@@ -262,7 +262,7 @@ data() {
       });
           
     axios
-    .get(`${SJ_URL}/products?${this.query.join("")}page=${page}`, {
+    .get(`${YE_URL}/products?${this.query.join("")}page=${page}`, {
       headers: {
         Authorization: localStorage.access_token
       }
@@ -270,10 +270,10 @@ data() {
     .then(response => {
       this.infoDatas = response.data;
     })
-
-    //쿼리스트링 초기화
-    this.query = [];
     
+    //쿼리스트링 초기화
+    this.query = [];   
+
     },
     reset: function() { 
 
@@ -314,7 +314,7 @@ data() {
       // 검색 버튼을 누르면 무조건 첫번째 페이지로 이동하도록 쿼리스트링
       this.query.push('page=1&');
       axios
-        .get(`${SJ_URL}/products?${this.query.join("")}`, {
+        .get(`${YE_URL}/products?${this.query.join("")}`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -332,7 +332,7 @@ data() {
     },
     getListDatas: function() {
       axios
-        .get(`${SJ_URL}/products`, {
+        .get(`${YE_URL}/products`, {
           headers: {
             Authorization: localStorage.access_token
           }
@@ -582,6 +582,11 @@ data() {
         color: #fff;
         border-radius: 3px;
         margin-left: 5px;
+      }
+    }
+    tr {
+      th {
+        width: 10%;
       }
     }
     th,
