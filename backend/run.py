@@ -6,11 +6,11 @@ LOCALHOST    = 'localhost'
 YEEUN        = '10.250.2.93'
 CAFE         = '192.168.7.39'
 WECODE       = '10.58.3.11'
-WECODE_YEEUN = '10.58.2.51'
+WECODE_YEEUN = '10.58.5.11'
 
 if __name__ == "__main__":
     app = create_app()
 
-    app.run(host = IP, port = 5000)
+    app.run(host = WECODE_YEEUN, port = 5000)
 
 

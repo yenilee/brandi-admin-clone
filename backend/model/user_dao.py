@@ -469,7 +469,7 @@ class UserDao:
         AND sellers.seller_status_id <> 6 
         AND sellers.seller_status_id <> 7
         AND (authority_id = 2 OR authority_id = 3)""" + statement + " ORDER BY sellers.id DESC LIMIT 10" + offset_statement
-    
+
         if cursor.execute(sellers_list_sql) == 0:
             return 0
 

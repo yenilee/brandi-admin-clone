@@ -798,13 +798,6 @@ product_register_schema = {
                         "$id": "#/properties/options/items/anyOf/0",
                         "type": "object",
                         "default": {},
-                        "examples": [
-                            {
-                                "size": 5,
-                                "color": 4,
-                                "quantity": 88
-                            }
-                        ],
                         "required": [
                             "size",
                             "color"

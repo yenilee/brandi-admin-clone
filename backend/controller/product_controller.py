@@ -16,6 +16,26 @@ def create_product_endpoints(app, product_service):
     @connection_error
     @authorize
     def get_register_page_sellers():
+        """
+        상품 등록 - 셀러 조회 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰 (마스터 토큰만 가능)
+
+        [Query String]
+        sellers.name : 상품 등록을 원하는 유저를 조회
+
+        Returns:
+        response  : 셀러 ID, 이름(영/한), 셀러 속성, 입점 상태, 담당자 정보, site url, 액션 버튼 등
+        code      : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
+        unauthorized : {message : UNAUTHORIZED}, code : 401
+        """
         db_connection = None
 
         try:
@@ -42,7 +62,20 @@ def create_product_endpoints(app, product_service):
     @authorize
     def get_color_filter():
         """
-        상품 등록 페이지 컬러 필터
+        상품 등록 - 컬러 필터 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰
+
+        Returns:
+        response  : 컬러 필터 ID, 이름(영/한), 이미지 url
+        code      : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
         """
 
         db_connection = None
@@ -63,7 +96,20 @@ def create_product_endpoints(app, product_service):
     @authorize
     def get_option():
         """
-        상품 등록 페이지 옵션 선택
+        상품 등록 - 옵션 선택 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰
+
+        Returns:
+        response : 옵션 색상 & 사이즈 id, 이름 ex) White, XL
+        code     : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
         """
 
         db_connection = None
@@ -83,13 +129,32 @@ def create_product_endpoints(app, product_service):
     @connection_error
     @authorize
     def get_first_category():
+        """
+        상품 등록 - 1차 카테고리 선택 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰
+
+        [Query String]
+        seller_key_id : 로그인 토큰이 마스터일 경우 쿼리스트링으로 해당 셀러의 정보를 조회
+
+        Returns:
+        success      : {'option_color' : colors,
+                        'option_size'  : sizes }  code : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
+        """
         db_connection = None
 
         try:
             db_connection = get_connection()
+            seller_key_id = g.user
 
             if db_connection:
-                seller_key_id = g.user
 
                 if g.auth is AUTH['MASTER']:
                     if request.args:
@@ -111,6 +176,26 @@ def create_product_endpoints(app, product_service):
     @connection_error
     @authorize
     def get_second_category():
+        """
+        상품 등록 - 2차 카테고리 선택 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰
+
+        [Query String]
+        seller_key_id     : 셀러 속성에 맞는 1차, 2차 카테고리 조합을 보여주기 위함
+        first_category_id : 1차 카테고리 선택 후 2차 카테고리 결과 노출 목적
+
+        Returns:
+        success      : {'option_color' : colors,
+                        'option_size'  : sizes }  code : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
+        """
         db_connection = None
 
         try:
@@ -135,7 +220,7 @@ def create_product_endpoints(app, product_service):
     def register_product():
 
         """
-        상품 등록 API [POST]
+        신규 상품 등록 API [POST]
 
         Args:
 
@@ -167,7 +252,7 @@ def create_product_endpoints(app, product_service):
         discount_end         : 할인 종료 시간
         maximum_quantity     : 최대판매수량
         minimum_quantity     : 최소판매수량
-        tag_name             : 상품 태그 (TYPE: List)
+        tags                 : 상품 태그 (TYPE: List)
 
         Returns:
 
@@ -205,6 +290,24 @@ def create_product_endpoints(app, product_service):
     @connection_error
     @authorize
     def get_product(product_key_id):
+        """
+        상품 상세 정보 조회 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰
+
+        [URL Parameter]
+        product_key_id  : 상품의 고유 ID를 통해 상세 페이지 접근
+
+        Returns:
+        success      : code : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
+        """
         db_connection = None
 
         try:
@@ -227,6 +330,25 @@ def create_product_endpoints(app, product_service):
     @connection_error
     @authorize
     def update_product(product_key_id):
+        """
+        기존 상품 수정 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰
+
+        [URL Parameter]
+        product_key_id  : 상품의 고유 ID를 통해 상세 페이지 접근
+
+        Returns:
+        response : 등록 일자, 세일/판매 여부, 가격, 할인율, 수정자
+        code     : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
+        """
         db_connection = None
 
         try:
@@ -310,6 +432,22 @@ def create_product_endpoints(app, product_service):
     @connection_error
     @authorize
     def get_product_history(product_key_id):
+        """
+        상품 수정 이력 조회 API [GET]
+        작성자: 이예은
+
+        Args:
+
+        [Header]
+        Authorization : 로그인 토큰 (마스터 Only)
+
+        Returns:
+        response : 등록 일자, 세일/판매 여부, 가격, 할인율, 수정자
+        code     : 200
+
+        key error    : {message : KEY_ERROR}, code : 400
+        type error   : {message : TYPE_ERROR}, code : 400
+        """
         db_connection = None
 
         try:
