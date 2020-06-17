@@ -48,9 +48,7 @@ def create_user_endpoints(app, user_service):
             셀러 영문 이름 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['eng_name'])}, code :400
             고객센터 전화번호 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['service_number'])}
             사이트 URL 형식 위반 : {message : PARAMETER_VALIDATION_ERROR deque(['site_url'])}, code :400
-
         """
-
         db_connection = None
         try:
             db_connection = get_connection()
@@ -89,8 +87,8 @@ def create_user_endpoints(app, user_service):
         Success     : {access_token : token}, 200
         key error   : {message : KEY_ERROR}, code : 400
 
-        로그인 ID 오류   : {'message' : 'USER_DOES_NOT_EXIST'}, code : 400
-        비밀번호 불일치   : {'message' : 'INVALID ACCESS'}
+        로그인 ID 오류   : {message : USER_DOES_NOT_EXIST}, code : 400
+        비밀번호 불일치   : {message' : INVALID ACCESS}
         """
 
         db_connection = None
@@ -120,12 +118,13 @@ def create_user_endpoints(app, user_service):
 
         Returns:
 
-        Success     : {'number_of_sellers' : number_of_sellers,
-                       'number_of_pages'   : number_of_pages,
-                       'sellers'           : sellers }, 200
+        Success     : {number_of_sellers : number_of_sellers,
+                       number_of_pages   : number_of_pages,
+                       sellers           : sellers }, 200
+
         key error   : {message : KEY_ERROR}, code : 400
 
-        마스터 권한 아닐 시 : {'message' : 'UNAUTHORIZED'}, code : 400
+        마스터 권한 아닐 시 : {message' : UNAUTHORIZED}, code : 400
         """
 
         if g.auth is not AUTH['MASTER']:
@@ -292,6 +291,7 @@ def create_user_endpoints(app, user_service):
                 feed_message : 쇼핑피드 업데이트 메세지          
 
         Returns:
+        
             Success : status code : 200
 
             Key error                          : {message : KEY_ERROR}, code : 400
@@ -424,7 +424,7 @@ def create_user_endpoints(app, user_service):
                 return action_response
 
         except  ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e)}, 400
+            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
 
         finally:
             if db_connection:

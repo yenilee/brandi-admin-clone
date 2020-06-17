@@ -1,3 +1,5 @@
+import math
+
 from const import AUTH
 
 class ProductService:
@@ -5,11 +7,6 @@ class ProductService:
     def __init__(self, product_dao, config):
         self.product_dao = product_dao
         self.config   = config
-        # self.s3 = boto3.client(
-        #     "s3",
-        #     aws_access_key_id     = S3['S3_ACCESS_KEY'],
-        #     aws_secret_access_key = S3['S3_SECRET_KEY']
-        # )
 
     def get_sellers_for_master(self, auth, filters, db_connection):
         try:
@@ -280,35 +277,11 @@ class ProductService:
             #products        : 상품 리스트            
             return {
                 'product_count'   : count,
-                'number_of_pages' : int(count / 10) + 1,
+                'number_of_pages' : math.ceil(count / 10),
                 'products'        : products}, 200
 
         except KeyError:           
             return {'message': 'KEY_ERROR'}, 400
 
-        except TypeError as e:            
-
-            return {'message': 'TYPE ERROR' + str(e)}, 400
-
-    def resize_image(self, image_url, db_connection):
-
-        IMAGE_SMALL = (150, 150)
-        IMAGE_MEDIUM = (320, 320)
-        IMAGE_LARGE = (640, 640)
-
-        image = Image.open(image_url)
-
-        image_large = image.resize(IMAGE_LARGE)
-        image_medium = image.resize(IMAGE_MEDIUM)
-        image_small = image.resize(IMAGE_SMALL)
-
-        filename = 'test'
-        # image_large.show()
-        # image_medium.show()
-        # image_small.show()
-
-        self.s3.upload_file(
-            image_url,
-            self.config['S3']['S3_BUCKET'],
-            "image_large"
-        )
+        except TypeError:
+            return {'message': 'TYPE ERROR'}, 400
