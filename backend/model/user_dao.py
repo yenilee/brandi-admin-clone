@@ -422,7 +422,7 @@ class UserDao:
         like_search = ['seller_keys.user', 'sellers.eng_name', 'sellers.name', 'supervisor_infos.name',
                        'supervisor_infos.phone_number', 'supervisor_infos.email']
 
-        offset_statement = " OFFSET 1"
+        offset_statement = " OFFSET 0"
 
         if filters is not None:
             for k, v in filters.items():
@@ -467,8 +467,7 @@ class UserDao:
         LEFT JOIN product_keys ON sellers.seller_key_id = product_keys.seller_key_id
         WHERE end_date = '2037-12-31 23:59:59' 
         AND sellers.seller_status_id <> 6 
-        AND sellers.seller_status_id <> 7
-        AND (authority_id = 2 OR authority_id = 3)""" + statement + " ORDER BY sellers.id DESC LIMIT 10" + offset_statement
+        AND authority_id <> 1""" + statement + " ORDER BY seller_keys.id DESC LIMIT 10" + offset_statement
 
         if cursor.execute(sellers_list_sql) == 0:
             return 0

@@ -39,7 +39,7 @@ seller_sign_up_schema = {
         },
         "seller_attribute_id": {
             "$id": "#/properties/seller_attribute_id",
-            "type": "integer",
+            "type": ["integer", "string"],
             "default": 0,
             "examples": [
                 3
