@@ -39,7 +39,7 @@ seller_sign_up_schema = {
         },
         "seller_attribute_id": {
             "$id": "#/properties/seller_attribute_id",
-            "type": "integer",
+            "type": ["integer", "string"],
             "default": 0,
             "examples": [
                 3
@@ -618,8 +618,7 @@ product_list_queryset_schema = {
             "examples": [
                 1
             ],
-            "pattern" : "[0-9]",
-            "maxLength": 1
+            "pattern" : "[0-9]",          
         }
     }
 }
@@ -799,13 +798,6 @@ product_register_schema = {
                         "$id": "#/properties/options/items/anyOf/0",
                         "type": "object",
                         "default": {},
-                        "examples": [
-                            {
-                                "size": 5,
-                                "color": 4,
-                                "quantity": 88
-                            }
-                        ],
                         "required": [
                             "size",
                             "color"

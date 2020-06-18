@@ -272,7 +272,7 @@ class ProductDao:
         # 밑에서 추가할 SQL statement를 정의
         statement = ""
 
-        # controller에서 받아온 쿼리스트링이 None이 아닌 경우, SQL statement에 filter 값을 WHERE문에 추가
+        # 프론트에서 키보드 입력이 있을 때마다 검색하는 용도의 filter
         if filters is not None:
             for k, v in filters.items():
                 statement += f" AND binary(sellers.name) LIKE '%{v}%'"

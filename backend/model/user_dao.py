@@ -422,7 +422,7 @@ class UserDao:
         like_search = ['seller_keys.user', 'sellers.eng_name', 'sellers.name', 'supervisor_infos.name',
                        'supervisor_infos.phone_number', 'supervisor_infos.email']
 
-        offset_statement = " OFFSET 1"
+        offset_statement = " OFFSET 0"
 
         if filters is not None:
             for k, v in filters.items():
@@ -468,9 +468,8 @@ class UserDao:
         WHERE end_date = '2037-12-31 23:59:59' 
         AND sellers.seller_status_id <> 6 
         AND sellers.seller_status_id <> 7
-        AND (authority_id = 2 OR authority_id = 3)""" + statement + " ORDER BY sellers.id DESC LIMIT 10" + offset_statement
+        AND authority_id <> 1""" + statement + " ORDER BY seller_keys.id DESC LIMIT 10" + offset_statement
 
-        print(sellers_list_sql)
         if cursor.execute(sellers_list_sql) == 0:
             return 0
 
@@ -565,13 +564,17 @@ class UserDao:
 
         return cursor.lastrowid
 
-    def update_status(self, next_status_id, user, db_connection):
+    def update_status(self, next_status_id, user, editor, db_connection):
         cursor = db_connection.cursor()
         update_status_sql = """
-        UPDATE sellers SET seller_status_id = %s
-        WHERE id = %s
+        UPDATE sellers
+        INNER JOIN seller_keys ON seller_keys.id = %s 
+        SET 
+        seller_status_id = %s,
+        editor = seller_keys.user        
+        WHERE sellers.id = %s        
         """
-        cursor.execute(update_status_sql, (next_status_id, user))
+        cursor.execute(update_status_sql, (editor, next_status_id, user))
 
     def get_seller_action(self, db_connection):
         cursor = db_connection.cursor()
@@ -608,10 +611,45 @@ class UserDao:
         SELECT count(seller_key_id)
         FROM sellers
         WHERE end_date = '2037-12-31 23:59:59'
+        AND sellers.seller_status_id <> 6
+        AND sellers.seller_status_id <> 7
         """
         affected_row = cursor.execute(get_number_of_sellers_sql)
         if affected_row == 0:
             return 0
 
         return cursor.fetchone()[0]
+
+    def get_seller_list_number(self, filters, db_connection):
+        cursor = db_connection.cursor(pymysql.cursors.DictCursor)
+
+        statement = ""
+        equal_search = ['sellers.id', 'sellers.seller_status_id', 'sellers.seller_attribute_id']
+        like_search = ['seller_keys.user', 'sellers.eng_name', 'sellers.name', 'supervisor_infos.name',
+                       'supervisor_infos.phone_number', 'supervisor_infos.email']
+
+        if filters is not None:
+            for k, v in filters.items():
+                if k in equal_search:
+                    statement += f" AND {k} = {v}"
+
+                if k in like_search:
+                    statement += f" AND {k} LIKE '%{v}%'"
+
+        sellers_list_sql = """
+        SELECT count(sellers.seller_key_id)
+        FROM sellers
+        INNER JOIN seller_keys ON sellers.seller_key_id = seller_keys.id
+        INNER JOIN seller_status ON sellers.seller_status_id = seller_status.id
+        INNER JOIN seller_attributes ON sellers.seller_attribute_id = seller_attributes.id
+        LEFT JOIN product_keys ON sellers.seller_key_id = product_keys.seller_key_id
+        WHERE end_date = '2037-12-31 23:59:59' 
+        AND sellers.seller_status_id <> 6 
+        AND authority_id <> 1""" + statement + " ORDER BY seller_keys.id DESC"
+
+        if cursor.execute(sellers_list_sql) == 0:
+            return 0
+
+        sellers = cursor.fetchone()
+        return sellers[0]
  

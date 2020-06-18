@@ -34,13 +34,13 @@ class UserService:
 
             return "", 200
 
-        except KeyError:
+        except KeyError as e:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR'}, 400
+            return {'message' : 'KEY_ERROR' + str(e)}, 400
 
-        except TypeError:
+        except TypeError as e:
             db_connection.rollback()
-            return {'message' : 'TYPE ERROR'}, 400
+            return {'message' : 'TYPE ERROR' + str(e)}, 400
 
     def check_user(self, get_user, db_connection):
         try:
@@ -100,13 +100,13 @@ class UserService:
             self.user_dao.update_seller(seller_infos, db_connection)
             return "", 200
 
-        except KeyError:
+        except KeyError as e:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR'}, 400
+            return {'message' : 'KEY_ERROR' + str(e)}, 400
 
-        except TypeError:
+        except TypeError as e:
             db_connection.rollback()
-            return {'message' : 'TYPE_ERROR'}, 400
+            return {'message' : 'TYPE_ERROR' + str(e)}, 400
 
     def get_seller_details(self, user, db_connection):
         try:
@@ -133,11 +133,11 @@ class UserService:
             # 사용자 기본정보 + 담당자 정보 + 영업시간 + 셀러 수정이력 
             return {'data' : user_info[0]}, 200
 
-        except KeyError:
-            return {'message' : 'KEY_ERROR'}, 400
+        except KeyError as e:
+            return {'message' : 'KEY_ERROR' + str(e)}, 400
 
-        except TypeError:
-            return {'message' : 'TYPE_ERROR'}, 400
+        except TypeError as e:
+            return {'message' : 'TYPE_ERROR' + str(e)}, 400
 
     def get_seller_list(self, filters, db_connection):
         try:
@@ -155,17 +155,18 @@ class UserService:
             merge_tuples = collections.defaultdict(list)
             [ merge_tuples[k].extend(v.split(',')) for k, v in seller_actions ]
 
-            number_of_sellers = self.user_dao.get_number_of_sellers(db_connection)
-
-            if filters:
-                if len(filters) > 1:
-                    number_of_sellers = len(sellers)
-
             # 위에서 만든 값을 셀러의 상태 ID와 매칭해줌
             for seller in sellers:
                 for action in list(merge_tuples.items()):
                     if action[0]== seller['status_id']:
                         seller.update({"actions_by_status" : action[1]})
+
+            number_of_sellers = self.user_dao.get_number_of_sellers(db_connection)
+
+
+            if filters:
+                if len(filters) > 1:
+                    number_of_sellers = len(sellers)
 
             return {'number_of_sellers' : number_of_sellers,
                     'number_of_pages' : math.ceil(number_of_sellers/10),
@@ -177,7 +178,7 @@ class UserService:
         except TypeError as e:
             return {'message' : 'TYPE ERROR' +str(e)}, 400
 
-    def update_status(self, user, action_type, db_connection):
+    def update_status(self, user, action_type, editor, db_connection):
         try:
             # 예전 기록 중 셀러의 최신 수정 데이터를 갖고 있는 ID를 불러오기
             previous_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)
@@ -209,18 +210,18 @@ class UserService:
             if next_status_id == 6 or next_status_id == 7:
                 self.user_dao.soft_delete_seller(recent_seller_id, db_connection)
 
-            # 입점 승인 요청일 경우 권한 ID를 2에서 3으로 바꿈
+            # 입점 승인 요청일 경우 권한 ID를 3에서 2로 바꿈
             if action_type['action_type'] == '입점 승인':
                 self.user_dao.update_authority(recent_seller_id, db_connection)
 
             # 다음 status id와 seller의 최신 ID를 가져와 반영해준다.
-            self.user_dao.update_status(next_status_id, recent_seller_id, db_connection)
+            self.user_dao.update_status(next_status_id, recent_seller_id, editor, db_connection)
 
             return "", 200
 
         except KeyError as e:
             db_connection.rollback()
-            return {'message' : 'KEY_ERROR' +str(e)}, 400
+            return {'message' : 'KEY_ERROR' + str(e)}, 400
 
         except TypeError as e:
             db_connection.rollback()

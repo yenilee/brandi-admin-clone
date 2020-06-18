@@ -280,8 +280,8 @@ class ProductService:
                 'number_of_pages' : math.ceil(count / 10),
                 'products'        : products}, 200
 
-        except KeyError:           
-            return {'message': 'KEY_ERROR'}, 400
+        except KeyError as e:           
+            return {'message': 'KEY_ERROR' + str(e)}, 400
 
-        except TypeError:
-            return {'message': 'TYPE ERROR'}, 400
+        except TypeError as e:
+            return {'message': 'TYPE ERROR' + str(e)}, 400

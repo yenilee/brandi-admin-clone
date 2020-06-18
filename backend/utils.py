@@ -1,8 +1,9 @@
 import jwt
 import pymysql
 
-from functools import wraps
-from flask     import request, Response, g
+from functools  import wraps
+from flask      import request, Response, g
+from connection import get_connection
 
 from config    import SECRET_KEY, ALGORITHM
 
@@ -32,9 +33,10 @@ def connection_error(f):
     @wraps(f)
     def func_wrapper(*args, **kwargs):
         try:
-           return f(*args, **kwargs)
+            return f(*args, **kwargs)
 
         except pymysql.err.InternalError:
+            db_connection = get_connection()
 
             if db_connection:
                 db_connection.rollback()
