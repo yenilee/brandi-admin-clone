@@ -26,30 +26,27 @@
 
       <div class="tableOut">
         <div class="pageContainer">
-          <span>Page</span>
-          <button>
+          <span>Page {{page}} of {{pagesData}} | total {{usersData}} records</span>
+          <!-- <button>
             <i class="xi-angle-left-min"></i>
           </button>
           <input type="text" />
           <button>
             <i class="xi-angle-right-min"></i>
-          </button>
-          <span>of {{pagesData}} | View</span>
-          <select name="page">
+          </button>-->
+          <!-- <select name="page">
             <option value="pageNum">10</option>
             <option value="pageNum">20</option>
             <option value="pageNum">50</option>
             <option value="pageNum">150</option>
-          </select>
-          <span>records Found total {{usersData}} records</span>
+          </select>-->
         </div>
-
-        <!-- 테이블 시작 부분입니다. -->
-        <template>
-          <v-simple-table>
-            <template v-slot:default>
-              <div class="tableIn">
-                <loading-screen>
+        <loading-screen ref="loadingScreen">
+          <!-- 테이블 시작 부분입니다. -->
+          <template>
+            <v-simple-table>
+              <template v-slot:default>
+                <div class="tableIn">
                   <thead>
                     <tr>
                       <th class="text-left">번호</th>
@@ -191,22 +188,22 @@
                           :key="action"
                         >
                           <button
-                            style="background-color: #5bc0de; border-color: #46b8da;"
+                            class="blueBtn"
                             v-if="action === '입점 승인'"
                             @click="() => actionClick(action,item.seller_key_id)"
                           >{{action}}</button>
                           <button
-                            style="background-color: #d9534f;border-color: #d43f3a;"
+                            class="redBtn"
                             v-if="action === '입점 거절' || action === '퇴점 신청 처리' || action === '퇴점 확정 처리'"
                             @click="() => actionClick(action,item.seller_key_id)"
                           >{{action}}</button>
                           <button
-                            style="background-color: #f0ad4e; border-color: #eea236;"
+                            class="orangeBtn"
                             v-if="action === '휴점 신청'"
                             @click="() => actionClick(action,item.seller_key_id)"
                           >{{action}}</button>
                           <button
-                            style="background-color: #5cb85c; border-color: #4cae4c;"
+                            class="greenBtn"
                             v-if="action === '퇴점 철회 처리' || action === '휴점 해제'"
                             @click="() => actionClick(action,item.seller_key_id)"
                           >{{action}}</button>
@@ -214,13 +211,20 @@
                       </td>
                     </tr>
                   </tbody>
-                </loading-screen>
-              </div>
-            </template>
-          </v-simple-table>
-        </template>
+                  <transition name="component-fade">
+                    <div v-if="loading" class="loading">
+                      <div class="message">{{loadingText}}</div>
+                    </div>
+                  </transition>
+                </div>
+              </template>
+            </v-simple-table>
+          </template>
+        </loading-screen>
+
         <div class="pageContainer">
-          <span>Page</span>
+          <span>Page {{page}} of {{pagesData}} | total {{usersData}} records</span>
+          <!-- <span>Page</span>
           <button>
             <i class="xi-angle-left-min"></i>
           </button>
@@ -235,7 +239,7 @@
             <option value="opel">50</option>
             <option value="audi">150</option>
           </select>
-          <span>records Found total {{usersData}} records</span>
+          <span>records Found total {{usersData}} records</span>-->
         </div>
       </div>
     </div>
@@ -254,11 +258,18 @@
 <script>
 import axios from "axios";
 import { sellerListHeaders } from "../../config/SellerListDatas";
+import LoadingScreen from "vue-loading-screen";
 import { URL, SJ_URL, YE_URL } from "../../config/urlConfig";
 
 export default {
+  components: {
+    LoadingScreen
+  },
   data() {
     return {
+      loading: false,
+      loadingText: "Brandi",
+      objects: [],
       page: 1,
       currentPage: 1,
       headers: sellerListHeaders,
@@ -284,13 +295,32 @@ export default {
   mounted: function() {
     this.getListDatas();
   },
-
+  created() {
+    this.$nextTick(() => {
+      this.refresh();
+    });
+  },
   methods: {
-    lengthCheck: function(index) {
-      this.searchDatas[index].id.length === 0
-        ? (this.searchDatas[index].state = false)
-        : (this.searchDatas[index].state = true);
+    refresh() {
+      const p = new Promise(success => {
+        setTimeout(success, 1000);
+      });
+
+      this.$refs.loadingScreen.load(p);
+
+      p.then(() => {
+        this.objects = [];
+      });
     },
+    load(promise) {
+      this.loading = true;
+      const loadingFalse = () => {
+        this.loading = false;
+      };
+      promise.then(loadingFalse, loadingFalse);
+      return promise;
+    },
+
     getListDatas: function() {
       axios
         .get(`${YE_URL}/sellers`, {
@@ -325,7 +355,8 @@ export default {
       if (
         action === "휴점 신청" ||
         action === "퇴점 철회 처리" ||
-        action === "퇴점 신청 처리"
+        action === "퇴점 신청 처리" ||
+        action === "퇴점 확정 처리"
       ) {
         if (
           confirm(
@@ -336,6 +367,7 @@ export default {
         }
       }
     },
+
     actionBtnChange: function(action, id) {
       axios
         .put(
@@ -364,8 +396,10 @@ export default {
           this.getListDatas();
         });
     },
+
     search: function(page) {
       let queryString = [];
+      this.refresh();
       if (page === undefined) {
         page = 1;
       }
@@ -389,6 +423,7 @@ export default {
           this.infoDatas = response.data.sellers;
           this.usersData = response.data.number_of_sellers;
           this.pagesData = response.data.number_of_pages;
+
           console.log("res", response);
           console.log("query", queryString);
         });
@@ -507,6 +542,7 @@ export default {
         border-radius: 4px;
       }
     }
+
     .xi-list-dot {
       font-size: 18px;
       margin: 0 15px;
@@ -514,6 +550,22 @@ export default {
     .statusBtnBox {
       display: inline;
       font-size: 12px;
+      .blueBtn {
+        background-color: #5bc0de;
+        border-color: #46b8da;
+      }
+      .redBtn {
+        background-color: #d9534f;
+        border-color: #d43f3a;
+      }
+      .orangeBtn {
+        background-color: #f0ad4e;
+        border-color: #eea236;
+      }
+      .greenBtn {
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+      }
     }
     .tableOut {
       min-width: 100%;
@@ -577,6 +629,38 @@ export default {
     border: 1px solid red;
     width: 50%;
     height: 50%;
+  }
+  .component-fade-enter-active,
+  .component-fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
+  .component-fade-enter,
+  .component-fade-leave-active {
+    opacity: 0;
+  }
+  .main {
+    position: relative;
+    min-height: 50px;
+  }
+  .loading {
+    position: absolute;
+    z-index: 1001;
+    top: 0;
+    left: 0;
+    background-color: rgba(230, 233, 236, 0.8);
+    cursor: wait;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .loading .message {
+    background-color: #f4f4f4;
+    border-radius: 4px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.15);
+    border: solid 1px #bbb;
+    padding: 10px 20px;
   }
 }
 </style>

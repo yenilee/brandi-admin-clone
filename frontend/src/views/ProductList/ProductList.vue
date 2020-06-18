@@ -14,21 +14,21 @@
       <div class="filterDiv">
         <div>조회 기간</div>
 
-        <!-- <b-row>
-          <b-col md="auto">
-            <b-calendar v-model="value" @context="onContext" locale="en-US"></b-calendar>
-          </b-col>
-          <b-col>
-            <p>
-              Value:
-              <b>'{{ value }}'</b>
-            </p>
-            <p class="mb-0">Context:</p>
-            <pre class="small">{{ context }}</pre>
-          </b-col>
-        </b-row>-->
-
-        <input type="text" />
+        <b-form-datepicker
+          v-model="searchPeriod[0].value"
+          id="datepicker-placeholder"
+          placeholder="클릭해주세요"
+          local="kr"
+          style="width:180px"
+        ></b-form-datepicker>
+        <span class="span-input-group">~</span>
+        <b-form-datepicker
+          v-model="searchPeriod[1].value"
+          id="datepicker-placeholder2"
+          placeholder="클릭해주세요"
+          local="kr"
+          style="width:180px"
+        ></b-form-datepicker>
       </div>
       <div class="filterDiv">
         <div>셀러명</div>
@@ -145,45 +145,48 @@
     <div class="count">전체 조회건 수 : {{infoDatas.product_count}}</div>
     <div class="tableBox">
       <!-- 테이블 시작 부분입니다.. -->
+
       <template>
         <v-simple-table>
           <template v-slot:default>
             <div class="tableIn">
-              <thead>
-                <tr>
-                  <th class="text-left">등록일</th>
-                  <th class="text-left">대표이미지</th>
-                  <th class="text-left">상품명</th>
-                  <th class="text-left">상품코드</th>
-                  <th class="text-left">상품번호</th>
-                  <th class="text-left">셀러속성</th>
-                  <th class="text-left">셀러명</th>
-                  <th class="text-left">판매가</th>
-                  <th class="text-left">할인가</th>
-                  <th class="text-left">판매여부</th>
-                  <th class="text-left">진열여부</th>
-                  <th class="text-left">할인여부</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="info in infoDatas.products" :key="info.id">
-                  <td>{{info.created_at}}</td>
-                  <td></td>
-                  <td @click="() => idClick(info.product_keys_id)">{{info.name}}</td>
-                  <td>{{info.product_code}}</td>
-                  <td>{{info.product_keys_id}}</td>
-                  <td>{{info.seller_attributes_name}}</td>
-                  <td>{{info.user}}</td>
-                  <td>{{new Intl.NumberFormat().format(info.price)}}</td>
-                  <td>
-                    {{new Intl.NumberFormat().format(info.discount_price)}}
-                    <div class="discount">{{info.discount_rate ? `(${info.discount_rate}%)` : ""}}</div>
-                  </td>
-                  <td>{{info.is_onsale ? "판매" : "미판매"}}</td>
-                  <td>{{info.is_displayed ? "진열" : "미진열"}}</td>
-                  <td>{{info.is_discount ? "할인" : "미할인"}}</td>
-                </tr>
-              </tbody>
+              <loading-screen ref="loadingScreen">
+                <thead>
+                  <tr>
+                    <th class="text-left">등록일</th>
+                    <th class="text-left">대표이미지</th>
+                    <th class="text-left">상품명</th>
+                    <th class="text-left">상품코드</th>
+                    <th class="text-left">상품번호</th>
+                    <th class="text-left">셀러속성</th>
+                    <th class="text-left">셀러명</th>
+                    <th class="text-left">판매가</th>
+                    <th class="text-left">할인가</th>
+                    <th class="text-left">판매여부</th>
+                    <th class="text-left">진열여부</th>
+                    <th class="text-left">할인여부</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="info in infoDatas.products" :key="info.id">
+                    <td>{{info.created_at}}</td>
+                    <td></td>
+                    <td @click="() => idClick(info.product_keys_id)">{{info.name}}</td>
+                    <td>{{info.product_code}}</td>
+                    <td>{{info.product_keys_id}}</td>
+                    <td>{{info.seller_attributes_name}}</td>
+                    <td>{{info.user}}</td>
+                    <td>{{new Intl.NumberFormat().format(info.price)}}</td>
+                    <td>
+                      {{new Intl.NumberFormat().format(info.discount_price)}}
+                      <div class="discount">{{info.discount_rate ? `(${info.discount_rate}%)` : ""}}</div>
+                    </td>
+                    <td>{{info.is_onsale ? "판매" : "미판매"}}</td>
+                    <td>{{info.is_displayed ? "진열" : "미진열"}}</td>
+                    <td>{{info.is_discount ? "할인" : "미할인"}}</td>
+                  </tr>
+                </tbody>
+              </loading-screen>
             </div>
           </template>
         </v-simple-table>
@@ -199,6 +202,7 @@
                   v-model="page"
                   :length="infoDatas.number_of_pages"
                   @input="pagination"
+                  total-visible="10"
                 ></v-pagination>
               </div>
             </v-app>
@@ -220,20 +224,18 @@ export default {
   components: {
     LoadingScreen
   },
-  props: {
-    loadingText: {
-      type: String,
-      default: "Loading..."
-    }
-  },
   data() {
     return {
       objects: [],
-      loading: false,
       number: "",
       page: 1,
       currentPage: 1,
       infoDatas: {},
+
+      searchPeriod: [
+        { name: "start_period", value: null },
+        { name: "end_period", value: null }
+      ],
 
       searchDatas: [
         { name: "user ", state: "" },
@@ -275,15 +277,7 @@ export default {
     this.getListDatas();
   },
   methods: {
-    load(promise) {
-      this.loading = true;
-      const loadingFalse = () => {
-        this.loading = false;
-      };
-      promise.then(loadingFalse, loadingFalse);
-      return promise;
-    },
-    refresh: function() {
+    refresh() {
       const p = new Promise(success => {
         setTimeout(success, 1000);
       });
@@ -301,6 +295,7 @@ export default {
       this.$router.push({ name: "productregist", params: { id: id } });
     },
     pagination: function(page) {
+      this.refresh();
       //판매여부, 진열여부, 할인여부
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
@@ -364,6 +359,7 @@ export default {
       }
     },
     search: function() {
+      this.refresh();
       this.twoBtn.filter(item => {
         item.state < 3 ? this.query.push(`${item.name}=${item.state}&`) : "";
       });
@@ -685,8 +681,6 @@ export default {
         }
       }
     }
-  }
-  .pgCon {
   }
   .pagination {
     font-size: 20px;

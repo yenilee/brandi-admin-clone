@@ -87,7 +87,7 @@
             <!-- 테이블 시작 영역 -->
             <!-- 셀러 상태 테이블 -->
 
-            <tr class="sellerSelect">
+            <tr class="sellerSelect" v-if="localId === 'master'">
               <th>
                 셀러 선택
                 <i class="xi-pen" />
@@ -361,11 +361,11 @@
                             <div
                               class="textBox"
                             >{{allOptions.color[index]?allOptions.color[index] : "색상 옵션을 선택해 주세요."}}</div>
-                            <input
+                            <!-- <input
                               @click=" $event.stopPropagation()"
                               v-if="invenColorsCount[index].state === true"
                               type="text"
-                            />
+                            />-->
                             <div v-if="invenColorsCount[index].state === true" class="optionList">
                               <p
                                 class="listText"
@@ -402,7 +402,7 @@
                             <div
                               class="textBox"
                             >{{allOptions.size[index]?allOptions.size[index] : "사이즈 옵션을 선택해 주세요."}}</div>
-                            <input v-if="invenSizesCount[index].state === true" type="text" />
+                            <!-- <input v-if="invenSizesCount[index].state === true" type="text" /> -->
                             <div v-if="invenSizesCount[index].state === true" class="optionList">
                               <p
                                 class="listText"
@@ -430,35 +430,6 @@
                   </template>
                 </v-simple-table>
               </td>
-              <!-- <td>
-                    <tr>
-                      <th>재고관리여부</th>
-                    </tr>
-                    <tr>
-                      <td>
-                        <input
-                          v-model="productDatas.is_displayed"
-                          type="radio"
-                          id="noinventory"
-                          :value="1"
-                          name="inventory"
-                        />
-                        <label for="noinventory">재고 수량 관리 안함</label>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <input
-                          v-model="productDatas.is_displayed"
-                          type="radio"
-                          id="inventroy"
-                          :value="1"
-                          name="inventory"
-                        />
-                        <label for="inventroy">재고 수량 관리</label>
-                      </td>
-                    </tr>
-              </td>-->
               <div class="optionSelected" @click="makingOptions()">
                 <i class="xi-check">적용</i>
               </div>
@@ -488,7 +459,7 @@
                               <input :name="`inven${index}`" id="noInven" type="radio" />
                               <label :for="`inven${index}`">재고관리 안함</label>
 
-                              <input :name=" `inven${index}`" id="inven" type="radio" />
+                              <input :name=" `inven${index}`" id="inven" type="radio" checked />
 
                               <label :for="`inven${index}`">
                                 <input v-model="makingOptionsData[index].quantity" type="text" />개
@@ -563,13 +534,13 @@
                         <div class="wonBox">%</div>
                       </th>
                       <th>
-                        <div>{{discountPrice > 0 ? discountPrice : ""}}</div>
+                        <div>{{discountPrice > 0 ? discountPrice : 0}}원</div>
                         <div class="discountBtn" @click="discountClick">할인 판매가 적용</div>
                       </th>
                     </tr>
                     <tr>
                       <th>할인판매가</th>
-                      <th>{{changedPrice > 0 ? changedPrice : ""}}</th>
+                      <th>{{changedPrice > 0 ? changedPrice : 0}}원</th>
                     </tr>
                     <!-- <tr>
                       <th>할인기간</th>
@@ -662,6 +633,7 @@ export default {
   },
   data() {
     return {
+      localId: "",
       value: "",
       context: null,
       infoDatas: [],
@@ -695,7 +667,7 @@ export default {
       changedPrice: "",
 
       productDatas: {
-        seller_key_id: "",
+        seller_key_id: localStorage.id != "master" ? 1 : "",
         is_onsale: 1,
         is_displayed: 1,
         first_category_id: "0",
@@ -723,60 +695,71 @@ export default {
     };
   },
   mounted: function() {
+    if (localStorage.id === "master") {
+      this.localId = localStorage.id;
+    }
     this.getListDatas();
     this.getOptionColors();
+    this.getFirstCategory(1);
   },
   methods: {
     sumbitClick: function() {
-      axios
-        .post(
-          `${YE_URL}/product`,
-          {
-            seller_key_id: this.productDatas.seller_key_id,
-            is_onsale: this.productDatas.is_onsale,
-            is_displayed: this.productDatas.is_displayed,
-            color_filter_id: this.productDatas.color_filter_id,
-            first_category_id: this.productDatas.first_category_id,
-            second_category_id: Number(this.productDatas.second_category_id),
-            is_detail_reference: this.productDatas.is_detail_reference,
-            manufacture: {
-              manufacturer: this.productDatas.manufacture.manufacturer,
-              manufacture_date: this.productDatas.manufacture.manufacture_date,
-              origin: this.productDatas.manufacture.origin
+      if (confirm("상품등록을 하시겠습니까?") === true) {
+        axios
+          .post(
+            `${YE_URL}/product`,
+            {
+              seller_key_id: this.productDatas.seller_key_id,
+              is_onsale: this.productDatas.is_onsale,
+              is_displayed: this.productDatas.is_displayed,
+              color_filter_id: this.productDatas.color_filter_id,
+              first_category_id: this.productDatas.first_category_id,
+              second_category_id: Number(this.productDatas.second_category_id),
+              is_detail_reference: this.productDatas.is_detail_reference,
+              manufacture: {
+                manufacturer: this.productDatas.manufacture.manufacturer,
+                manufacture_date: this.productDatas.manufacture
+                  .manufacture_date,
+                origin: this.productDatas.manufacture.origin
+              },
+              name: this.productDatas.name,
+              simple_description: this.productDatas.simple_description,
+              details: this.productDatas.details,
+              color_filter_id: this.productDatas.color_filter_id,
+              options: this.makingOptionsData,
+              wholesale_price: Number(this.productDatas.wholesale_price),
+              price: Number(this.productDatas.price),
+              discount_rate: Number(this.productDatas.discount_rate),
+              discount_start: "2020-06-17 00:00:00",
+              discount_end: "2020-06-20 23:59:59",
+              maximum_quantity: Number(this.productDatas.maximum_quantity),
+              minimum_quantity: Number(this.productDatas.minimum_quantity),
+              tags: this.productDatas.tags
             },
-            name: this.productDatas.name,
-            simple_description: this.productDatas.simple_description,
-            details: this.productDatas.details,
-            color_filter_id: this.productDatas.color_filter_id,
-            options: this.makingOptionsData,
-            wholesale_price: Number(this.productDatas.wholesale_price),
-            price: Number(this.productDatas.price),
-            discount_rate: Number(this.productDatas.discount_rate),
-            discount_start: "2020-06-16 00:00:00",
-            discount_end: "2020-06-18 23:59:59",
-            maximum_quantity: Number(this.productDatas.maximum_quantity),
-            minimum_quantity: Number(this.productDatas.minimum_quantity),
-            tags: this.productDatas.tags
-          },
-          {
-            headers: {
-              Authorization: localStorage.access_token
+            {
+              headers: {
+                Authorization: localStorage.access_token
+              }
             }
-          }
-        )
-        .then(response => {
-          console.log(response);
-        })
-        .catch(error => {
-          console.log(error.response.data.message);
-        });
+          )
+          .then(response => {
+            if (response) {
+              alert("등록이 완료되었습니다.");
+              this.$router.push("/main/product/productlist");
+            }
+          })
+          .catch(error => {
+            console.log(error.response.data.message);
+          });
+      }
     },
     onContext(ctx) {
       this.context = ctx;
     },
     discountClick: function() {
-      this.discountPrice =
-        this.productDatas.price * (this.productDatas.discount_rate / 100);
+      this.discountPrice = Math.floor(
+        this.productDatas.price * (this.productDatas.discount_rate / 100)
+      );
       this.changedPrice = this.productDatas.price - this.discountPrice;
     },
     minusMakingOptions: function(index) {
@@ -835,9 +818,6 @@ export default {
           ? alert(`이미 선택된 옵션입니다.`)
           : this.allOptions.size.push(name);
       }
-      // option === "color"
-      //   ? this.allOptions.color.push(name)
-      //   : this.allOptions.size.push(name);
     },
     colorModalHandle: function(index) {
       this.invenColorsCount[index].state = !this.invenColorsCount[index].state;
@@ -857,11 +837,6 @@ export default {
           this.optionColors = response.data.option_color;
           this.optionSizes = response.data.option_size;
         });
-      // axios.get(`${URL}/test.json`).then(response => {
-      //   console.log("here is test Data >>>>", response);
-      //   this.optionSizes = response.data.size;
-      //   this.optionColors = response.data.color;
-      // });
     },
     minusSizeOption: function() {
       this.invenSizesCount.splice(this.invenSizesCount.length - 1, 1);
@@ -934,6 +909,9 @@ export default {
         })
         .then(response => {
           this.firstCate = response.data.first_category;
+        })
+        .catch(error => {
+          console.log(error.response.data.message);
         });
     },
     //셀러 검색창에 입력된 텍스트들을 실시간으로 받아, 해당 텍스트가 포함된 셀러 리스트를 받아옵니다.
