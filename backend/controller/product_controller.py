@@ -155,12 +155,12 @@ def create_product_endpoints(app, product_service):
             seller_key_id = g.user
 
             if db_connection:
-
-                if g.auth is AUTH['MASTER']:
-                    if request.args:
+                if request.args:
+                    if g.auth is AUTH['MASTER']:
                         seller_key_id = request.args['seller_key_id']
+                    if g.auth is AUTH['SELLER']:
+                        seller_key_id = g.user
 
-                    # return {'message' : 'NO SELLER SELECTED FOR MASTER'}, 400
             first_categories = product_service.get_first_category(seller_key_id, db_connection)
             attribute_id = product_service.get_attribute_id(seller_key_id, db_connection)
 
@@ -197,6 +197,7 @@ def create_product_endpoints(app, product_service):
         type error   : {message : TYPE_ERROR}, code : 400
         """
         db_connection = None
+        seller_key_id = g.user
 
         try:
             db_connection = get_connection()
@@ -204,8 +205,11 @@ def create_product_endpoints(app, product_service):
                 seller_key_id = g.user
 
                 if request.args:
+                    if g.auth is AUTH['MASTER']:
+                        seller_key_id = request.args['seller_key_id']
+                    if g.auth is AUTH['SELLER']:
+                        seller_key_id = g.user
                     first_category_id = request.args['first_category_id']
-                    seller_key_id = request.args['seller_key_id']
 
                 register_response = product_service.get_second_category(seller_key_id, first_category_id, db_connection)
                 return register_response
