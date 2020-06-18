@@ -11,6 +11,6 @@ WECODE_YEEUN = '10.58.5.11'
 if __name__ == "__main__":
     app = create_app()
 
-    app.run(host = WECODE_YEEUN, port = 5000)
+    app.run(host = LOCALHOST, port = 5000)
 
 

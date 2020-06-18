@@ -564,13 +564,17 @@ class UserDao:
 
         return cursor.lastrowid
 
-    def update_status(self, next_status_id, user, db_connection):
+    def update_status(self, next_status_id, user, editor, db_connection):
         cursor = db_connection.cursor()
         update_status_sql = """
-        UPDATE sellers SET seller_status_id = %s
-        WHERE id = %s
+        UPDATE sellers
+        INNER JOIN seller_keys ON seller_keys.id = %s 
+        SET 
+        seller_status_id = %s,
+        editor = seller_keys.user        
+        WHERE sellers.id = %s        
         """
-        cursor.execute(update_status_sql, (next_status_id, user))
+        cursor.execute(update_status_sql, (editor, next_status_id, user))
 
     def get_seller_action(self, db_connection):
         cursor = db_connection.cursor()
