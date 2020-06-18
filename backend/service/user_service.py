@@ -209,7 +209,7 @@ class UserService:
             if next_status_id == 6 or next_status_id == 7:
                 self.user_dao.soft_delete_seller(recent_seller_id, db_connection)
 
-            # 입점 승인 요청일 경우 권한 ID를 2에서 3으로 바꿈
+            # 입점 승인 요청일 경우 권한 ID를 3에서 2로 바꿈
             if action_type['action_type'] == '입점 승인':
                 self.user_dao.update_authority(recent_seller_id, db_connection)
 
