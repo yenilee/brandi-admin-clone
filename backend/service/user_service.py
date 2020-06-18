@@ -157,15 +157,15 @@ class UserService:
 
             number_of_sellers = self.user_dao.get_number_of_sellers(db_connection)
 
-            if filters:
-                if len(filters) > 1:
-                    number_of_sellers = len(sellers)
-
             # 위에서 만든 값을 셀러의 상태 ID와 매칭해줌
             for seller in sellers:
                 for action in list(merge_tuples.items()):
                     if action[0]== seller['status_id']:
                         seller.update({"actions_by_status" : action[1]})
+
+            if filters:
+                if len(filters) > 1:
+                    number_of_sellers = len(sellers)
 
             return {'number_of_sellers' : number_of_sellers,
                     'number_of_pages' : math.ceil(number_of_sellers/10),
@@ -209,7 +209,7 @@ class UserService:
             if next_status_id == 6 or next_status_id == 7:
                 self.user_dao.soft_delete_seller(recent_seller_id, db_connection)
 
-            # 입점 승인 요청일 경우 권한 ID를 2에서 3으로 바꿈
+            # 입점 승인 요청일 경우 권한 ID를 3에서 2로 바꿈
             if action_type['action_type'] == '입점 승인':
                 self.user_dao.update_authority(recent_seller_id, db_connection)
 
