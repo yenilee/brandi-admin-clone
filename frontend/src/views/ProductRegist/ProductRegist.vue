@@ -613,7 +613,7 @@
         <v-btn class="enroll-button" @click="sumbitClick()">등록</v-btn>
       </div>
       <div class="my-2">
-        <v-btn class="cancle-button">취소</v-btn>
+        <v-btn class="cancle-button" @click="cancelClick()">취소</v-btn>
       </div>
     </v-col>
   </div>
@@ -750,7 +750,13 @@ export default {
           })
           .catch(error => {
             console.log(error.response.data.message);
+            alert("필수사항을 올바르게 입력해 주세요.");
           });
+      }
+    },
+    cancelClick() {
+      if (confirm("확인을 누르시면 상품관리 페이지로 이동합니다.") === true) {
+        this.$router.push("/main/product/productlist");
       }
     },
     onContext(ctx) {

@@ -19,15 +19,15 @@
           id="datepicker-placeholder"
           placeholder="클릭해주세요"
           local="kr"
-          style="width:180px"
+          style="width:180px; font-size: 13px;"
         ></b-form-datepicker>
-        <span class="span-input-group">~</span>
+        <span class="water">~</span>
         <b-form-datepicker
           v-model="searchPeriod[1].value"
           id="datepicker-placeholder2"
           placeholder="클릭해주세요"
           local="kr"
-          style="width:180px"
+          style="width:180px; font-size: 13px;"
         ></b-form-datepicker>
       </div>
       <div class="filterDiv">
@@ -560,6 +560,13 @@ export default {
       background-color: #428bca;
     }
   }
+  .water {
+    width: 30px;
+    text-align: center;
+    padding-top: 5px;
+    background-color: #eee;
+    font-size: 18px;
+  }
 
   input {
     border: 1px solid lightgray;
@@ -622,9 +629,9 @@ export default {
     }
 
     .resetBtn {
-      color: black;
+      color: #333;
       background-color: white;
-      border-color: #333;
+      border-color: gray;
       &:hover {
         background-color: #eee;
       }
