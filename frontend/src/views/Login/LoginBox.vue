@@ -82,7 +82,7 @@ export default {
             if (response.data.access_token) {
               localStorage.setItem("access_token", response.data.access_token);
               localStorage.setItem("id", this.loginValue);
-              this.$router.push("/main/seller/sellerlist");
+              this.$router.push("/main/product/productlist");
             }
           })
           .catch(error => {

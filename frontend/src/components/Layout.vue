@@ -48,11 +48,12 @@
 
 <script>
 import { items } from "../config/Items";
+import { sellersItems } from "../config/sellersItems";
 
 export default {
   data() {
     return {
-      items: items
+      items: localStorage.id === "master" ? items : sellersItems
     };
   },
   methods: {

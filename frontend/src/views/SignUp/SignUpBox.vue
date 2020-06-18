@@ -208,11 +208,6 @@ export default {
             }
           })
           .catch(error => console.log(error.response.data.message));
-
-        // .catch(err => {
-        //   alert("입력 내용을 확인해 주시기 바랍니다. 감사합니다.");
-        //   console.log(err);
-        // });
       }
     },
     radios: function() {}
