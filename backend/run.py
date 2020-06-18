@@ -12,4 +12,4 @@ HOME         = '192.168.35.167'
 if __name__ == "__main__":
     app = create_app()
     
-    app.run(host = YEEUN, port = 5000)
+    app.run(host = CAFE, port = 5000)

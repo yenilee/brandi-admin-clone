@@ -428,11 +428,9 @@ class UserDao:
             for k, v in filters.items():
                 if k in equal_search:
                     statement += f" AND {k} = {v}"
-                    offset_statement = ""
 
                 if k in like_search:
                     statement += f" AND {k} LIKE '%{v}%'"
-                    offset_statement = ""
 
                 if k == 'pages':
                     if v is not '1':
@@ -468,7 +466,7 @@ class UserDao:
         WHERE end_date = '2037-12-31 23:59:59' 
         AND sellers.seller_status_id <> 6 
         AND sellers.seller_status_id <> 7
-        AND authority_id <> 1""" + statement + " ORDER BY seller_keys.id DESC LIMIT 10" + offset_statement
+        AND authority_id <> 1 """ + statement + " ORDER BY seller_keys.id DESC LIMIT 10" + offset_statement
 
         if cursor.execute(sellers_list_sql) == 0:
             return 0
@@ -613,8 +611,10 @@ class UserDao:
         WHERE end_date = '2037-12-31 23:59:59'
         AND sellers.seller_status_id <> 6
         AND sellers.seller_status_id <> 7
+        AND authority_id <> 1
         """
         affected_row = cursor.execute(get_number_of_sellers_sql)
+
         if affected_row == 0:
             return 0
 

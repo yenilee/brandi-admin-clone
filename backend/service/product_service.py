@@ -216,11 +216,11 @@ class ProductService:
 
             # 상세 상품 정보에 기입하지 않고 직접 등록할 경우 제조 관련 정보를 field(3개) insert
             # 추가 하기 전 동일한 정보가 있다면 id를 받아오고, 없을 경우 새롭게 추가한다
-            notices_id = self.product_dao.select_notices_id(product['notices'], db_connection)
+            notices_id = self.product_dao.select_notices_id(product['manufacture'], db_connection)
             product['notices_id'] = notices_id
 
             if notices_id is 0:
-                product['notices_id'] = self.product_dao.insert_manufacturer(product['notices'], db_connection)
+                product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
 
             # request로 받아온 상품 정보를 업데이트 한다
             self.product_dao.update_product(product, db_connection)

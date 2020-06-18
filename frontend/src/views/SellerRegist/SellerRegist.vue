@@ -618,7 +618,7 @@ export default {
           })
           .catch(error => {
             console.log(error.response.data.message);
-            alert("입력하지 않은 필수항목이 있습니다. 다시 확인해주세요.");
+            alert("올바르게 입력하지 않은 항목이 있습니다. 다시 확인해주세요.");
           });
       }
     },
