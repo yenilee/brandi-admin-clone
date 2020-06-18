@@ -321,7 +321,7 @@ def create_user_endpoints(app, user_service):
                 return update_response
 
         except ValidationError as e:
-            return {'message' : 'PARAMETER_VALIDATION_ERROR' + str(e.path)}, 400
+            return {'message' : 'PARAMETER_VALIDATION_ERROR ' + str(e.path)}, 400
 
         finally:
             
@@ -421,9 +421,10 @@ def create_user_endpoints(app, user_service):
                 if g.auth is not AUTH['MASTER']:
                     return {'message' : 'UNAUTHORIZED'}, 400
 
-                user = action_type['user']
+                user   = action_type['user']
+                editor = g.user
 
-                action_response = user_service.update_status(user, action_type, db_connection)
+                action_response = user_service.update_status(user, action_type, editor, db_connection)
                 db_connection.commit()
 
                 return action_response

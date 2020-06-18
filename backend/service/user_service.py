@@ -177,7 +177,7 @@ class UserService:
         except TypeError as e:
             return {'message' : 'TYPE ERROR' +str(e)}, 400
 
-    def update_status(self, user, action_type, db_connection):
+    def update_status(self, user, action_type, editor, db_connection):
         try:
             # 예전 기록 중 셀러의 최신 수정 데이터를 갖고 있는 ID를 불러오기
             previous_seller_id = self.user_dao.get_recent_seller_id(user, db_connection)
@@ -214,7 +214,7 @@ class UserService:
                 self.user_dao.update_authority(recent_seller_id, db_connection)
 
             # 다음 status id와 seller의 최신 ID를 가져와 반영해준다.
-            self.user_dao.update_status(next_status_id, recent_seller_id, db_connection)
+            self.user_dao.update_status(next_status_id, recent_seller_id, editor, db_connection)
 
             return "", 200
 
