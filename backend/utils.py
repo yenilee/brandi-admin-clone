@@ -10,6 +10,14 @@ from config    import SECRET_KEY, ALGORITHM
 def authorize(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        """
+        로그인 데코레이터
+        작성자: 이예은
+
+        request header의 토큰에서 로그인 계정의 고유 ID, 권한 ID 파악
+        해당 데코레이터를 추가한 함수에서 g.user & g.auth 로 ID 확인 가능
+        """
+
         if not 'Authorization' in request.headers:
             return {'message' : 'ACCESS NOT ALLOWED'}, 401
         
@@ -32,6 +40,16 @@ def authorize(f):
 def connection_error(f):
     @wraps(f)
     def func_wrapper(*args, **kwargs):
+        """
+        DB connection error check 데코레이터
+        작성자: 이예은
+
+        데이터베이스 관련 에러의 경우 모든 함수에서 동일하게 작동하기 때문에,
+        except에서 일괄적으로 return할 수 있도록 별도 데코레이터 생성
+
+        *rollback의 경우 internal error에만 적용하였으며,
+        데이터를 get하는 경우에는 무관하고 추가, 수정할 경우에만 해당
+        """
         try:
             return f(*args, **kwargs)
 
