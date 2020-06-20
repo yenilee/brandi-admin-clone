@@ -315,7 +315,7 @@ def create_product_endpoints(app, product_service):
             db_connection = get_connection()
             if db_connection:
 
-                # 마스터일 경우 모든 셀러 조회가 가능하고, 셀러일 경우 토큰 값으로 고유 ID에 해당하는 상품만 볼 수 있도록 설정
+                # 마스터일 경우 모든 셀러 조회가 가능하고, 셀러일 경우 토큰 값으로 고유 ID에 해당하는 상품만 볼 수 있도록 seller 고유 id 설정
                 seller_key_id = None
 
                 if g.auth is not AUTH['MASTER']:

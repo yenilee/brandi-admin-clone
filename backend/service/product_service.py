@@ -165,18 +165,18 @@ class ProductService:
 
     def get_product(self, product_key_id, seller_key_id, db_connection):
         try:
-            # 셀러로 로그인했을 경우 해당 유저가 가진 상품 KEY ID를 가져오고, 만약 본인의 상품이 아닌 상품을 조회하려 할 경우 에러 표시
+            # 셀러로 로그인했을 경우 해당 유가 가진 상품 KEY ID를 가져오고, 만약 본인의 상품이 아닌 상품을 조회하려 할 경우 에러 표시
             if seller_key_id is not None:
                 sellers_product_key = self.product_dao.get_sellers_product_key(seller_key_id, db_connection)
 
+                # 셀러가 상품을 가지고 있지 않을 경우
+                if sellers_product_key is 0:
+                    return {'message' : 'SELLER HAS NO PRODUCT'}, 400
+
                 if product_key_id not in sellers_product_key:
-                    return {'message' : 'PRODUCT DOES NOT EXIST FOR SELLER'}, 400
+                    return {'message' : 'PRODUCT DOES NOT EXIST'}, 400
 
             recent_product = self.product_dao.get_recent_product(product_key_id, db_connection)
-
-            # 존재하지 않는 상품 ID를 검색할 경우, DB에 없는 상품이므로 선택되지 않았다는 메시지를 보내줌
-            if recent_product is 0:
-                return {'message' : 'PRODUCT DOES NOT EXIST'}, 400
 
             # DB에서 불러온 최근 상품의 id를 변수에 저장
             recent_product_id = recent_product['id']
@@ -187,6 +187,7 @@ class ProductService:
                 recent_product['manufacture'] = self.product_dao.get_recent_manufacture(recent_product_id, db_connection)
 
             tags = self.product_dao.get_tag(recent_product_id, db_connection)
+
             tag_list = []
 
             [tag_list.append(tag['name']) for tag in tags]
