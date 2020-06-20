@@ -225,6 +225,7 @@ def create_product_endpoints(app, product_service):
 
         """
         신규 상품 등록 API [POST]
+        작성자: 이예은
 
         Args:
 
