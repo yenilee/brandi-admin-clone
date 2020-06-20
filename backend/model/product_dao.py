@@ -519,12 +519,15 @@ class ProductDao:
         WHERE seller_key_id = %s
         """
         affected_row = cursor.execute(get_sellers_product_key, seller_key_id)
-        if affected_row == 0:
-            return 0
-        product_key_list = []
+        product_keys = cursor.fetchall()
 
-        for item in cursor.fetchall():
-            product_key_list.append(item[0])
+        if affected_row is 0 or 0 in product_keys:
+            return 0
+        else:
+            product_key_list = []
+
+            for item in product_keys:
+                    product_key_list.append(item[0])
 
         return product_key_list
 
