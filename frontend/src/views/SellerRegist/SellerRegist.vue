@@ -324,9 +324,7 @@
             <!-- 셀러상태 변경기록 -->
             <tbody>
               <th>셀러상태 변경기록</th>
-              <td
-
-              >
+              <td>
                 <tbody>
                   <tr class="history-background">
                     <th>셀러상태 변경 적용일시</th>
@@ -342,7 +340,6 @@
                     <th>{{history.name}}</th>
                     <th>{{history.editor}}</th>
                   </tr>
-              
                 </tbody>
               </td>
             </tbody>
@@ -618,7 +615,7 @@ export default {
           })
           .catch(error => {
             console.log(error.response.data.message);
-            alert("입력하지 않은 필수항목이 있습니다. 다시 확인해주세요.");
+            alert("올바르게 입력하지 않은 항목이 있습니다. 다시 확인해주세요.");
           });
       }
     },
@@ -733,7 +730,7 @@ export default {
   }
   .historyBox {
     width: 100%;
-    background-color: white!important;
+    background-color: white !important;
     th,
     td {
       border: 1px solid lightgray;
@@ -865,7 +862,7 @@ export default {
   color: red;
 }
 
-.history-background {  
-   background-color: #eee;
+.history-background {
+  background-color: #eee;
 }
 </style>;
