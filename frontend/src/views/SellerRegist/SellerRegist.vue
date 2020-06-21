@@ -324,9 +324,7 @@
             <!-- 셀러상태 변경기록 -->
             <tbody>
               <th>셀러상태 변경기록</th>
-              <td
-
-              >
+              <td>
                 <tbody>
                   <tr class="history-background">
                     <th>셀러상태 변경 적용일시</th>
@@ -342,7 +340,6 @@
                     <th>{{history.name}}</th>
                     <th>{{history.editor}}</th>
                   </tr>
-              
                 </tbody>
               </td>
             </tbody>
@@ -733,7 +730,7 @@ export default {
   }
   .historyBox {
     width: 100%;
-    background-color: white!important;
+    background-color: white !important;
     th,
     td {
       border: 1px solid lightgray;
@@ -865,7 +862,7 @@ export default {
   color: red;
 }
 
-.history-background {  
-   background-color: #eee;
+.history-background {
+  background-color: #eee;
 }
 </style>;
