@@ -87,7 +87,7 @@
             <!-- 테이블 시작 영역 -->
             <!-- 셀러 상태 테이블 -->
 
-            <tr class="sellerSelect" v-if="localId === 'master'">
+            <tr class="sellerSelect">
               <th>
                 셀러 선택
                 <i class="xi-pen" />
@@ -174,7 +174,7 @@
                   <th>1차 카테고리</th>
                   <td>
                     <select
-                      v-model="productDatas.first_category_id"
+                      v-model="productDatas.first_category"
                       @change="getSecondCategory(productDatas.seller_key_id, productDatas.first_category_id)"
                     >
                       <option value="0">1차 카테고리를 선택해 주세요.</option>
@@ -695,12 +695,16 @@ export default {
     };
   },
   mounted: function() {
-    if (localStorage.id === "master") {
+    if (
+      localStorage.id === "master" ||
+      localStorage.id === "masteryeni" ||
+      localStorage.id === "wonchul"
+    ) {
       this.localId = localStorage.id;
     }
     this.getListDatas();
     this.getOptionColors();
-    this.getFirstCategory(1);
+    this.getFirstCategory();
   },
   methods: {
     sumbitClick: function() {
@@ -945,8 +949,13 @@ export default {
           }
         })
         .then(response => {
-          console.log(response.data.product_detail);
+          console.log("here is res", response.data.product_detail);
           this.productDatas = response.data.product_detail;
+          this.getFirstCategory(response.data.product_detail.seller_key_id);
+          this.getSecondCategory(
+            response.data.product_detail.seller_key_id,
+            response.data.product_detail.first_category
+          );
         });
     }
   }
