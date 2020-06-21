@@ -163,7 +163,6 @@ class UserService:
 
             number_of_sellers = self.user_dao.get_number_of_sellers(db_connection)
 
-
             if filters:
                 if len(filters) > 1:
                     number_of_sellers = len(sellers)

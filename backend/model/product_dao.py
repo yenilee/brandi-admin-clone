@@ -509,19 +509,35 @@ class ProductDao:
         affected_row = cursor.execute(get_recent_product_id_sql, product_key_id)
         if affected_row == 0:
             return 0
-        return cursor.fetchone()[0]
+        return cursor.fetchall()[0]
 
-    def get_recent_product(self, product_key_id, seller_key_id, db_connection):
+    def get_sellers_product_key(self, seller_key_id, db_connection):
+        cursor = db_connection.cursor()
+        get_sellers_product_key = """
+        SELECT id
+        FROM product_keys
+        WHERE seller_key_id = %s
+        """
+        affected_row = cursor.execute(get_sellers_product_key, seller_key_id)
+        product_keys = cursor.fetchall()
+
+        if affected_row is 0 or 0 in product_keys:
+            return 0
+        else:
+            product_key_list = []
+
+            for item in product_keys:
+                    product_key_list.append(item[0])
+
+        return product_key_list
+
+    def get_recent_product(self, product_key_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
-
-        statement = ""
-
-        if seller_key_id is not None:
-            statement = " AND seller_keys.seller_key_id = %s "
 
         get_recent_product_sql = """
         SELECT
             products.id,
+            product_keys.seller_key_id,
             products.is_deleted,
             products.product_key_id,
             product_keys.product_number,
@@ -542,22 +558,18 @@ class ProductDao:
             DATE_FORMAT(product_keys.created_at, '%%Y-%%m-%%d %%H:%%i:%%s') as created_at,
             DATE_FORMAT(products.start_date, '%%Y-%%m-%%d %%H:%%i:%%s') as start_date,
             DATE_FORMAT(products.end_date, '%%Y-%%m-%%d %%H:%%i:%%s') as end_date,
-            first_categories.name as first_category,
-            second_categories.name as second_category
+            first_categories.id as first_category_id,
+            second_categories.id as second_category_id
         FROM products
         INNER JOIN product_keys ON product_keys.id = products.product_key_id
         INNER JOIN color_filters ON color_filters.id = products.color_filter_id
         INNER JOIN attributes_categories ON attributes_categories.id = products.attributes_categories_id
         INNER JOIN first_categories ON first_categories.id = attributes_categories.first_category_id
         INNER JOIN second_categories ON second_categories.id = attributes_categories.second_category_id
-        WHERE products.product_key_id = %s AND products.end_date = '2037-12-31 23:59:59'
-        """ + statement
-
-        if seller_key_id is not None:
-            affected_row = cursor.execute(get_recent_product_sql, (seller_key_id, product_key_id))
+        WHERE product_keys.id = %s AND products.end_date = '2037-12-31 23:59:59'
+        """
 
         affected_row = cursor.execute(get_recent_product_sql, product_key_id)
-
         if affected_row == 0:
             return 0
 
@@ -603,8 +615,10 @@ class ProductDao:
         INNER JOIN notices ON products.notices_id = notices.id
         WHERE products.id = %s
         """
-        cursor.execute(get_recent_options_sql, product_previous_id)
-        return cursor.fetchall()
+        affected_row = cursor.execute(get_recent_options_sql, product_previous_id)
+        if affected_row == 0:
+            return {'message': 'NOTICE ID DOES NOT EXIST'}
+        return cursor.fetchall()[0]
 
     def update_product_history(self, product_previous_id, db_connection):
         # 이전의 레코드의 유효종료일을 현재 시점으로 업데이트
@@ -686,7 +700,7 @@ class ProductDao:
             simple_description = %(simple_description)s,
             details = %(details)s,
             notices_id = %(notices_id)s,
-            editor = (SELECT user FROM seller_keys WHERE id = %(user)s),
+            editor = (SELECT user FROM seller_keys WHERE id = %(editor)s),
             maximum_quantity = %(maximum_quantity)s,
             minimum_quantity = %(minimum_quantity)s,
             discount_rate = %(discount_rate)s,

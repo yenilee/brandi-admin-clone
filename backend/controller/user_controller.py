@@ -77,6 +77,7 @@ def create_user_endpoints(app, user_service):
 
         """
         로그인 API [POST]
+        작성자: 이예은
 
         Args:
 
@@ -112,6 +113,7 @@ def create_user_endpoints(app, user_service):
 
         """
         셀러 계정 관리 리스트 API [GET]
+        작성자: 이예은
 
         Args:
 
@@ -409,7 +411,29 @@ def create_user_endpoints(app, user_service):
     @connection_error
     @authorize
     def update_seller_status():
+        """
+        셀러 상세 정보 (셀러권한) [PUT]
+        작성자 : 이예은
 
+        Args:
+            [Header]
+                Authorization : 로그인 토큰
+
+            [Body]
+                seller_key_id : 셀러 고유 ID
+                action_type   : 값
+
+
+        Returns:
+
+            Success             : {data : user_info}, code : 200
+
+            Key error           : {message : KEY_ERROR}, code : 400
+            Type error          : {message : TYPE_ERROR}, code : 400
+
+            unauthorized        : {message : UNAUTHORIZED}, code : 401
+            no selected sellers : {message : NO_SELLER_SELECTED}, code : 400
+        """
         db_connection = None
         try:
             db_connection = get_connection()
