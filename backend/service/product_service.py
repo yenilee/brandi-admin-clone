@@ -10,10 +10,6 @@ class ProductService:
 
     def get_sellers_for_master(self, auth, filters, db_connection):
         try:
-            # 권한 ID가 마스터가 아닐 경우 권한 없음 에러 메시지 표시
-            if auth is not AUTH['MASTER']:
-                return {'message': 'UNAUTHORIZED'}, 401
-
             # 셀러 권한 ID들의 한국 이름, 프로필 불러오기
             sellers_kor_names = self.product_dao.get_sellers_for_master(filters, db_connection)
             return sellers_kor_names
@@ -96,7 +92,7 @@ class ProductService:
                 {'id': category['second_category_id'],
                  'name': category['second_category_name']} for category in categories]
 
-            return {'second_categories':second_categories}, 200
+            return second_categories
 
         except KeyError as e:
             return {'message': 'KEY_ERROR' + str(e)}, 400
@@ -169,12 +165,18 @@ class ProductService:
 
     def get_product(self, product_key_id, seller_key_id, db_connection):
         try:
-            # 셀러가 가진 상품 key ID를 찾고, 선분 이력으로 가장 최근에 저장된 상품 ID를 가져옴
-            recent_product = self.product_dao.get_recent_product(product_key_id, seller_key_id, db_connection)
+            # 셀러로 로그인했을 경우 해당 유가 가진 상품 KEY ID를 가져오고, 만약 본인의 상품이 아닌 상품을 조회하려 할 경우 에러 표시
+            if seller_key_id is not None:
+                sellers_product_key = self.product_dao.get_sellers_product_key(seller_key_id, db_connection)
 
-            # 만약 리턴되는 ID가 없을 경우, DB에 없는 상품이므로 선택되지 않았다는 메시지를 보내줌
-            if recent_product is 0:
-                return {'message' : 'NO PRODUCT SELECTED'}, 400
+                # 셀러가 상품을 가지고 있지 않을 경우
+                if sellers_product_key is 0:
+                    return {'message' : 'SELLER HAS NO PRODUCT'}, 400
+
+                if product_key_id not in sellers_product_key:
+                    return {'message' : 'PRODUCT DOES NOT EXIST'}, 400
+
+            recent_product = self.product_dao.get_recent_product(product_key_id, db_connection)
 
             # DB에서 불러온 최근 상품의 id를 변수에 저장
             recent_product_id = recent_product['id']
@@ -185,6 +187,7 @@ class ProductService:
                 recent_product['manufacture'] = self.product_dao.get_recent_manufacture(recent_product_id, db_connection)
 
             tags = self.product_dao.get_tag(recent_product_id, db_connection)
+
             tag_list = []
 
             [tag_list.append(tag['name']) for tag in tags]
@@ -216,11 +219,11 @@ class ProductService:
 
             # 상세 상품 정보에 기입하지 않고 직접 등록할 경우 제조 관련 정보를 field(3개) insert
             # 추가 하기 전 동일한 정보가 있다면 id를 받아오고, 없을 경우 새롭게 추가한다
-            notices_id = self.product_dao.select_notices_id(product['notices'], db_connection)
+            notices_id = self.product_dao.select_notices_id(product['manufacture'], db_connection)
             product['notices_id'] = notices_id
 
             if notices_id is 0:
-                product['notices_id'] = self.product_dao.insert_manufacturer(product['notices'], db_connection)
+                product['notices_id'] = self.product_dao.insert_manufacturer(product['manufacture'], db_connection)
 
             # request로 받아온 상품 정보를 업데이트 한다
             self.product_dao.update_product(product, db_connection)
