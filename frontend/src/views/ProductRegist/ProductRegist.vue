@@ -174,7 +174,7 @@
                   <th>1차 카테고리</th>
                   <td>
                     <select
-                      v-model="productDatas.first_category"
+                      v-model="productDatas.first_category_id"
                       @change="getSecondCategory(productDatas.seller_key_id, productDatas.first_category_id)"
                     >
                       <option value="0">1차 카테고리를 선택해 주세요.</option>
@@ -189,7 +189,10 @@
                 <tr>
                   <th>2차 카테고리를 선택해 주세요.</th>
                   <td>
-                    <select @change="productDatas.second_category_id = $event.target.value">
+                    <select
+                      v-model="productDatas.second_category_id"
+                      @change="productDatas.second_category_id = $event.target.value"
+                    >
                       <option>2차 카테고리</option>
                       <option
                         :value="list.id"
@@ -295,9 +298,20 @@
               </th>
               <td class="onSaleBox">
                 <div style="width: 100%">
-                  <input @click="deleteColor()" type="radio" name="colorFilter" checked />
+                  <input
+                    @click="deleteColor()"
+                    type="radio"
+                    name="colorFilter"
+                    :checked="!productDatas.color_filter_id"
+                  />
                   <label @click="deleteColor()" for="unuse">사용안함</label>
-                  <input @click="getColors()" type="radio" class="colorFitler" name="colorFilter" />
+                  <input
+                    @click="getColors()"
+                    type="radio"
+                    class="colorFitler"
+                    name="colorFilter"
+                    :checked="productDatas.color_filter_id"
+                  />
                   <label @click="getColors()" for="using">사용</label>
                   <input
                     class="colorInput"
@@ -704,7 +718,6 @@ export default {
     }
     this.getListDatas();
     this.getOptionColors();
-    this.getFirstCategory();
   },
   methods: {
     sumbitClick: function() {
@@ -870,8 +883,8 @@ export default {
       this.productDatas.color_filter_id = 0;
       this.selectedColor = [];
     },
-    getColors: function() {
-      this.colorModal = 1;
+    getColors: function(modal, index) {
+      modal === 2 ? (this.colorModal = 0) : (this.colorModal = 1);
       axios
         .get(`${YE_URL}/product-color-filter`, {
           headers: {
@@ -880,6 +893,18 @@ export default {
         })
         .then(response => {
           this.colors = response.data.color_filters;
+          console.log(response.data.color_filters[index - 1].name);
+          index &&
+            this.selectedColor.push(
+              response.data.color_filters[index - 1].id,
+              response.data.color_filters[index - 1].image,
+              response.data.color_filters[index - 1].name
+            );
+          // this.selectedColor(
+          //   response.data.color_filters[index - 1].id,
+          //   response.data.color_filters[index - 1].image,
+          //   response.data.color_filters[index - 1].name
+          // );
         });
     },
 
@@ -904,7 +929,8 @@ export default {
           }
         )
         .then(response => {
-          this.secondCate = response.data.second_categories;
+          this.secondCate = response.data.second_category;
+          console.log("second", response.data.second_category);
         });
     },
 
@@ -949,13 +975,14 @@ export default {
           }
         })
         .then(response => {
-          console.log("here is res", response.data.product_detail);
           this.productDatas = response.data.product_detail;
           this.getFirstCategory(response.data.product_detail.seller_key_id);
           this.getSecondCategory(
             response.data.product_detail.seller_key_id,
-            response.data.product_detail.first_category
+            response.data.product_detail.first_category_id
           );
+          this.getColors(2, response.data.product_detail.color_filter_id);
+          this.makingOptionsData = response.data.product_detail.options;
         });
     }
   }
