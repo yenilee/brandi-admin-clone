@@ -558,8 +558,8 @@ class ProductDao:
             DATE_FORMAT(product_keys.created_at, '%%Y-%%m-%%d %%H:%%i:%%s') as created_at,
             DATE_FORMAT(products.start_date, '%%Y-%%m-%%d %%H:%%i:%%s') as start_date,
             DATE_FORMAT(products.end_date, '%%Y-%%m-%%d %%H:%%i:%%s') as end_date,
-            first_categories.id as first_category,
-            second_categories.id as second_category
+            first_categories.id as first_category_id,
+            second_categories.id as second_category_id
         FROM products
         INNER JOIN product_keys ON product_keys.id = products.product_key_id
         INNER JOIN color_filters ON color_filters.id = products.color_filter_id
@@ -615,8 +615,10 @@ class ProductDao:
         INNER JOIN notices ON products.notices_id = notices.id
         WHERE products.id = %s
         """
-        cursor.execute(get_recent_options_sql, product_previous_id)
-        return cursor.fetchall()
+        affected_row = cursor.execute(get_recent_options_sql, product_previous_id)
+        if affected_row == 0:
+            return {'message': 'NOTICE ID DOES NOT EXIST'}
+        return cursor.fetchall()[0]
 
     def update_product_history(self, product_previous_id, db_connection):
         # 이전의 레코드의 유효종료일을 현재 시점으로 업데이트
