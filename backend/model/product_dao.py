@@ -542,6 +542,7 @@ class ProductDao:
             products.product_key_id,
             product_keys.product_number,
             products.name,
+            products.color_filter_id,
             products.notices_id,
             products.is_onsale,
             products.is_displayed,
