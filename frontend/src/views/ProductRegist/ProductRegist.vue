@@ -86,8 +86,7 @@
           <template>
             <!-- 테이블 시작 영역 -->
             <!-- 셀러 상태 테이블 -->
-
-            <tr class="sellerSelect">
+            <tr class="sellerSelect" v-if="this.$route.params.id === 'productregist'">
               <th>
                 셀러 선택
                 <i class="xi-pen" />
@@ -237,7 +236,14 @@
                     </div>
                     <div class="inputBox">
                       <div class="inputTitle">제조일자:</div>
-                      <input v-model="productDatas.manufacture.manufacture_date" type="text" />
+                      <b-form-datepicker
+                        v-model="productDatas.manufacture.manufacture_date"
+                        class="dateInput"
+                        id="datepicker-placeholder"
+                        placeholder="클릭해주세요"
+                        local="kr"
+                        style="width:250px"
+                      ></b-form-datepicker>
                     </div>
                     <div class="inputBox">
                       <div class="inputTitle">원산지:</div>
@@ -624,10 +630,23 @@
     <!-- 등록 취소 버튼 -->
     <v-col class="text-center">
       <div class="my-2">
-        <v-btn class="enroll-button" @click="sumbitClick()">등록</v-btn>
+        <!-- <v-btn
+          v-bind:class="{  enrollButton : this.$route.params.id === 'productregist', cancleButton : this.$route.params.id != 'productregist'}"
+          @click="sumbitClick()"
+        >등록</v-btn>-->
+        <v-btn
+          v-if="this.$route.params.id === 'productregist'"
+          class="enrollButton"
+          @click="sumbitClick()"
+        >등록</v-btn>
+        <v-btn
+          v-if="this.$route.params.id != 'productregist'"
+          class="editButton"
+          @click="editClick()"
+        >수정</v-btn>
       </div>
       <div class="my-2">
-        <v-btn class="cancle-button" @click="cancelClick()">취소</v-btn>
+        <v-btn class="cancleButton" @click="cancelClick()">취소</v-btn>
       </div>
     </v-col>
   </div>
@@ -720,6 +739,56 @@ export default {
     this.getOptionColors();
   },
   methods: {
+    editClick: function() {
+      if (confirm("상품수정을 하시겠습니까?") === true) {
+        axios
+          .put(
+            `${YE_URL}/product/${this.$route.params.id}`,
+            {
+              seller_key_id: this.productDatas.seller_key_id,
+              is_onsale: this.productDatas.is_onsale,
+              is_displayed: this.productDatas.is_displayed,
+              first_category_id: Number(this.productDatas.first_category_id),
+              second_category_id: Number(this.productDatas.second_category_id),
+              is_detail_reference: this.productDatas.is_detail_reference,
+              manufacture: {
+                manufacturer: this.productDatas.manufacture.manufacturer,
+                manufacture_date: this.productDatas.manufacture
+                  .manufacture_date,
+                origin: this.productDatas.manufacture.origin
+              },
+              name: this.productDatas.name,
+              simple_description: this.productDatas.simple_description,
+              color_filter_id: this.productDatas.color_filter_id,
+              details: this.productDatas.details,
+              options: this.makingOptionsData,
+              wholesale_price: Number(this.productDatas.wholesale_price),
+              price: Number(this.productDatas.price),
+              discount_rate: Number(this.productDatas.discount_rate),
+              discount_start: "2020-06-17 00:00:00",
+              discount_end: "2020-06-20 23:59:59",
+              maximum_quantity: Number(this.productDatas.maximum_quantity),
+              minimum_quantity: Number(this.productDatas.minimum_quantity),
+              tags: this.productDatas.tags
+            },
+            {
+              headers: {
+                Authorization: localStorage.access_token
+              }
+            }
+          )
+          .then(response => {
+            if (response) {
+              alert("수정이 완료되었습니다.");
+              this.$router.push("/main/product/productlist");
+            }
+          })
+          .catch(error => {
+            console.log(error.response.data.message);
+            alert("필수사항을 올바르게 입력해 주세요.");
+          });
+      }
+    },
     sumbitClick: function() {
       if (confirm("상품등록을 하시겠습니까?") === true) {
         axios
@@ -893,7 +962,6 @@ export default {
         })
         .then(response => {
           this.colors = response.data.color_filters;
-          console.log(response.data.color_filters[index - 1].name);
           index &&
             this.selectedColor.push(
               response.data.color_filters[index - 1].id,
@@ -930,7 +998,6 @@ export default {
         )
         .then(response => {
           this.secondCate = response.data.second_category;
-          console.log("second", response.data.second_category);
         });
     },
 
@@ -983,7 +1050,20 @@ export default {
           );
           this.getColors(2, response.data.product_detail.color_filter_id);
           this.makingOptionsData = response.data.product_detail.options;
+          this.optionFilter(response.data.product_detail.options);
         });
+    },
+    optionFilter: function(options) {
+      options.map(option => {
+        if (!this.allOptions.color.includes(option.color)) {
+          this.allOptions.color.push(option.color);
+          this.invenColorsCount.push({});
+        }
+        if (!this.allOptions.size.includes(option.size)) {
+          this.allOptions.size.push(option.size);
+          this.invenSizesCount.push({});
+        }
+      });
     }
   }
 };
@@ -1307,7 +1387,7 @@ export default {
       font-size: 14px;
       font-weight: 400;
       cursor: pointer;
-      .enroll-button {
+      .enrollButton {
         color: #ffffff;
         width: 50px;
         height: 35px;
@@ -1315,7 +1395,14 @@ export default {
         border-top-left-radius: 4px;
         border-bottom-left-radius: 4px;
       }
-      .cancle-button {
+      .editButton {
+        color: #fff;
+        width: 50px;
+        height: 35px;
+        background-color: #5cb85c;
+        border-color: #4cae4c;
+      }
+      .cancleButton {
         color: #ffffff;
         width: 50px;
         height: 35px;
