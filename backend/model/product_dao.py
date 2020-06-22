@@ -18,6 +18,7 @@ class ProductDao:
         )
         """
         affected_row = cursor.execute(insert_product_key_sql, seller_key_id)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -31,6 +32,7 @@ class ProductDao:
          WHERE product_number = "default";
          """
         affected_row = cursor.execute(insert_product_number_sql)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -65,6 +67,7 @@ class ProductDao:
         AND origin = %(origin)s
         """
         affected_row = cursor.execute(select_notice_sql, product_manufacturer)
+
         if affected_row == 0:
             return 0
 
@@ -78,8 +81,8 @@ class ProductDao:
         FROM tags
         WHERE name = %s
         """
-
         affected_row = cursor.execute(find_tags_sql, tag_name)
+
         if affected_row == 0:
             return 0
 
@@ -92,7 +95,6 @@ class ProductDao:
         insert_tags_sql = """
         INSERT INTO tags(name) VALUES (%s)
         """
-
         affected_row = cursor.execute(insert_tags_sql, tag)
 
         if affected_row == -1:
@@ -617,8 +619,10 @@ class ProductDao:
         WHERE products.id = %s
         """
         affected_row = cursor.execute(get_recent_options_sql, product_previous_id)
+
         if affected_row == 0:
             return {'message': 'NOTICE ID DOES NOT EXIST'}
+
         return cursor.fetchall()[0]
 
     def update_product_history(self, product_previous_id, db_connection):
@@ -629,7 +633,10 @@ class ProductDao:
         SET end_date = now()
         WHERE id = %s;
         """
-        cursor.execute(update_product_end_date_sql, product_previous_id)
+        affected_row = cursor.execute(update_product_end_date_sql, product_previous_id)
+
+        if affected_row == -1:
+            raise Exception("CANNOT UPDATE DATA")
 
     def copy_previous_product(self, product_previous_id, db_connection):
         cursor = db_connection.cursor()
@@ -685,7 +692,6 @@ class ProductDao:
             raise Exception("CANNOT INSERT DATA")
 
         recent_product_id = cursor.lastrowid
-
         return recent_product_id
 
     def update_product(self, product, db_connection):
@@ -711,7 +717,10 @@ class ProductDao:
             discount_end = %(discount_end)s
         WHERE id = %(product_id)s
         """
-        cursor.execute(update_product_sql, product)
+        affected_row = cursor.execute(update_product_sql, product)
+
+        if affected_row == -1:
+            raise Exception("CANNOT UPDATE DATA")
 
     def get_product_history(self, product_key_id, db_connection):
         cursor = db_connection.cursor(pymysql.cursors.DictCursor)
@@ -727,6 +736,7 @@ class ProductDao:
         WHERE products.product_key_id = %s
         """
         affected_row = cursor.execute(get_product_history_sql, product_key_id)
+
         if affected_row == 0:
             return 0
 
