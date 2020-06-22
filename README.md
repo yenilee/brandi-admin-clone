@@ -6,6 +6,10 @@
 - 기간 : 2020.05.25 - 2020.06.18 (약 4주)
 - 개발 인원 : 프론트엔드 [one-iron](https://github.com/one-iron) 백엔드 [yeeunlee](https://github.com/yenilee), [sungjun-jin](https://github.com/sungjun-jin)
 
+### 데모영상
+[![Video Label](http://bitly.kr/zjeaTpbOjpt)](https://youtu.be/0bsh6q-kauU)
+
+
 ### 기술
 - Python, Flask
 - Flask CORS headers
