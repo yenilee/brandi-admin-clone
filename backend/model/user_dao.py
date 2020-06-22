@@ -15,6 +15,7 @@ class UserDao:
             )
         """
         affected_row = cursor.execute(seller_key_insert_sql, new_user)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -54,6 +55,7 @@ class UserDao:
                         """
 
         affected_row = cursor.execute(seller_insert_sql, new_user)
+        
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -244,6 +246,7 @@ class UserDao:
         WHERE seller_key_id = %(user)s AND end_date = '2037-12-31 23:59:59'
         """
         affected_row = cursor.execute(seller_register_sql, seller_infos)
+
         if affected_row == -1:
             raise Exception("CANNOT UPDATE DATA")
 
@@ -266,6 +269,7 @@ class UserDao:
         )
         """
         affected_row = cursor.execute(supervisor_register_sql, supervisor)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -286,6 +290,7 @@ class UserDao:
         )
         """
         affected_row = cursor.execute(supervisor_register_sql, buisness_hour)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -314,6 +319,7 @@ class UserDao:
         )
         """
         affected_row = cursor.execute(supervisor_register_sql, new_user)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -340,6 +346,7 @@ class UserDao:
         )
         """
         affected_row = cursor.execute(supervisor_register_sql, new_user)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -365,6 +372,7 @@ class UserDao:
         WHERE seller_id = %(previous_id)s
         """
         affected_row = cursor.execute(insert_first_supervisor_sql, user_id)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")
 
@@ -388,6 +396,7 @@ class UserDao:
         WHERE seller_id = %(previous_id)s
         """
         affected_row = cursor.execute(insert_first_buisness_hour_sql, user_id)
+
         if affected_row == -1:
             raise Exception("CANNOT INSERT DATA")  
 
@@ -399,7 +408,10 @@ class UserDao:
         SET end_date = now()
         WHERE id = %s;
         """
-        cursor.execute(insert_seller_infos_sql, previous_id)
+        affected_row = cursor.execute(insert_seller_infos_sql, previous_id)
+
+        if affected_row == -1:
+            raise Exception("CANNOT UPDATE DATA")
 
     def get_recent_seller_id(self, user, db_connection):
         # 가장 최근에 수정된 셀러 레코드의 id를 가져온다 
@@ -410,8 +422,10 @@ class UserDao:
         WHERE seller_key_id = %s AND end_date = '2037-12-31 23:59:59';
         """
         affected_row = cursor.execute(get_recent_seller_id_sql, user)
+
         if affected_row == 0:
             return 0
+
         return cursor.fetchone()[0]
 
     def get_seller_list(self, filters, db_connection):
@@ -482,6 +496,7 @@ class UserDao:
         WHERE action_type = %(action_type)s
         """
         affected_row = cursor.execute(change_status_sql, action_type_name)
+
         if affected_row == 0:
             return 0
 
@@ -557,6 +572,7 @@ class UserDao:
             WHERE id = %s;
         """
         sellers = cursor.execute(update_seller_all_sql, user)
+
         if sellers == 0:
             return 0
 
@@ -572,7 +588,10 @@ class UserDao:
         editor = seller_keys.user        
         WHERE sellers.id = %s        
         """
-        cursor.execute(update_status_sql, (editor, next_status_id, user))
+        affected_row = cursor.execute(update_status_sql, (editor, next_status_id, user))
+
+        if affected_row == -1:
+            raise Exception("CANNOT UPDATE DATA")
 
     def get_seller_action(self, db_connection):
         cursor = db_connection.cursor()
@@ -591,7 +610,10 @@ class UserDao:
         UPDATE sellers SET authority_id = %s
         WHERE id = %s
         """
-        cursor.execute(update_status_sql, (2, authority_user))
+        affected_row = cursor.execute(update_status_sql, (2, authority_user))
+
+        if affected_row == -1:
+            raise Exception("CANNOT UPDATE DATA")
 
     def soft_delete_seller(self, seller_key_id, db_connection):
         cursor = db_connection.cursor()
@@ -600,7 +622,10 @@ class UserDao:
         SET is_deleted = 1
         WHERE id = %s AND end_date = '2037-12-31 23:59:59';
         """
-        cursor.execute(soft_delete_seller_sql, seller_key_id)
+        affected_row = cursor.execute(soft_delete_seller_sql, seller_key_id)
+        
+        if affected_row == -1:
+            raise Exception("CANNOT UPDATE DATA")
 
     def get_number_of_sellers(self, db_connection):
 
